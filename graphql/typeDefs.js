@@ -12,13 +12,13 @@ module.exports = gql`
     id: ID!
     username: String!
     email: String!
-    name: String!
-    birthdate: String!
-    location: String!
-    coverPhoto: String!
-    profilePhoto: String!
-    age: Int!
-    karma: Int!
+    name: String
+    birthdate: String
+    location: String
+    coverPhoto: String
+    profilePhoto: String
+    age: Int
+    karma: Int
     createdAt: String!
   }
   # Subforums

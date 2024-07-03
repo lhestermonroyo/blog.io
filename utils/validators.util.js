@@ -34,7 +34,7 @@ module.exports.validateSignUpInput = (
   };
 };
 
-module.exports.validateProfileInput = (name, birthdate) => {
+module.exports.validateProfileInput = (name, birthdate, location) => {
   const errors = {};
 
   if (name.trim() === '') {
@@ -43,6 +43,10 @@ module.exports.validateProfileInput = (name, birthdate) => {
 
   if (birthdate.trim() === '') {
     errors.birthdate = 'Birthdate must not be empty.';
+  }
+
+  if (location.trim() === '') {
+    errors.location = 'Location must not be empty.';
   }
 
   return {

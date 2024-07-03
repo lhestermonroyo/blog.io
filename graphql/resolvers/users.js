@@ -7,7 +7,11 @@ const {
   validateLoginInput,
   validateProfileInput,
 } = require('../../utils/validators.util');
-const { generateToken, checkAuth } = require('../../utils/auth.util');
+const {
+  generateToken,
+  checkAuth,
+  checkEmail,
+} = require('../../utils/auth.util');
 
 module.exports = {
   Mutation: {
@@ -43,9 +47,10 @@ module.exports = {
           username,
           password: cryptedPassword,
           name: '',
-          karma: 0,
           birthdate: '',
+          location: '',
           age: 0,
+          karma: 0,
           createdAt: new Date().toISOString(),
         });
 
@@ -70,7 +75,13 @@ module.exports = {
           throw new UserInputError('Validation Error', { errors });
         }
 
-        const user = await User.findOne({ username });
+        let user;
+
+        if (checkEmail(username)) {
+          user = await User.findOne({ email: username });
+        } else {
+          user = await User.findOne({ username });
+        }
 
         if (!user) {
           errors.general = 'User not found.';
@@ -96,15 +107,21 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async updateProfile(_, { name, birthdate }, context) {
+    async updateProfile(_, { profileInput }, context) {
       try {
+        const { name, birthdate, location } = profileInput;
+
         const user = checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated.');
         }
 
-        const { valid, errors } = validateProfileInput(name, birthdate);
+        const { valid, errors } = validateProfileInput(
+          name,
+          birthdate,
+          location
+        );
 
         if (!valid) {
           throw new UserInputError('Validation Error', { errors });
@@ -115,6 +132,7 @@ module.exports = {
           {
             name,
             birthdate,
+            location,
           },
           { new: true }
         );

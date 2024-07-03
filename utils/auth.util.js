@@ -23,6 +23,11 @@ module.exports.checkAuth = context => {
   throw new Error('Authorization header must be provided');
 };
 
+module.exports.checkEmail = email => {
+  const re = /\S+@\S+\.\S+/;
+  return re.test(email);
+};
+
 module.exports.generateToken = user => {
   return jwt.sign(
     {

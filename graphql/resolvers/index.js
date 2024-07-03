@@ -10,10 +10,14 @@ module.exports = {
     voteCount: parent => parent.upvotes.length - parent.downvotes.length,
   },
   SubForum: {
-    subsCount: parent => parent.subscribers.length,
+    subsCount: parent => parent.subscribers.length || 0,
   },
   Profile: {
     age: parent => {
+      if (!parent.birthdate) {
+        return 0;
+      }
+
       const birthdate = new Date(parent.birthdate);
       const ageDiffMs = Date.now() - birthdate.getTime();
       const ageDate = new Date(ageDiffMs);
