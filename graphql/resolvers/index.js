@@ -6,11 +6,11 @@ const followResolver = require('./follows');
 
 module.exports = {
   Post: {
-    likeCount: parent => parent.likes.length,
-    commentCount: parent => parent.comments.length,
+    likeCount: (parent) => parent.likes.length,
+    commentCount: (parent) => parent.comments.length
   },
   Profile: {
-    age: parent => {
+    age: (parent) => {
       if (!parent.birthdate) {
         return 0;
       }
@@ -19,23 +19,23 @@ module.exports = {
       const ageDiffMs = Date.now() - birthdate.getTime();
       const ageDate = new Date(ageDiffMs);
       return Math.abs(ageDate.getUTCFullYear() - 1970);
-    },
+    }
   },
   Query: {
     ...userResolver.Query,
     ...postResolver.Query,
-    ...followResolver.Query,
+    ...followResolver.Query
   },
   Mutation: {
     ...userResolver.Mutation,
     ...postResolver.Mutation,
     ...likeResolver.Mutation,
     ...commentResolver.Mutation,
-    ...followResolver.Mutation,
+    ...followResolver.Mutation
   },
   Subscription: {
     ...postResolver.Subscription,
     ...commentResolver.Subscription,
-    ...likeResolver.Subscription,
-  },
+    ...likeResolver.Subscription
+  }
 };

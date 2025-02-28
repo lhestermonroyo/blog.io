@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import {
-  Avatar,
+  ActionIcon,
   Badge,
   Card,
   Grid,
@@ -11,9 +11,18 @@ import {
   Title,
   UnstyledButton
 } from '@mantine/core';
-import { IconClock, IconHeart, IconMessage } from '@tabler/icons-react';
+import {
+  IconClock,
+  IconHeart,
+  IconHeartFilled,
+  IconMessage,
+  IconMessageFilled
+} from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
+import { useRecoilValue } from 'recoil';
+
+import states from '../../../states';
 
 import ProfileBadge from '../../profile-badge';
 
@@ -84,6 +93,28 @@ const PostCard: FC<IPostCardProps> = ({ item }) => {
             </Grid.Col>
           )}
         </Grid>
+        <Group mt="lg" gap="lg">
+          <Group justify="center" align="center" gap={4}>
+            <ActionIcon variant="transparent">
+              {item.isLiked ? (
+                <IconHeartFilled size={24} />
+              ) : (
+                <IconHeart size={24} />
+              )}
+            </ActionIcon>
+            <Text c="dimmed">{item.likeCount}</Text>
+          </Group>
+          <Group justify="center" align="center" gap={4}>
+            <ActionIcon variant="transparent">
+              {item.isCommented ? (
+                <IconMessageFilled size={24} />
+              ) : (
+                <IconMessage size={24} />
+              )}
+            </ActionIcon>
+            <Text c="dimmed">{item.commentCount}</Text>
+          </Group>
+        </Group>
       </Card>
     </UnstyledButton>
   );

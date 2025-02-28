@@ -10,7 +10,7 @@ const ProtectedLayout: FC<ProtectedLayoutProps> = ({ children }) => {
   return (
     <Fragment>
       <Navbar />
-      <Container size="xl" pt="md" pb="lg">
+      <Container size="xl" py={80}>
         {children}
       </Container>
     </Fragment>

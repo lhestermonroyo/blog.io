@@ -1,6 +1,12 @@
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../firebase.config';
 
+const isBase64 = (str: string) => {
+  const base64Regex =
+    /^(data:image\/(png|jpeg|jpg|gif|webp);base64,)[A-Za-z0-9+/=]+$/;
+  return base64Regex.test(str);
+};
+
 const uploadBlogFiles = async (uploadArr: any[]) => {
   try {
     const uploadRequests = uploadArr.map(async (upload: any) => {
@@ -21,4 +27,4 @@ const uploadBlogFiles = async (uploadArr: any[]) => {
   }
 };
 
-export { uploadBlogFiles };
+export { uploadBlogFiles, isBase64 };

@@ -70,6 +70,58 @@ export const CREATE_POST = gql`
   }
 `;
 
+export const UPDATE_POST = gql`
+  mutation UpdatePost($postId: ID!, $postInput: PostInput) {
+    updatePost(postId: $postId, postInput: $postInput) {
+      id
+      title
+      content
+      tags
+      creator {
+        id
+        email
+        firstName
+        lastName
+        profilePhoto
+      }
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          profilePhoto
+        }
+        createdAt
+      }
+      likes {
+        id
+        liker {
+          id
+          email
+          firstName
+          lastName
+          profilePhoto
+        }
+        createdAt
+      }
+      commentCount
+      likeCount
+      createdAt
+    }
+  }
+`;
+
+export const DELETE_POST = gql`
+  mutation DeletePost($postId: ID!) {
+    deletePost(postId: $postId) {
+      success
+    }
+  }
+`;
+
 export const LIKE_POST = gql`
   mutation LikePost($postId: ID!) {
     likePost(postId: $postId) {

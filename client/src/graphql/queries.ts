@@ -33,6 +33,10 @@ export const GET_POSTS = gql`
         lastName
         profilePhoto
       }
+      likeCount
+      commentCount
+      isLiked
+      isCommented
       createdAt
     }
   }

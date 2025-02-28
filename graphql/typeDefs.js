@@ -38,6 +38,10 @@ module.exports = gql`
     content: String!
     creator: ProfileBadge!
     tags: [String]!
+    likeCount: Int!
+    commentCount: Int!
+    isLiked: Boolean!
+    isCommented: Boolean!
     createdAt: String!
   }
 
@@ -126,7 +130,7 @@ module.exports = gql`
     # Posts
     createPost(postInput: PostInput): Post!
     updatePost(postId: ID!, postInput: PostInput): Post!
-    deletePost(postId: ID!): String!
+    deletePost(postId: ID!): Status!
     # Comments
     createComment(postId: ID!, body: String!): Post!
     updateComment(postId: ID!, commentId: ID!, body: String!): Post!

@@ -30,6 +30,8 @@ const Feed = () => {
       const key = Object.keys(data)[0];
       const posts = data[key];
 
+      console.log('Posts:', posts);
+
       setPost((prev: any) => ({
         ...prev,
         posts

@@ -8,6 +8,7 @@ import {
   Button,
   Code,
   Divider,
+  Grid,
   Group,
   Image,
   List,
@@ -35,6 +36,7 @@ import { GET_POST_BY_ID } from '../../graphql/queries';
 import {
   CREATE_COMMENT,
   DELETE_COMMENT,
+  DELETE_POST,
   LIKE_POST,
   UPDATE_COMMENT
 } from '../../graphql/mutations';
@@ -45,6 +47,8 @@ import LoadingPost from '../../components/post-details/loading-post';
 import ProfileBadge from '../../components/profile-badge';
 import PostReaction from '../../components/post-details/post-reaction';
 import CommentCard from '../../components/post-details/comment-card';
+import { modals } from '@mantine/modals';
+import AuthorCard from '../../components/post-details/author-card';
 
 const PostDetails = () => {
   const [postDetails, setPostDetails] = useState<any>(null);
@@ -73,6 +77,7 @@ const PostDetails = () => {
       postId: params.id
     }
   });
+  const [deletePost] = useMutation(DELETE_POST);
   const [likePost] = useMutation(LIKE_POST);
   const [createComment] = useMutation(CREATE_COMMENT);
   const [updateComment] = useMutation(UPDATE_COMMENT);
@@ -93,6 +98,36 @@ const PostDetails = () => {
       navigate('/');
     }
   }, [error]);
+
+  const handleDeletePost = async () => {
+    try {
+      const response = await deletePost({
+        variables: {
+          postId: params.id
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
+
+      if (data.success) {
+        notifications.show({
+          title: 'Post Deleted',
+          message: 'Your post has been deleted successfully.',
+          color: 'teal',
+          position: 'top-center'
+        });
+        modals.close('delete-post');
+        navigate('/');
+      }
+    } catch (error) {
+      notifications.show({
+        title: 'Deleting Post failed',
+        message: 'An error occurred. Please try again.',
+        color: 'red',
+        position: 'top-center'
+      });
+    }
+  };
 
   const handleLike = async () => {
     try {
@@ -177,6 +212,21 @@ const PostDetails = () => {
     const key = Object.keys(response.data)[0];
     return response.data[key];
   };
+
+  const showDeleteModal = () =>
+    modals.openConfirmModal({
+      id: 'delete-post',
+      withCloseButton: false,
+      title: 'Delete Post',
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this post? This action cannot be
+          undone.
+        </Text>
+      ),
+      labels: { confirm: 'Confirm', cancel: 'Cancel' },
+      onConfirm: () => handleDeletePost()
+    });
 
   const isOwnPost = useMemo(() => {
     return postDetails?.creator.email === auth?.profile.email;
@@ -395,49 +445,68 @@ const PostDetails = () => {
 
   return (
     <ProtectedLayout>
-      <Stack gap="lg">
-        <Group justify="space-between" align="center">
-          <Button leftSection={<IconArrowLeft />} onClick={() => navigate('/')}>
-            Back
-          </Button>
+      <Grid>
+        <Grid.Col span={8}>
+          <Stack gap="lg">
+            <Group justify="space-between" align="center">
+              <Button
+                leftSection={<IconArrowLeft />}
+                onClick={() => navigate('/')}
+              >
+                Back
+              </Button>
 
-          {isOwnPost && (
-            <Menu
-              width={120}
-              position="bottom-end"
-              transitionProps={{ transition: 'pop-top-right' }}
-              withinPortal
-            >
-              <Menu.Target>
-                <ActionIcon variant="transparent" color="dimmed">
-                  <IconDotsVertical />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item leftSection={<IconEdit size={16} stroke={1.5} />}>
-                  Edit
-                </Menu.Item>
-                <Menu.Divider />
-
-                <Menu.Item
-                  leftSection={
-                    <IconTrash
-                      size={16}
-                      color={theme.colors.red[6]}
-                      stroke={1.5}
-                    />
-                  }
+              {isOwnPost && (
+                <Menu
+                  width={120}
+                  position="bottom-end"
+                  transitionProps={{ transition: 'pop-top-right' }}
+                  withinPortal
                 >
-                  Delete
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          )}
-        </Group>
-        <LoadingPost loading={loading}>
-          {postDetails && renderPost(postDetails)}
-        </LoadingPost>
-      </Stack>
+                  <Menu.Target>
+                    <ActionIcon variant="transparent" color="dimmed">
+                      <IconDotsVertical />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      leftSection={<IconEdit size={16} stroke={1.5} />}
+                      onClick={() => navigate(`/edit-post/${params.id}`)}
+                    >
+                      Edit
+                    </Menu.Item>
+                    <Menu.Divider />
+
+                    <Menu.Item
+                      leftSection={
+                        <IconTrash
+                          size={16}
+                          color={theme.colors.red[6]}
+                          stroke={1.5}
+                        />
+                      }
+                      onClick={showDeleteModal}
+                    >
+                      Delete
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
+            </Group>
+            <LoadingPost loading={loading}>
+              {postDetails && renderPost(postDetails)}
+            </LoadingPost>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={4}>
+          {/* Sticky column */}
+          {/* Author's Profile Card */}
+          {/* Read Next Card */}
+          <Stack gap="lg">
+            <AuthorCard />
+          </Stack>
+        </Grid.Col>
+      </Grid>
     </ProtectedLayout>
   );
 };
