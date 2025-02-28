@@ -1,14 +1,13 @@
 import { atom } from 'recoil';
 
-const initialState = {
-  isAuthenticated: false,
-  user: null,
-  token: null,
+const initialState: any = {
+  isAuth: false,
+  profile: null
 };
 
-const AUTH_STATE = atom({
+export const AUTH_STATE = atom({
   key: 'AUTH_STATE',
-  default: initialState,
+  default: initialState
 });
 
 export default AUTH_STATE;

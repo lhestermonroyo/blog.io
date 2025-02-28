@@ -2,39 +2,32 @@ const { model, Schema } = require('mongoose');
 
 const postSchema = new Schema({
   title: String,
-  body: String,
-  files: [String],
+  content: String,
+  tags: [String],
   creator: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  subForum: {
-    type: Schema.Types.ObjectId,
-    ref: 'SubForum',
+    ref: 'User'
   },
   comments: [
     {
       body: String,
-      creator: {
+      commentor: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'User'
       },
-      createdAt: String,
-    },
+      createdAt: String
+    }
   ],
-  upvotes: [
+  likes: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    },
+      liker: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      createdAt: String
+    }
   ],
-  downvotes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    },
-  ],
-  createdAt: String,
+  createdAt: String
 });
 
 module.exports = model('Post', postSchema);

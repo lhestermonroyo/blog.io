@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "server": "nodemon index.js",
-    "dev": "concurrently \"npm run server\" \"cd client && sudo npx expo start\""
+    "dev": "concurrently \"npm run server\" \"cd client && npm run dev\""
   },
   "author": "",
   "license": "ISC",
@@ -16,8 +16,11 @@
     "@graphql-tools/schema": "^10.0.3",
     "apollo-server": "^3.13.0",
     "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
     "concurrently": "^8.2.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.19.2",
     "graphql": "^16.8.1",
     "graphql-subscriptions": "^2.0.0",

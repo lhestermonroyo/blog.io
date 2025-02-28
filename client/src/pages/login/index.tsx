@@ -1,159 +1,120 @@
-import React, { FC, Fragment, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { useState } from 'react';
 import {
-  Box,
-  Heading,
-  VStack,
-  Text,
-  FormControl,
-  Input,
+  Anchor,
   Button,
-  IconButton,
-  Toast,
-  Center,
-} from 'native-base';
-import { useMutation } from '@apollo/client';
+  Group,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title
+} from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useForm } from '@mantine/form';
+import { useNavigate } from 'react-router';
 import { useSetRecoilState } from 'recoil';
 
 import states from '../../states';
-import { saveItem } from '../../utils/SecureStore.util';
-import { LOGIN } from '../../mutations/user';
+import { useMutation } from '@apollo/client';
+import { LOGIN } from '../../graphql/mutations';
 
-import AuthLayout from '../../layout/auth-layout';
+import AuthLayout from '../../layouts/auth';
 
-const Login: FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [values, setValues] = useState({
-    username: '',
-    password: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
+const Login = () => {
+  const [submitting, setSubmitting] = useState(false);
 
   const setAuth = useSetRecoilState(states.auth);
 
-  const navigation = useNavigation<any>();
+  const form = useForm({
+    initialValues: {
+      email: '',
+      password: ''
+    },
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      password: (value) => (value.length < 6 ? 'Password is too short' : null)
+    },
+    validateInputOnBlur: true
+  });
 
-  const [Login] = useMutation(LOGIN);
+  const [login] = useMutation(LOGIN);
 
-  const handleSubmit = async () => {
-    if (!values.username || !values.password) {
-      return;
-    }
+  const navigate = useNavigate();
 
+  const handleSubmit = async (values: typeof form.values) => {
     try {
-      setLoading(true);
+      setSubmitting(true);
 
-      const data = await Login({
+      const response = await login({
         variables: {
-          username: values.username,
-          password: values.password,
-        },
+          email: values.email,
+          password: values.password
+        }
       });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
 
       if (data) {
-        const token = data?.data?.login?.token;
+        setAuth((prev: any) => ({
+          ...prev,
+          isAuth: true
+        }));
 
-        if (token) {
-          await saveItem('token', token);
-          setAuth(prev => ({
-            ...prev,
-            isAuthenticated: true,
-          }));
-        }
+        navigate('/');
       }
     } catch (error) {
-      Toast.show({
-        placement: 'top',
-        backgroundColor: 'red.500',
-        description: 'Username or password is incorrect. Please try again.',
+      console.error('error', error);
+      notifications.show({
+        title: 'Login failed',
+        message: 'Invalid email or password. Please try again.',
+        color: 'red',
+        position: 'top-center'
       });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
     <AuthLayout>
-      <Fragment>
-        <VStack space={6}>
-          <Box>
-            <Heading size="2xl">Welcome</Heading>
-            <Text fontSize="lg" color="gray.500">
-              Sign in to continue.
-            </Text>
-          </Box>
-          <FormControl>
-            <VStack space={4}>
-              <VStack>
-                <FormControl.Label>Username</FormControl.Label>
-                <Input
-                  padding={4}
-                  size="lg"
-                  type="text"
-                  placeholder="Enter your username"
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  value={values.username}
-                  onChangeText={text =>
-                    setValues({ ...values, username: text })
-                  }
-                />
-              </VStack>
-              <VStack>
-                <FormControl.Label>Password</FormControl.Label>
-                <Input
-                  padding={4}
-                  size="lg"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  value={values.password}
-                  onChangeText={text =>
-                    setValues({ ...values, password: text })
-                  }
-                  rightElement={
-                    <IconButton
-                      size="lg"
-                      variant="link"
-                      icon={
-                        <Ionicons
-                          name={
-                            showPassword ? 'eye-off-outline' : 'eye-outline'
-                          }
-                          size={20}
-                        />
-                      }
-                      onPress={() => setShowPassword(!showPassword)}
-                    />
-                  }
-                />
-              </VStack>
-              <Button
-                size="lg"
-                isLoading={loading}
-                isLoadingText="Logging in..."
-                onPress={handleSubmit}
-              >
-                Login
-              </Button>
-              <VStack space={2} marginTop={8}>
-                <Text textAlign="center" fontSize="sm" color="gray.500">
-                  Don't have an account?
-                </Text>
-                <Center>
-                  <Button
-                    size="lg"
-                    variant="link"
-                    onPress={() => navigation.navigate('Sign Up')}
-                  >
-                    Create your Account
-                  </Button>
-                </Center>
-              </VStack>
-            </VStack>
-          </FormControl>
-        </VStack>
-      </Fragment>
+      <Title order={1}>Hello there!</Title>
+      <Text c="dimmed" mb="xl">
+        Login and continue sharing your ideas to the world
+      </Text>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack>
+          <TextInput
+            label="Email"
+            placeholder="Enter your email"
+            key={form.key('email')}
+            {...form.getInputProps('email')}
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Enter your password"
+            key={form.key('password')}
+            {...form.getInputProps('password')}
+          />
+        </Stack>
+        <Group justify="space-between" mt="xl">
+          <Text size="sm">
+            Don't have an account yet?{' '}
+            <Anchor
+              component="button"
+              type="button"
+              variant="light"
+              size="sm"
+              onClick={() => navigate('/sign-up')}
+            >
+              Sign Up
+            </Anchor>
+          </Text>
+
+          <Button type="submit" loading={submitting}>
+            Login
+          </Button>
+        </Group>
+      </form>
     </AuthLayout>
   );
 };

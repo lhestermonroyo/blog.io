@@ -6,21 +6,24 @@ const {
   validateSignUpInput,
   validateLoginInput,
   validateProfileInput,
+  validateProfilePhotoInput,
 } = require('../../utils/validators.util');
 const {
-  generateToken,
   checkAuth,
-  checkEmail,
+  genAndStoreToken,
+  clearToken,
 } = require('../../utils/auth.util');
 
 module.exports = {
   Mutation: {
-    async signUp(_, { signUpInput }) {
+    async signUp(_, { signUpInput }, ctx) {
       try {
-        const { username, email, password, confirmPassword } = signUpInput;
+        const { firstName, lastName, email, password, confirmPassword } =
+          signUpInput;
 
         const { valid, errors } = validateSignUpInput(
-          username,
+          firstName,
+          lastName,
           email,
           password,
           confirmPassword
@@ -30,12 +33,12 @@ module.exports = {
           throw new UserInputError('Validation Error', { errors });
         }
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
 
         if (user) {
-          throw new UserInputError('Username is already taken.', {
+          throw new UserInputError('Email is already taken.', {
             errors: {
-              username: 'Username is already taken.',
+              email: 'Email is already taken.',
             },
           });
         }
@@ -43,45 +46,38 @@ module.exports = {
         const cryptedPassword = await bcrypt.hash(password, 12);
 
         const newUser = new User({
+          firstName,
+          lastName,
           email,
-          username,
           password: cryptedPassword,
-          name: '',
           birthdate: '',
           location: '',
           age: 0,
-          karma: 0,
+          pronouns: '',
+          bio: '',
           createdAt: new Date().toISOString(),
         });
 
         const response = await newUser.save();
-        const token = generateToken(response);
+        await genAndStoreToken(response, ctx);
 
         return {
           id: response._id,
           email: response._doc.email,
-          username: response._doc.username,
-          token,
         };
       } catch (error) {
         throw new Error(error);
       }
     },
-    async login(_, { username, password }) {
+    async login(_, { email, password }, ctx) {
       try {
-        const { valid, errors } = validateLoginInput(username, password);
+        const { valid, errors } = validateLoginInput(email, password);
 
         if (!valid) {
           throw new UserInputError('Validation Error', { errors });
         }
 
-        let user;
-
-        if (checkEmail(username)) {
-          user = await User.findOne({ email: username });
-        } else {
-          user = await User.findOne({ username });
-        }
+        const user = await User.findOne({ email });
 
         if (!user) {
           errors.general = 'User not found.';
@@ -95,30 +91,41 @@ module.exports = {
           throw new UserInputError('Wrong credentials.', { errors });
         }
 
-        const token = generateToken(user);
+        await genAndStoreToken(user, ctx);
 
         return {
           id: user._id,
           email: user._doc.email,
-          username: user._doc.username,
-          token,
         };
       } catch (error) {
         throw new Error(error);
       }
     },
-    async updateProfile(_, { profileInput }, context) {
+    async logout(_, __, ctx) {
       try {
-        const { name, birthdate, location } = profileInput;
+        await clearToken(ctx);
 
-        const user = checkAuth(context);
+        return {
+          success: true,
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async updateProfile(_, { profileInput }, ctx) {
+      try {
+        const user = checkAuth(ctx);
 
         if (!user) {
           throw new Error('User not authenticated.');
         }
 
+        const { firstName, lastName, birthdate, location, pronouns, bio } =
+          profileInput;
+
         const { valid, errors } = validateProfileInput(
-          name,
+          firstName,
+          lastName,
           birthdate,
           location
         );
@@ -130,9 +137,58 @@ module.exports = {
         const response = await User.findByIdAndUpdate(
           user.id,
           {
-            name,
+            firstName,
+            lastName,
             birthdate,
             location,
+            pronouns,
+            bio,
+          },
+          { new: true }
+        );
+        await response.save();
+
+        return {
+          id: response._id,
+          ...response._doc,
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async updateProfilePhoto(_, { profilePhotoInput }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated.');
+        }
+
+        const { photoType, photoUri } = profilePhotoInput;
+
+        const { valid, errors } = validateProfilePhotoInput(
+          photoType,
+          photoUri
+        );
+
+        if (!valid) {
+          throw new UserInputError('Validation Error', { errors });
+        }
+
+        let key;
+
+        if (photoType === 'COVER') {
+          key = 'coverPhoto';
+        } else {
+          key = 'profilePhoto';
+        }
+
+        const response = await User.findByIdAndUpdate(
+          user.id,
+          {
+            $set: {
+              [key]: photoUri,
+            },
           },
           { new: true }
         );
@@ -148,11 +204,13 @@ module.exports = {
     },
   },
   Query: {
-    async getOwnProfile(_, __, context) {
+    async getProfile(_, __, ctx) {
       try {
-        const user = checkAuth(context);
+        const user = checkAuth(ctx);
 
-        const response = await User.findById(user.id);
+        const response = await User.findOne({
+          email: user.email,
+        });
 
         if (!response) {
           throw new Error('User not found.');
@@ -166,7 +224,7 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getProfile(_, { username }, context) {
+    async getProfileByEmail(_, { email }, context) {
       try {
         const user = checkAuth(context);
 
@@ -174,7 +232,7 @@ module.exports = {
           throw new Error('User not authenticated.');
         }
 
-        const response = await User.findOne({ username });
+        const response = await User.findOne({ email });
 
         if (!response) {
           throw new Error('User not found.');

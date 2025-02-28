@@ -1,119 +1,145 @@
 const { gql } = require('graphql-tag');
 
 module.exports = gql`
+  enum PhotoType {
+    COVER
+    PROFILE
+  }
   # Users
-  type User {
+  type Session {
     id: ID!
-    token: String!
-    username: String!
     email: String!
   }
   type Profile {
     id: ID!
-    username: String!
     email: String!
-    name: String
+    firstName: String!
+    lastName: String!
     birthdate: String
     location: String
+    pronouns: String
+    bio: String
     coverPhoto: String
     profilePhoto: String
     age: Int
-    karma: Int
     createdAt: String!
   }
-  # Subforums
-  type SubForum {
+  type ProfileBadge {
     id: ID!
-    name: String!
-    description: String!
-    coverPhoto: String!
-    profilePhoto: String!
-    creator: Profile!
-    subscribers: [Profile]
-    subsCount: Int!
-    createdAt: String!
+    email: String!
+    firstName: String!
+    lastName: String!
+    profilePhoto: String
   }
   # Posts
+  type Posts {
+    id: ID!
+    title: String!
+    content: String!
+    creator: ProfileBadge!
+    tags: [String]!
+    createdAt: String!
+  }
+
   type Post {
     id: ID!
     title: String!
-    body: String!
-    files: [String]
+    content: String!
+    tags: [String]!
     creator: Profile!
-    subForum: SubForum!
-    comments: [Comment]
-    upvotes: [String]
-    downvotes: [String]
+    comments: [Comment]!
+    likes: [Like]!
     commentCount: Int!
-    voteCount: Int!
+    likeCount: Int!
     createdAt: String!
   }
   type Comment {
     id: ID!
     body: String!
-    creator: Profile!
-    upvotes: [String]
-    downvotes: [String]
-    voteCount: Int!
+    commentor: ProfileBadge!
+    isEdited: Boolean
     createdAt: String!
   }
+  type Like {
+    id: ID!
+    liker: ProfileBadge!
+    createdAt: String!
+  }
+  type Follow {
+    id: ID!
+    follower: ProfileBadge!
+    following: ProfileBadge!
+  }
+  type Status {
+    success: Boolean!
+  }
+
   # Inputs
   input SignUpInput {
-    username: String!
+    firstName: String!
+    lastName: String!
     email: String!
     password: String!
     confirmPassword: String!
   }
   input ProfileInput {
-    name: String
-    birthdate: String
-    location: String
-    coverPhoto: String
-    profilePhoto: String
-  }
-  input SubForumInput {
-    name: String!
-    description: String!
+    firstName: String!
+    lastName: String!
+    birthdate: String!
     location: String!
-    coverPhoto: String!
-    profilePhoto: String!
+    pronouns: String
+    bio: String
+  }
+  input ProfilePhotoInput {
+    type: PhotoType!
+    photoUri: String!
   }
   input PostInput {
-    subForum: ID!
     title: String!
-    body: String!
-    files: [String]
+    content: String!
+    tags: [String]!
+  }
+  input FollowInput {
+    following: String!
   }
 
   type Query {
-    getOwnProfile: Profile!
-    getProfile(username: String!): Profile!
-    getSubForums: [SubForum]!
-    getSubForum(id: ID!): SubForum!
-    getJoinedSubForums: [SubForum]!
-    getPosts: [Post]!
-    getPost(id: ID!): Post!
+    # Users
+    getProfile: Profile!
+    getProfileByEmail(email: String!): Profile!
+    # Posts
+    getPosts: [Posts]!
+    getPostsByCreator(creator: ID!): [Posts]!
+    getPostById(postId: ID!): Post!
+    # Follows
+    getFollowers: [Follow]!
+    getFollowing: [Follow]!
   }
 
   type Mutation {
-    signUp(signUpInput: SignUpInput): User!
-    login(username: String!, password: String!): User!
+    # Users
+    signUp(signUpInput: SignUpInput): Session!
+    login(email: String!, password: String!): Session!
+    logout: Status!
     updateProfile(profileInput: ProfileInput): Profile!
-    createSubForum(subForumInput: SubForumInput): SubForum!
-    editSubForum(subForumId: ID!, subForumInput: SubForumInput): SubForum!
-    deleteSubForum(subForumId: ID!): String!
-    joinSubForum(subForumId: ID!): SubForum!
-    leaveSubForum(subForumId: ID!): SubForum!
+    updateProfilePhoto(profilePhotoInput: ProfilePhotoInput): Profile!
+    # Posts
     createPost(postInput: PostInput): Post!
+    updatePost(postId: ID!, postInput: PostInput): Post!
+    deletePost(postId: ID!): String!
+    # Comments
     createComment(postId: ID!, body: String!): Post!
+    updateComment(postId: ID!, commentId: ID!, body: String!): Post!
     deleteComment(postId: ID!, commentId: ID!): Post!
-    upVotePost(postId: ID!): Post!
-    downVotePost(postId: ID!): Post!
-    upVoteComment(postId: ID!, commentId: ID!): Post!
-    downVoteComment(postId: ID!, commentId: ID!): Post!
+    # Likes
+    likePost(postId: ID!): Post!
+    # Follows
+    followUser(followInput: FollowInput): Follow!
   }
 
   type Subscription {
     onNewPost: Post!
+    onNewComment: Post!
+    onLikePost: Post!
   }
 `;

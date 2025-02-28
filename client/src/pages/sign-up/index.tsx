@@ -1,218 +1,159 @@
-import React, { FC, Fragment, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { FC, useState } from 'react';
 import {
-  Box,
-  Heading,
-  VStack,
-  Text,
-  FormControl,
-  Input,
+  Anchor,
   Button,
-  IconButton,
-  WarningOutlineIcon,
-  Toast,
-  Center,
-} from 'native-base';
+  Group,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title
+} from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useForm } from '@mantine/form';
+import { useNavigate } from 'react-router';
 import { useMutation } from '@apollo/client';
 import { useSetRecoilState } from 'recoil';
 
-import { saveItem } from '../../utils/SecureStore.util';
-import { SIGN_UP } from '../../mutations/user';
 import states from '../../states';
+import { SIGN_UP } from '../../graphql/mutations';
 
-import AuthLayout from '../../layout/auth-layout';
+import AuthLayout from '../../layouts/auth';
 
 const SignUp: FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [values, setValues] = useState({
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const navigation = useNavigation<any>();
+  const [submitting, setSubmitting] = useState(false);
 
   const setAuth = useSetRecoilState(states.auth);
 
-  const [SignUp] = useMutation(SIGN_UP);
+  const form = useForm({
+    initialValues: {
+      email: '',
+      firstName: '',
+      lastName: '',
+      password: '',
+      confirmPassword: ''
+    },
+    validate: {
+      firstName: (value) =>
+        value.length < 2 ? 'Firstname must have at least 2 letters' : null,
+      lastName: (value) =>
+        value.length < 2 ? 'Lastname must have at least 2 letters' : null,
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      password: (value) => (value.length < 6 ? 'Password is too short' : null),
+      confirmPassword: (value, values) =>
+        value !== values.password ? 'Passwords do not match' : null
+    },
+    mode: 'uncontrolled',
+    validateInputOnBlur: true
+  });
 
-  const handleSubmit = async () => {
-    if (Object.values(values).some(value => !value)) {
-      return;
-    }
+  const [signUp] = useMutation(SIGN_UP);
 
+  const navigate = useNavigate();
+
+  const handleSubmit = async (values: typeof form.values) => {
     try {
-      setLoading(true);
+      setSubmitting(true);
 
-      const data = await SignUp({
+      const response = await signUp({
         variables: {
           signUpInput: {
             email: values.email,
-            username: values.username,
+            firstName: values.firstName,
+            lastName: values.lastName,
             password: values.password,
-            confirmPassword: values.confirmPassword,
-          },
-        },
+            confirmPassword: values.confirmPassword
+          }
+        }
       });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
 
       if (data) {
-        const token = data?.data?.signUp?.token;
+        setAuth((prev: any) => ({
+          ...prev,
+          isAuth: true
+        }));
 
-        if (token) {
-          await saveItem('token', token);
-          setAuth(prev => ({
-            ...prev,
-            isAuthenticated: true,
-          }));
-        }
+        navigate('/');
       }
     } catch (error) {
-      Toast.show({
-        placement: 'top',
-        backgroundColor: 'red.500',
-        description:
-          error.message ||
-          'An error occured while creating your account. Please try again.',
+      console.error('error', error);
+      notifications.show({
+        title: 'Sign Up failed',
+        message: 'An error occurred. Please try again.',
+        color: 'red',
+        position: 'top-center'
       });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
     <AuthLayout>
-      <Fragment>
-        <VStack space={6}>
-          <Box>
-            <Heading size="2xl">Create your Account</Heading>
-            <Text fontSize="lg" color="gray.500">
-              Setup your account in few seconds.
-            </Text>
-          </Box>
-          <FormControl>
-            <VStack space={4}>
-              <VStack>
-                <FormControl.Label>Username</FormControl.Label>
-                <Input
-                  padding={4}
-                  size="lg"
-                  placeholder="Enter your username"
-                  autoCapitalize="none"
-                  value={values.username}
-                  onChangeText={text =>
-                    setValues({ ...values, username: text })
-                  }
-                />
-              </VStack>
-              <VStack>
-                <FormControl.Label>Email</FormControl.Label>
-                <Input
-                  padding={4}
-                  size="lg"
-                  placeholder="Enter your email"
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  value={values.email}
-                  onChangeText={text => setValues({ ...values, email: text })}
-                />
-              </VStack>
-              <VStack>
-                <FormControl.Label>Password</FormControl.Label>
-                <Input
-                  padding={4}
-                  size="lg"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  value={values.password}
-                  onChangeText={text =>
-                    setValues({ ...values, password: text })
-                  }
-                  rightElement={
-                    <IconButton
-                      size="lg"
-                      variant="link"
-                      icon={
-                        <Ionicons
-                          name={
-                            showPassword ? 'eye-off-outline' : 'eye-outline'
-                          }
-                          size={18}
-                        />
-                      }
-                      onPress={() => setShowPassword(!showPassword)}
-                    />
-                  }
-                />
-              </VStack>
-              <VStack>
-                <FormControl.Label>Confirm Password</FormControl.Label>
-                <Input
-                  padding={4}
-                  size="lg"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter confirm password"
-                  value={values.confirmPassword}
-                  onChangeText={text =>
-                    setValues({ ...values, confirmPassword: text })
-                  }
-                  rightElement={
-                    <IconButton
-                      size="lg"
-                      variant="link"
-                      icon={
-                        <Ionicons
-                          name={
-                            showConfirmPassword
-                              ? 'eye-off-outline'
-                              : 'eye-outline'
-                          }
-                          size={18}
-                        />
-                      }
-                      onPress={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                    />
-                  }
-                />
-                {values.password !== values.confirmPassword && (
-                  <FormControl.ErrorMessage
-                    leftIcon={<WarningOutlineIcon size="xs" />}
-                  >
-                    Passwords did not match.
-                  </FormControl.ErrorMessage>
-                )}
-              </VStack>
-              <Button
-                size="lg"
-                isLoading={loading}
-                isLoadingText="Creating account..."
-                onPress={handleSubmit}
-              >
-                Create Account
-              </Button>
-              <VStack space={2} marginTop={8}>
-                <Text textAlign="center" fontSize="sm" color="gray.500">
-                  Already have an account?
-                </Text>
-                <Center>
-                  <Button
-                    size="lg"
-                    variant="link"
-                    onPress={() => navigation.navigate('Login')}
-                  >
-                    Login
-                  </Button>
-                </Center>
-              </VStack>
-            </VStack>
-          </FormControl>
-        </VStack>
-      </Fragment>
+      <Title order={1}>Create your Account</Title>
+      <Text c="dimmed" mb="xl">
+        Fill-in your information and let's get started.
+      </Text>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack>
+          <TextInput
+            label="Firstname"
+            placeholder="Enter your firstname"
+            name="firstName"
+            key={form.key('firstName')}
+            {...form.getInputProps('firstName')}
+          />
+          <TextInput
+            label="Lastname"
+            placeholder="Enter your lastname"
+            name="lastname"
+            key={form.key('lastName')}
+            {...form.getInputProps('lastName')}
+          />
+          <TextInput
+            label="Email"
+            placeholder="Enter your email"
+            name="email"
+            key={form.key('email')}
+            {...form.getInputProps('email')}
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Enter your password"
+            name="password"
+            key={form.key('password')}
+            {...form.getInputProps('password')}
+          />
+          <PasswordInput
+            label="Confirm Password"
+            placeholder="Enter confirm password"
+            name="confirmPassword"
+            key={form.key('confirmPassword')}
+            {...form.getInputProps('confirmPassword')}
+          />
+        </Stack>
+
+        <Group justify="space-between" mt="xl">
+          <Text size="sm">
+            Don't have an account yet?{' '}
+            <Anchor
+              component="button"
+              type="button"
+              variant="light"
+              size="sm"
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </Anchor>
+          </Text>
+
+          <Button type="submit" loading={submitting}>
+            Sign Up
+          </Button>
+        </Group>
+      </form>
     </AuthLayout>
   );
 };

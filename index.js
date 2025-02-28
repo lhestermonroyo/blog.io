@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const { createServer } = require('http');
@@ -56,11 +57,15 @@ const apolloServer = new ApolloServer({
     await apolloServer.start();
     app.use(
       '/',
-      cors(),
+      cors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+      }),
+      cookieParser(),
       express.json(),
       expressMiddleware(apolloServer, {
-        context: async ({ req }) => ({
-          req,
+        context: async ctx => ({
+          ...ctx,
         }),
       })
     );

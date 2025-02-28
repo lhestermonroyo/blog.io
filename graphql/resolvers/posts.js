@@ -9,6 +9,9 @@ const pubSub = new PubSub();
 
 const NEW_POST = 'NEW_POST';
 
+const postProj = '_id title content creator tags createdAt';
+const profileBadgeProj = '_id email firstName lastName profilePhoto';
+
 module.exports = {
   Query: {
     async getPosts(_, __, context) {
@@ -19,37 +22,21 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const posts = await Post.find()
+        const posts = await Post.find({}, postProj)
           .sort({ createdAt: -1 })
-          .populate('creator')
-          .populate({
-            path: 'subForum',
-            model: 'SubForum',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
-          })
-          .populate({
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
-          });
+          .populate('creator', profileBadgeProj);
 
-        return posts.map(post => {
+        return posts.map((post) => {
           return {
             id: post._id,
-            ...post._doc,
+            ...post._doc
           };
         });
       } catch (error) {
         throw new Error(error);
       }
     },
-    async getPost(_, { id }, context) {
+    async getPostsByCreator(_, { creator }, context) {
       try {
         const user = checkAuth(context);
 
@@ -57,23 +44,47 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const post = await Post.findById(id)
-          .populate('creator')
+        const posts = await Post.find({ creator })
+          .sort({ createdAt: -1 })
+          .populate('creator', profileBadgeProj);
+
+        return posts.map((post) => {
+          return {
+            id: post._id,
+            ...post._doc
+          };
+        });
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async getPostById(_, { postId }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const post = await Post.findById(postId)
+          .populate('creator', profileBadgeProj)
           .populate({
-            path: 'subForum',
-            model: 'SubForum',
+            path: 'likes',
+            model: 'Like',
             populate: {
-              path: 'creator',
+              path: 'liker',
               model: 'User',
-            },
+              select: profileBadgeProj
+            }
           })
           .populate({
             path: 'comments',
             model: 'Comment',
             populate: {
-              path: 'creator',
+              path: 'commentor',
               model: 'User',
-            },
+              select: profileBadgeProj
+            }
           });
 
         if (!post) {
@@ -82,12 +93,12 @@ module.exports = {
 
         return {
           id: post._id,
-          ...post._doc,
+          ...post._doc
         };
       } catch (error) {
         throw new Error(error);
       }
-    },
+    }
   },
   Mutation: {
     async createPost(_, { postInput }, context) {
@@ -98,49 +109,56 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const { title, body, files, subForum } = postInput;
+        const { title, content, tags } = postInput;
 
-        const { valid, errors } = validatePostInput(title, body, subForum);
+        const { valid, errors } = validatePostInput(title, content);
 
         if (!valid) {
           throw new UserInputError('Validation Error', { errors });
         }
 
-        if (!subForum) {
-          errors.general = 'Subforum not found';
-          throw new UserInputError('SubForum not found', { errors });
-        }
-
         const newPost = new Post({
           title,
-          body,
-          files,
+          content,
+          tags,
           creator: user.id,
-          subForum,
           comments: [],
-          upvotes: [],
-          downvotes: [],
-          createdAt: new Date().toISOString(),
+          likes: [],
+          createdAt: new Date().toISOString()
         });
         await newPost.save();
         await newPost.populate([
-          'creator',
           {
-            path: 'subForum',
-            model: 'SubForum',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
+            path: 'creator',
+            model: 'User',
+            select: profileBadgeProj
           },
+          {
+            path: 'comments',
+            model: 'Comment',
+            populate: {
+              path: 'commentor',
+              model: 'User',
+              select: profileBadgeProj
+            }
+          },
+          {
+            path: 'likes',
+            model: 'Like',
+            populate: {
+              path: 'liker',
+              model: 'User',
+              select: profileBadgeProj
+            }
+          }
         ]);
         const post = {
           id: newPost._id,
-          ...newPost._doc,
+          ...newPost._doc
         };
 
         pubSub.publish(NEW_POST, {
-          onNewPost: post,
+          onNewPost: post
         });
 
         return post;
@@ -148,7 +166,70 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async upVotePost(_, { postId }, context) {
+    async updatePost(_, { postId, postInput }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const { title, content, tags } = postInput;
+
+        const { valid, errors } = validatePostInput(title, content);
+
+        if (!valid) {
+          throw new UserInputError('Validation Error', { errors });
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+          throw new Error('Post not found');
+        }
+
+        if (post.creator.toString() !== user.id) {
+          throw new Error('User not authorized');
+        }
+
+        post.title = title;
+        post.content = content;
+        post.tags = tags;
+
+        await post.save();
+        await post.populate([
+          {
+            path: 'creator',
+            model: 'User',
+            select: profileBadgeProj
+          },
+          {
+            path: 'comments',
+            model: 'Comment',
+            populate: {
+              path: 'commentor',
+              model: 'User'
+            }
+          },
+          {
+            path: 'likes',
+            model: 'Like',
+            populate: {
+              path: 'liker',
+              model: 'User'
+            }
+          }
+        ]);
+
+        return {
+          id: post._id,
+          ...post._doc
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async deletePost(_, { postId }, context) {
       try {
         const user = checkAuth(context);
 
@@ -162,110 +243,20 @@ module.exports = {
           throw new Error('Post not found');
         }
 
-        if (post.downvotes.find(downvote => downvote.toString() === user.id)) {
-          post.downvotes = post.downvotes.filter(
-            downvote => downvote.toString() !== user.id
-          );
+        if (post.creator.toString() !== user.id) {
+          throw new Error('User not authorized');
         }
 
-        if (post.upvotes.find(upvote => upvote.toString() === user.id)) {
-          post.upvotes = post.upvotes.filter(
-            upvote => upvote.toString() !== user.id
-          );
-        } else {
-          post.upvotes.push(user.id);
-        }
-
-        await post.save();
-        await post.populate([
-          'creator',
-          {
-            path: 'subForum',
-            model: 'SubForum',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
-          },
-        ]);
-
-        return {
-          id: post._id,
-          ...post._doc,
-        };
+        await post.delete();
+        return 'Post deleted successfully';
       } catch (error) {
         throw new Error(error);
       }
-    },
-    async downVotePost(_, { postId }, context) {
-      try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
-        const post = await Post.findById(postId);
-
-        if (!post) {
-          throw new Error('Post not found');
-        }
-
-        if (post.upvotes.find(upvote => upvote.toString() === user.id)) {
-          post.upvotes = post.upvotes.filter(
-            upvote => upvote.toString() !== user.id
-          );
-        }
-
-        if (post.downvotes.find(downvote => downvote.toString() === user.id)) {
-          post.downvotes = post.downvotes.filter(
-            downvote => downvote.toString() !== user.id
-          );
-        } else {
-          post.downvotes.push(user.id);
-        }
-
-        await post.save();
-        await post.populate([
-          'creator',
-          {
-            path: 'subForum',
-            model: 'SubForum',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'creator',
-              model: 'User',
-            },
-          },
-        ]);
-
-        return {
-          id: post._id,
-          ...post._doc,
-        };
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
+    }
   },
   Subscription: {
     onNewPost: {
-      subscribe: () => pubSub.asyncIterator([NEW_POST]),
-    },
-  },
+      subscribe: () => pubSub.asyncIterator([NEW_POST])
+    }
+  }
 };

@@ -1,16 +1,13 @@
 const userResolver = require('./users');
-const subForumResolver = require('./subforums');
 const postResolver = require('./posts');
+const likeResolver = require('./likes');
 const commentResolver = require('./comments');
-const subscriptionResolver = require('./subscriptions');
+const followResolver = require('./follows');
 
 module.exports = {
   Post: {
+    likeCount: parent => parent.likes.length,
     commentCount: parent => parent.comments.length,
-    voteCount: parent => parent.upvotes.length - parent.downvotes.length,
-  },
-  SubForum: {
-    subsCount: parent => parent.subscribers.length || 0,
   },
   Profile: {
     age: parent => {
@@ -26,18 +23,19 @@ module.exports = {
   },
   Query: {
     ...userResolver.Query,
-    ...subForumResolver.Query,
     ...postResolver.Query,
-    ...subscriptionResolver.Query,
+    ...followResolver.Query,
   },
   Mutation: {
     ...userResolver.Mutation,
-    ...subForumResolver.Mutation,
     ...postResolver.Mutation,
+    ...likeResolver.Mutation,
     ...commentResolver.Mutation,
-    ...subscriptionResolver.Mutation,
+    ...followResolver.Mutation,
   },
   Subscription: {
     ...postResolver.Subscription,
+    ...commentResolver.Subscription,
+    ...likeResolver.Subscription,
   },
 };

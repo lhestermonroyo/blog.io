@@ -1,17 +1,22 @@
 module.exports.validateSignUpInput = (
-  username,
+  firstName,
+  lastName,
   email,
   password,
   confirmPassword
 ) => {
   const errors = {};
 
-  if (username.trim() === '') {
-    errors.username = 'Username must not be empty.';
+  if (firstName.trim() === '') {
+    errors.firstName = 'Firstname must not be empty.';
+  }
+
+  if (lastName.trim() === '') {
+    errors.lastName = 'Lastname must not be empty.';
   }
 
   if (email.trim() === '') {
-    errors.username = 'Username must not be empty.';
+    errors.email = 'Email must not be empty.';
   } else {
     const regEx = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/;
 
@@ -30,15 +35,24 @@ module.exports.validateSignUpInput = (
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1,
+    valid: Object.keys(errors).length < 1
   };
 };
 
-module.exports.validateProfileInput = (name, birthdate, location) => {
+module.exports.validateProfileInput = (
+  firstName,
+  lastName,
+  birthdate,
+  location
+) => {
   const errors = {};
 
-  if (name.trim() === '') {
-    errors.name = 'Name must not be empty.';
+  if (firstName.trim() === '') {
+    errors.firstName = 'Firstname must not be empty.';
+  }
+
+  if (lastName.trim() === '') {
+    errors.firstName = 'Firstname must not be empty.';
   }
 
   if (birthdate.trim() === '') {
@@ -51,15 +65,36 @@ module.exports.validateProfileInput = (name, birthdate, location) => {
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1,
+    valid: Object.keys(errors).length < 1
   };
 };
 
-module.exports.validateLoginInput = (username, password) => {
+module.exports.validateProfilePhotoInput = (photoType, photoUri) => {
   const errors = {};
 
-  if (username.trim() === '') {
-    errors.username = 'Username must not be empty.';
+  if (photoType.trim() === '') {
+    if (photoType !== 'COVER' || photoType !== 'PROFILE') {
+      errors.firstName = 'Photo Type must be either COVER or PROFILE.';
+    } else {
+      errors.firstName = 'Photo Type must not be empty.';
+    }
+  }
+
+  if (photoUri.trim() === '') {
+    errors.firstName = 'Photo URI must not be empty.';
+  }
+
+  return {
+    errors,
+    valid: Object.keys(errors).length < 1
+  };
+};
+
+module.exports.validateLoginInput = (email, password) => {
+  const errors = {};
+
+  if (email.trim() === '') {
+    errors.email = 'Email must not be empty.';
   }
 
   if (password.trim() === '') {
@@ -68,7 +103,7 @@ module.exports.validateLoginInput = (username, password) => {
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1,
+    valid: Object.keys(errors).length < 1
   };
 };
 
@@ -85,32 +120,28 @@ module.exports.validateSubForumInput = (name, description) => {
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1,
+    valid: Object.keys(errors).length < 1
   };
 };
 
-module.exports.validatePostInput = (title, body, subForum) => {
+module.exports.validatePostInput = (title, content) => {
   const errors = {};
 
   if (title.trim() === '') {
     errors.title = 'Title must not be empty.';
   }
 
-  if (body.trim() === '') {
-    errors.body = 'Body must not be empty.';
-  }
-
-  if (subForum.trim() === '') {
-    errors.subForum = 'Subforum must not be empty.';
+  if (content.trim() === '') {
+    errors.content = 'Content must not be empty.';
   }
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1,
+    valid: Object.keys(errors).length < 1
   };
 };
 
-module.exports.validateCommentInput = body => {
+module.exports.validateCommentInput = (body) => {
   const errors = {};
 
   if (body.trim() === '') {
@@ -119,6 +150,6 @@ module.exports.validateCommentInput = body => {
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1,
+    valid: Object.keys(errors).length < 1
   };
 };
