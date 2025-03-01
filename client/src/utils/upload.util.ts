@@ -1,4 +1,9 @@
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import {
+  ref,
+  uploadString,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
 import { storage } from '../../firebase.config';
 
 const isBase64 = (str: string) => {
@@ -27,4 +32,19 @@ const uploadBlogFiles = async (uploadArr: any[]) => {
   }
 };
 
-export { uploadBlogFiles, isBase64 };
+const deleteBlogFiles = async (blogFiles: any[]) => {
+  try {
+    const deleteRequests = blogFiles.map(
+      async (file: { data: { file: { url: string } } }) => {
+        const fileRef = ref(storage, file.data.file.url);
+        await deleteObject(fileRef);
+      }
+    );
+
+    await Promise.all(deleteRequests);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+  }
+};
+
+export { uploadBlogFiles, isBase64, deleteBlogFiles };

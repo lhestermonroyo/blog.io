@@ -1,12 +1,30 @@
-import { Card, Grid, Group, SimpleGrid, Skeleton, Stack } from '@mantine/core';
+import {
+  Button,
+  Card,
+  Center,
+  Grid,
+  Group,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Text,
+  Title
+} from '@mantine/core';
 import { FC, ReactNode } from 'react';
 
 interface LoadingFeedProps {
   loading: boolean;
+  error: any;
+  refetch: () => Promise<any>;
   children: ReactNode;
 }
 
-const LoadingFeed: FC<LoadingFeedProps> = ({ loading, children }) => {
+const LoadingFeed: FC<LoadingFeedProps> = ({
+  loading,
+  error,
+  refetch,
+  children
+}) => {
   if (loading) {
     return (
       <SimpleGrid cols={2}>
@@ -39,6 +57,23 @@ const LoadingFeed: FC<LoadingFeedProps> = ({ loading, children }) => {
           </Card>
         ))}
       </SimpleGrid>
+    );
+  }
+
+  if (error) {
+    return (
+      <Stack gap="lg">
+        <Title order={1} ta="center">
+          Something went wrong.
+        </Title>
+        <Text size="sm" ta="center" color="dimmed">
+          An error occured while fetching posts. Please try again.
+        </Text>
+
+        <Center mt="lg">
+          <Button onClick={() => refetch()}>Retry</Button>
+        </Center>
+      </Stack>
     );
   }
 

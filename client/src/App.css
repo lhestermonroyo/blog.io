@@ -37,3 +37,11 @@ div {
   --front-color: #303030 !important;
   --border-color: #ccc !important;
 }
+
+.extras-container.is-sticky {
+  position: sticky !important;
+  top: 80px !important;
+  padding-bottom: 2em;
+  /* height: 100vh !important; */
+  width: 100% !important;
+}

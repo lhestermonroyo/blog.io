@@ -20,6 +20,7 @@ import {
   Title,
   useMantineTheme
 } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
@@ -41,14 +42,16 @@ import {
   UPDATE_COMMENT
 } from '../../graphql/mutations';
 import states from '../../states';
+import { deleteBlogFiles } from '../../utils/upload.util';
 
 import ProtectedLayout from '../../layouts/protected';
 import LoadingPost from '../../components/post-details/loading-post';
 import ProfileBadge from '../../components/profile-badge';
 import PostReaction from '../../components/post-details/post-reaction';
 import CommentCard from '../../components/post-details/comment-card';
-import { modals } from '@mantine/modals';
-import AuthorCard from '../../components/post-details/author-card';
+import AuthorPanel from '../../components/post-details/author-panel';
+import SuggestionsPanel from '../../components/post-details/suggestions-panel';
+import AuthorPostsPanel from '../../components/post-details/author-posts-panel';
 
 const PostDetails = () => {
   const [postDetails, setPostDetails] = useState<any>(null);
@@ -84,6 +87,18 @@ const PostDetails = () => {
   const [deleteComment] = useMutation(DELETE_COMMENT);
 
   useEffect(() => {
+    window.addEventListener('scroll', stickyListener);
+
+    return () => {
+      window.removeEventListener('scroll', stickyListener);
+    };
+  });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (data) {
       const key = Object.keys(data)[0];
       const post = data[key];
@@ -99,8 +114,26 @@ const PostDetails = () => {
     }
   }, [error]);
 
+  const stickyListener = () => {
+    const extras = document.querySelector('.extras-container');
+    const scrollTop = window.scrollY;
+
+    if (extras) {
+      if (scrollTop >= 25) {
+        extras.classList.add('is-sticky');
+      } else {
+        extras.classList.remove('is-sticky');
+      }
+    }
+  };
+
   const handleDeletePost = async () => {
     try {
+      const content = JSON.parse(postDetails?.content);
+      const files = content.blocks.filter(
+        (block: any) => block.type === 'image'
+      );
+
       const response = await deletePost({
         variables: {
           postId: params.id
@@ -110,6 +143,8 @@ const PostDetails = () => {
       const data = response.data[key];
 
       if (data.success) {
+        await deleteBlogFiles(files);
+
         notifications.show({
           title: 'Post Deleted',
           message: 'Your post has been deleted successfully.',
@@ -213,6 +248,10 @@ const PostDetails = () => {
     return response.data[key];
   };
 
+  const handleFollowAuthor = () => {
+    // Follow author logic
+  };
+
   const showDeleteModal = () =>
     modals.openConfirmModal({
       id: 'delete-post',
@@ -262,10 +301,14 @@ const PostDetails = () => {
                 onClick={() => navigate(`/profile/${post.creator.email}`)}
               />
 
-              {isOwnPost && (
+              {!isOwnPost && (
                 <Fragment>
                   &bull;
-                  <Button px={0} variant="transparent">
+                  <Button
+                    px={0}
+                    variant="transparent"
+                    onClick={handleFollowAuthor}
+                  >
                     Follow
                   </Button>
                 </Fragment>
@@ -328,7 +371,12 @@ const PostDetails = () => {
                   : block.data.content;
 
                 return (
-                  <Table withTableBorder withColumnBorders key={block.id}>
+                  <Table
+                    withTableBorder
+                    withColumnBorders
+                    key={block.id}
+                    layout="fixed"
+                  >
                     {withHeadings && (
                       <Table.Thead>
                         <Table.Tr>
@@ -445,7 +493,7 @@ const PostDetails = () => {
 
   return (
     <ProtectedLayout>
-      <Grid>
+      <Grid gutter="xl">
         <Grid.Col span={8}>
           <Stack gap="lg">
             <Group justify="space-between" align="center">
@@ -499,11 +547,16 @@ const PostDetails = () => {
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          {/* Sticky column */}
-          {/* Author's Profile Card */}
-          {/* Read Next Card */}
-          <Stack gap="lg">
-            <AuthorCard />
+          <Stack gap="lg" className="extras-container">
+            <AuthorPanel creatorEmail={postDetails?.creator.email} />
+            <AuthorPostsPanel
+              postId={postDetails?.id}
+              creator={postDetails?.creator.id}
+            />
+            <SuggestionsPanel
+              postId={postDetails?.id}
+              tags={postDetails?.tags}
+            />
           </Stack>
         </Grid.Col>
       </Grid>

@@ -84,7 +84,7 @@ const Navbar = () => {
             />
           </Group>
 
-          {isAuth && profile ? (
+          {isAuth ? (
             <Group gap="lg" justify="center">
               <Button
                 onClick={() => navigate('/compose')}

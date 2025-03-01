@@ -114,6 +114,7 @@ module.exports = gql`
     # Posts
     getPosts: [Posts]!
     getPostsByCreator(creator: ID!): [Posts]!
+    getPostsByTags(tags: [String]!): [Posts]!
     getPostById(postId: ID!): Post!
     # Follows
     getFollowers: [Follow]!

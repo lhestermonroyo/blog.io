@@ -16,7 +16,7 @@ const Feed = () => {
   const { profile } = auth;
   const { posts } = post;
 
-  const { data, loading, refetch } = useQuery(GET_POSTS, {
+  const { data, loading, error, refetch } = useQuery(GET_POSTS, {
     pollInterval: 30000
   });
 
@@ -29,8 +29,6 @@ const Feed = () => {
     if (data) {
       const key = Object.keys(data)[0];
       const posts = data[key];
-
-      console.log('Posts:', posts);
 
       setPost((prev: any) => ({
         ...prev,
@@ -49,7 +47,7 @@ const Feed = () => {
         </Tabs.List>
       </Tabs>
       <Box mt="lg">
-        <LoadingFeed loading={loading}>
+        <LoadingFeed loading={loading} error={error} refetch={refetch}>
           <SimpleGrid cols={2}>
             {posts &&
               posts.map((post: any) => <PostCard key={post.id} item={post} />)}

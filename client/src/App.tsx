@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { createTheme, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import { useLazyQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRecoilState } from 'recoil';
 
 import states from './states';
@@ -68,15 +68,17 @@ const theme = createTheme({
 function App() {
   const [auth, setAuth] = useRecoilState(states.auth);
 
-  const [getProfile, { data, loading, error }] = useLazyQuery(GET_PROFILE);
+  const { data, loading, error, refetch } = useQuery(GET_PROFILE, {
+    pollInterval: 60 * 1000
+  });
 
   useEffect(() => {
-    getProfile();
+    refetch();
   }, []);
 
   useEffect(() => {
     if (auth.isAuth) {
-      getProfile();
+      refetch();
     }
   }, [auth]);
 

@@ -89,6 +89,48 @@ module.exports = {
         throw new Error(error);
       }
     },
+    async getPostsByTags(_, { tags }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const posts = await Post.find({
+          tags: {
+            $in: [...tags]
+          }
+        })
+          .sort({ createdAt: -1 })
+          .populate('creator', profileBadgeProj);
+
+        return posts.map((post) => {
+          const isLiked = post._doc.likes.some(
+            (like) => like.liker.toString() === user.id
+          );
+          const isCommented = post._doc.comments.some(
+            (comment) => comment.commentor.toString() === user.id
+          );
+          const likeCount = post._doc.likes.length ?? 0;
+          const commentCount = post._doc.comments.length ?? 0;
+
+          delete post._doc.likes;
+          delete post._doc.comments;
+
+          return {
+            id: post._id,
+            ...post._doc,
+            likeCount,
+            commentCount,
+            isLiked,
+            isCommented
+          };
+        });
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
     async getPostById(_, { postId }, context) {
       try {
         const user = checkAuth(context);
