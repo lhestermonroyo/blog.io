@@ -75,7 +75,7 @@ const SignUp: FC = () => {
           isAuth: true
         }));
 
-        navigate('/');
+        navigate('/onboarding');
       }
     } catch (error) {
       console.error('error', error);

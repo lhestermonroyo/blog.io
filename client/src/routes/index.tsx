@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Login from '../pages/login';
 import SignUp from '../pages/sign-up';
 import Feed from '../pages/feed';
+import Onboarding from '../pages/onboarding';
 import PostDetails from '../pages/post-details';
 import Profile from '../pages/profile';
 import Compose from '../pages/compose';
@@ -21,6 +22,7 @@ const AppRouter = () => {
         {/*  */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Feed />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/post/:id" element={<PostDetails />} />
           <Route path="/compose" element={<Compose />} />
           <Route path="/edit-post/:id" element={<EditPost />} />

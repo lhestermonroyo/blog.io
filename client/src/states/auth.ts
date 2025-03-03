@@ -2,7 +2,8 @@ import { atom } from 'recoil';
 
 const initialState: any = {
   isAuth: false,
-  profile: null
+  profile: null,
+  follows: null
 };
 
 export const AUTH_STATE = atom({

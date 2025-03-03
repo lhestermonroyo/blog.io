@@ -19,9 +19,11 @@ module.exports = gql`
     location: String
     pronouns: String
     bio: String
+    tags: [String]!
     coverPhoto: String
     profilePhoto: String
     age: Int
+    postCount: Int
     createdAt: String!
   }
   type ProfileBadge {
@@ -33,6 +35,11 @@ module.exports = gql`
   }
   # Posts
   type Posts {
+    totalCount: Int!
+    currentCount: Int!
+    posts: [PostItem]!
+  }
+  type PostItem {
     id: ID!
     title: String!
     content: String!
@@ -44,7 +51,6 @@ module.exports = gql`
     isCommented: Boolean!
     createdAt: String!
   }
-
   type Post {
     id: ID!
     title: String!
@@ -69,11 +75,15 @@ module.exports = gql`
     liker: ProfileBadge!
     createdAt: String!
   }
-  type Follow {
-    id: ID!
-    follower: ProfileBadge!
-    following: ProfileBadge!
+  # Follows
+  type Follows {
+    email: String!
+    followers: [ProfileBadge]!
+    following: [ProfileBadge]!
+    followersCount: Int!
+    followingCount: Int!
   }
+  # Status
   type Status {
     success: Boolean!
   }
@@ -103,22 +113,20 @@ module.exports = gql`
     content: String!
     tags: [String]!
   }
-  input FollowInput {
-    following: String!
-  }
 
   type Query {
     # Users
     getProfile: Profile!
     getProfileByEmail(email: String!): Profile!
     # Posts
-    getPosts: [Posts]!
-    getPostsByCreator(creator: ID!): [Posts]!
-    getPostsByTags(tags: [String]!): [Posts]!
+    getPosts(limit: Int): Posts!
+    getPostsByCreator(creator: ID!, limit: Int): Posts!
+    getPostsByTags(tags: [String]!, limit: Int): Posts!
     getPostById(postId: ID!): Post!
     # Follows
-    getFollowers: [Follow]!
-    getFollowing: [Follow]!
+    getFollowsByEmail(email: String!): Follows!
+    # Tags
+    getTags: [String]!
   }
 
   type Mutation {
@@ -139,7 +147,9 @@ module.exports = gql`
     # Likes
     likePost(postId: ID!): Post!
     # Follows
-    followUser(followInput: FollowInput): Follow!
+    followUser(email: String): Follows!
+    # Tags
+    assignTags(tags: [String]!): Profile
   }
 
   type Subscription {

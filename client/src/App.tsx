@@ -32,45 +32,50 @@ const theme = createTheme({
       '#02b174'
     ]
   },
-  primaryColor: 'green'
-  // components: {
-  //   Input: {
-  //     styles: (theme: any) => ({
-  //       input: {
-  //         backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5' // Darker gray in light mode, lighter gray in dark mode
-  //       }
-  //     })
-  //   },
-  //   TextInput: {
-  //     styles: (theme: any) => ({
-  //       input: {
-  //         backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
-  //       }
-  //     })
-  //   },
-  //   Select: {
-  //     styles: (theme: any) => ({
-  //       input: {
-  //         backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
-  //       }
-  //     })
-  //   },
-  //   Textarea: {
-  //     styles: (theme: any) => ({
-  //       input: {
-  //         backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
-  //       }
-  //     })
-  //   }
-  // }
+  primaryColor: 'green',
+  components: {
+    // Modal: {
+    //   styles: {
+    //     overlay: {
+    //       zIndex: 100 // Set higher or lower as needed
+    //     }
+    //   }
+    // }
+    // Input: {
+    //   styles: (theme: any) => ({
+    //     input: {
+    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5' // Darker gray in light mode, lighter gray in dark mode
+    //     }
+    //   })
+    // },
+    // TextInput: {
+    //   styles: (theme: any) => ({
+    //     input: {
+    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
+    //     }
+    //   })
+    // },
+    // Select: {
+    //   styles: (theme: any) => ({
+    //     input: {
+    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
+    //     }
+    //   })
+    // },
+    // Textarea: {
+    //   styles: (theme: any) => ({
+    //     input: {
+    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
+    //     }
+    //   })
+    // }
+  }
 });
 
 function App() {
   const [auth, setAuth] = useRecoilState(states.auth);
 
-  const { data, loading, error, refetch } = useQuery(GET_PROFILE, {
-    pollInterval: 60 * 1000
-  });
+  const { data, loading, error, refetch } = useQuery(GET_PROFILE);
 
   useEffect(() => {
     refetch();

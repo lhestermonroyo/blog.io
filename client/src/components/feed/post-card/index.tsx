@@ -20,9 +20,6 @@ import {
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
-import { useRecoilValue } from 'recoil';
-
-import states from '../../../states';
 
 import ProfileBadge from '../../profile-badge';
 
@@ -72,7 +69,7 @@ const PostCard: FC<IPostCardProps> = ({ item }) => {
               ></Text>
               <Group gap={6}>
                 {item.tags.map((tag: string) => (
-                  <Badge>{tag}</Badge>
+                  <Badge key={tag}>{tag}</Badge>
                 ))}
               </Group>
             </Stack>

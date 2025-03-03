@@ -11,6 +11,7 @@ export const GET_PROFILE = gql`
       location
       pronouns
       bio
+      tags
       coverPhoto
       profilePhoto
       age
@@ -30,6 +31,7 @@ export const GET_PROFILE_BY_EMAIL = gql`
       location
       pronouns
       bio
+      tags
       coverPhoto
       profilePhoto
       age
@@ -38,71 +40,107 @@ export const GET_PROFILE_BY_EMAIL = gql`
   }
 `;
 
-export const GET_POSTS = gql`
-  query GetPosts {
-    getPosts {
-      id
-      title
-      content
-      tags
-      creator {
+export const GET_FOLLOWS_BY_EMAIL = gql`
+  query GetFollowsByEmail($email: String!) {
+    getFollowsByEmail(email: $email) {
+      email
+      followers {
         id
         email
         firstName
         lastName
         profilePhoto
       }
-      likeCount
-      commentCount
-      isLiked
-      isCommented
-      createdAt
+      following {
+        id
+        email
+        firstName
+        lastName
+        profilePhoto
+      }
+      followersCount
+      followingCount
+    }
+  }
+`;
+
+export const GET_POSTS = gql`
+  query GetPosts($limit: Int) {
+    getPosts(limit: $limit) {
+      totalCount
+      currentCount
+      posts {
+        id
+        title
+        content
+        tags
+        creator {
+          id
+          email
+          firstName
+          lastName
+          profilePhoto
+        }
+        likeCount
+        commentCount
+        isLiked
+        isCommented
+        createdAt
+      }
     }
   }
 `;
 
 export const GET_POSTS_BY_TAGS = gql`
-  query GetPostsByTags($tags: [String!]!) {
-    getPostsByTags(tags: $tags) {
-      id
-      title
-      content
-      tags
-      creator {
+  query GetPostsByTags($tags: [String!]!, $limit: Int) {
+    getPostsByTags(tags: $tags, limit: $limit) {
+      totalCount
+      currentCount
+      posts {
         id
-        email
-        firstName
-        lastName
-        profilePhoto
+        title
+        content
+        tags
+        creator {
+          id
+          email
+          firstName
+          lastName
+          profilePhoto
+        }
+        likeCount
+        commentCount
+        isLiked
+        isCommented
+        createdAt
       }
-      likeCount
-      commentCount
-      isLiked
-      isCommented
-      createdAt
     }
   }
 `;
 
 export const GET_POSTS_BY_CREATOR = gql`
-  query GetPostsByCreator($creator: ID!) {
-    getPostsByCreator(creator: $creator) {
-      id
-      title
-      content
-      tags
-      creator {
+  query GetPostsByCreator($creator: ID!, $limit: Int) {
+    getPostsByCreator(creator: $creator, limit: $limit) {
+      totalCount
+      currentCount
+      posts {
         id
-        email
-        firstName
-        lastName
-        profilePhoto
+        title
+        content
+        tags
+        creator {
+          id
+          email
+          firstName
+          lastName
+          profilePhoto
+        }
+        likeCount
+        commentCount
+        isLiked
+        isCommented
+        createdAt
       }
-      likeCount
-      commentCount
-      isLiked
-      isCommented
-      createdAt
     }
   }
 `;
@@ -149,5 +187,11 @@ export const GET_POST_BY_ID = gql`
       likeCount
       createdAt
     }
+  }
+`;
+
+export const GET_TAGS = gql`
+  query GetTags {
+    getTags
   }
 `;

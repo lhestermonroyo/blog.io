@@ -1,6 +1,7 @@
 import { FC } from 'react';
-import { Card, Stack, Title } from '@mantine/core';
+import { Card, Divider, Skeleton, Stack, Title } from '@mantine/core';
 import { useQuery } from '@apollo/client';
+
 import { GET_POSTS_BY_TAGS } from '../../../graphql/queries';
 
 import ExtrasPostCard from '../extras-post-card';
@@ -11,20 +12,37 @@ interface SuggestionsPanelProps {
 }
 
 const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ postId, tags }) => {
-  const { data } = useQuery(GET_POSTS_BY_TAGS, {
-    variables: { tags }
+  const { data, loading } = useQuery(GET_POSTS_BY_TAGS, {
+    variables: { tags, limit: 5 }
   });
+
+  if (loading) {
+    return (
+      <Card withBorder>
+        <Stack gap="lg">
+          <Title order={3}>Posts Like This</Title>
+          <Stack gap="xs">
+            <Skeleton height={100} />
+            <Divider />
+            <Skeleton height={100} />
+          </Stack>
+        </Stack>
+      </Card>
+    );
+  }
 
   if (data) {
     const key = Object.keys(data)[0];
-    const posts = data[key].filter((post: any) => post.id !== postId);
+    const { posts } = data[key];
+
+    const filteredPosts = posts.filter((post: any) => post.id !== postId);
 
     const renderList = () => {
-      return posts.map((item: any, index: number) => (
+      return filteredPosts.map((item: any, index: number) => (
         <ExtrasPostCard
           key={item.id}
           item={item}
-          isLastPost={posts.length === index + 1}
+          isLastPost={filteredPosts.length === index + 1}
         />
       ));
     };
@@ -43,7 +61,7 @@ const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ postId, tags }) => {
       <Card withBorder>
         <Stack gap="lg">
           <Title order={3}>Posts Like This</Title>
-          {posts.length > 0 ? renderList() : renderEmpty()}
+          {filteredPosts.length > 0 ? renderList() : renderEmpty()}
         </Stack>
       </Card>
     );

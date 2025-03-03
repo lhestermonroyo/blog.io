@@ -26,6 +26,38 @@ export const LOGOUT = gql`
   }
 `;
 
+export const ASSIGN_TAGS = gql`
+  mutation AssignTags($tags: [String]!) {
+    assignTags(tags: $tags) {
+      tags
+    }
+  }
+`;
+
+export const FOLLOW_USER = gql`
+  mutation FollowUser($email: String!) {
+    followUser(email: $email) {
+      email
+      followers {
+        id
+        email
+        firstName
+        lastName
+        profilePhoto
+      }
+      following {
+        id
+        email
+        firstName
+        lastName
+        profilePhoto
+      }
+      followersCount
+      followingCount
+    }
+  }
+`;
+
 export const CREATE_POST = gql`
   mutation CreatePost($postInput: PostInput) {
     createPost(postInput: $postInput) {

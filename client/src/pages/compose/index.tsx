@@ -124,6 +124,17 @@ const Compose = () => {
       const uploadFiles = content.blocks.filter(
         (block: any) => block.type === 'image'
       );
+
+      if (!uploadFiles.length) {
+        notifications.show({
+          title: 'Create Post failed',
+          message: 'Please add at least one image.',
+          color: 'red',
+          position: 'top-center'
+        });
+        return;
+      }
+
       const fileUrls = await uploadBlogFiles(uploadFiles);
       content.blocks = content.blocks.map((block: any) => {
         fileUrls.forEach((file: any) => {

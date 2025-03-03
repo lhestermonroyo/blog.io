@@ -41,7 +41,7 @@ div {
 .extras-container.is-sticky {
   position: sticky !important;
   top: 80px !important;
-  padding-bottom: 2em;
+  padding-bottom: 10em !important;
   /* height: 100vh !important; */
   width: 100% !important;
 }

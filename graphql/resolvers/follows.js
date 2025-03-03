@@ -1,52 +1,101 @@
 const { UserInputError } = require('apollo-server');
 
 const User = require('../../models/User');
-const { checkAuth } = require('../../utils/auth.util');
 const Follow = require('../../models/Follow');
+const { checkAuth } = require('../../utils/auth.util');
+
+const profileBadgeProj = '_id email firstName lastName profilePhoto';
 
 module.exports = {
   Mutation: {
-    followUser: async (_, { following }, context) => {
-      const user = checkAuth(context);
+    async followUser(_, { email }, context) {
+      try {
+        const user = checkAuth(context);
 
-      if (user.email === following) {
-        throw new UserInputError('You cannot follow yourself.');
-      }
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
 
-      const followingUser = await User.find({ email: following });
+        if (user.email === email) {
+          throw new UserInputError('You cannot follow yourself.');
+        }
 
-      if (!followingUser) {
-        throw new UserInputError('User not found.');
-      }
+        const followingUser = await User.find({ email });
 
-      const isAlreadyFollowing = await Follow.findOne({
-        follower: user.email,
-        following,
-      });
+        if (!followingUser) {
+          throw new UserInputError('User not found.');
+        }
 
-      if (!isAlreadyFollowing) {
-        const newFollow = new Follow({
+        const isAlreadyFollowing = await Follow.findOne({
           follower: user.email,
-          following,
+          following: email
         });
-        await newFollow.save();
-      } else {
-        await Follow.deleteOne({ follower: user.email, following });
-      }
 
-      return await Follow.find({ follower: user.email });
-    },
+        if (!isAlreadyFollowing) {
+          const newFollow = new Follow({
+            follower: user.email,
+            following: email
+          });
+          await newFollow.save();
+        } else {
+          await Follow.deleteOne({ follower: user.email, following: email });
+        }
+
+        const followers = await Follow.find({ following: email });
+        const followerEmails = followers.map((follow) => follow.follower);
+        const followerUsers = await User.find(
+          { email: { $in: followerEmails } },
+          profileBadgeProj
+        );
+
+        const following = await Follow.find({ follower: email });
+        const followingEmails = following.map((follow) => follow.following);
+        const followingUsers = await User.find(
+          { email: { $in: followingEmails } },
+          profileBadgeProj
+        );
+
+        return {
+          email,
+          followers: followerUsers,
+          following: followingUsers
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
   },
   Query: {
-    getFollowers: async (_, __, context) => {
-      const user = checkAuth(context);
+    async getFollowsByEmail(_, { email }, context) {
+      try {
+        const user = checkAuth(context);
 
-      return await Follow.find({ follower: user.email });
-    },
-    getFollowing: async (_, __, context) => {
-      const user = checkAuth(context);
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
 
-      return await Follow.find({ following: user.email });
-    },
-  },
+        const followers = await Follow.find({ following: email });
+        const followerEmails = followers.map((follow) => follow.follower);
+        const followerUsers = await User.find(
+          { email: { $in: followerEmails } },
+          profileBadgeProj
+        );
+
+        const following = await Follow.find({ follower: email });
+        const followingEmails = following.map((follow) => follow.following);
+        const followingUsers = await User.find(
+          { email: { $in: followingEmails } },
+          profileBadgeProj
+        );
+
+        return {
+          email,
+          followers: followerUsers,
+          following: followingUsers
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+  }
 };

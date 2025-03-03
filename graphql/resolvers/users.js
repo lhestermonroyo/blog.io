@@ -6,12 +6,12 @@ const {
   validateSignUpInput,
   validateLoginInput,
   validateProfileInput,
-  validateProfilePhotoInput,
+  validateProfilePhotoInput
 } = require('../../utils/validators.util');
 const {
   checkAuth,
   genAndStoreToken,
-  clearToken,
+  clearToken
 } = require('../../utils/auth.util');
 
 module.exports = {
@@ -38,8 +38,8 @@ module.exports = {
         if (user) {
           throw new UserInputError('Email is already taken.', {
             errors: {
-              email: 'Email is already taken.',
-            },
+              email: 'Email is already taken.'
+            }
           });
         }
 
@@ -55,7 +55,7 @@ module.exports = {
           age: 0,
           pronouns: '',
           bio: '',
-          createdAt: new Date().toISOString(),
+          createdAt: new Date().toISOString()
         });
 
         const response = await newUser.save();
@@ -63,7 +63,7 @@ module.exports = {
 
         return {
           id: response._id,
-          email: response._doc.email,
+          email: response._doc.email
         };
       } catch (error) {
         throw new Error(error);
@@ -95,7 +95,7 @@ module.exports = {
 
         return {
           id: user._id,
-          email: user._doc.email,
+          email: user._doc.email
         };
       } catch (error) {
         throw new Error(error);
@@ -106,7 +106,7 @@ module.exports = {
         await clearToken(ctx);
 
         return {
-          success: true,
+          success: true
         };
       } catch (error) {
         throw new Error(error);
@@ -142,7 +142,7 @@ module.exports = {
             birthdate,
             location,
             pronouns,
-            bio,
+            bio
           },
           { new: true }
         );
@@ -150,7 +150,7 @@ module.exports = {
 
         return {
           id: response._id,
-          ...response._doc,
+          ...response._doc
         };
       } catch (error) {
         throw new Error(error);
@@ -187,8 +187,8 @@ module.exports = {
           user.id,
           {
             $set: {
-              [key]: photoUri,
-            },
+              [key]: photoUri
+            }
           },
           { new: true }
         );
@@ -196,12 +196,12 @@ module.exports = {
 
         return {
           id: response._id,
-          ...response._doc,
+          ...response._doc
         };
       } catch (error) {
         throw new Error(error);
       }
-    },
+    }
   },
   Query: {
     async getProfile(_, __, ctx) {
@@ -209,7 +209,7 @@ module.exports = {
         const user = checkAuth(ctx);
 
         const response = await User.findOne({
-          email: user.email,
+          email: user.email
         });
 
         if (!response) {
@@ -217,7 +217,7 @@ module.exports = {
         } else {
           return {
             id: response._id,
-            ...response._doc,
+            ...response._doc
           };
         }
       } catch (error) {
@@ -239,12 +239,12 @@ module.exports = {
         } else {
           return {
             id: response._id,
-            ...response._doc,
+            ...response._doc
           };
         }
       } catch (error) {
         throw new Error(error);
       }
-    },
-  },
+    }
+  }
 };

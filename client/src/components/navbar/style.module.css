@@ -10,7 +10,7 @@
     var(--mantine-color-white),
     var(--mantine-color-dark-8)
   );
-  z-index: 301;
+  z-index: 100;
 }
 
 .link {

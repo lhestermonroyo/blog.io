@@ -30,7 +30,7 @@ import {
   IconEdit,
   IconTrash
 } from '@tabler/icons-react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { format } from 'date-fns';
 
 import { GET_POST_BY_ID } from '../../graphql/queries';
@@ -54,12 +54,13 @@ import SuggestionsPanel from '../../components/post-details/suggestions-panel';
 import AuthorPostsPanel from '../../components/post-details/author-posts-panel';
 
 const PostDetails = () => {
-  const [postDetails, setPostDetails] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const commentRef = useRef<HTMLTextAreaElement>(null);
 
+  const [post, setPost] = useRecoilState(states.post);
   const auth = useRecoilValue(states.auth);
+  const { postDetails } = post;
 
   const form = useForm({
     initialValues: {
@@ -80,6 +81,7 @@ const PostDetails = () => {
       postId: params.id
     }
   });
+
   const [deletePost] = useMutation(DELETE_POST);
   const [likePost] = useMutation(LIKE_POST);
   const [createComment] = useMutation(CREATE_COMMENT);
@@ -101,9 +103,12 @@ const PostDetails = () => {
   useEffect(() => {
     if (data) {
       const key = Object.keys(data)[0];
-      const post = data[key];
+      const postDetails = data[key];
 
-      setPostDetails(post);
+      setPost((prev: any) => ({
+        ...prev,
+        postDetails
+      }));
     }
   }, [data]);
 
@@ -175,7 +180,10 @@ const PostDetails = () => {
       const data = response.data[key];
 
       if (data) {
-        setPostDetails(data);
+        setPost({
+          ...post,
+          postDetails: data
+        });
       }
     } catch (error) {
       console.log('Error:', error);
@@ -202,7 +210,10 @@ const PostDetails = () => {
       const data = response.data[key];
 
       if (data) {
-        setPostDetails(data);
+        setPost({
+          ...post,
+          postDetails: data
+        });
         form.reset();
         commentRef.current?.blur();
         notifications.show({
@@ -248,10 +259,6 @@ const PostDetails = () => {
     return response.data[key];
   };
 
-  const handleFollowAuthor = () => {
-    // Follow author logic
-  };
-
   const showDeleteModal = () =>
     modals.openConfirmModal({
       id: 'delete-post',
@@ -271,15 +278,15 @@ const PostDetails = () => {
     return postDetails?.creator.email === auth?.profile.email;
   }, [postDetails?.creator.email, auth?.profile.email]);
 
+  const isLiked = postDetails?.likes?.some(
+    (item: any) => item.liker.email === auth?.profile.email
+  );
+  const isCommented = postDetails?.comments?.some(
+    (item: any) => item.commentor.email === auth?.profile.email
+  );
+
   const renderPost = (post: any) => {
     const content = JSON.parse(post?.content);
-
-    const isLiked = post?.likes?.some(
-      (item: any) => item.liker.email === auth?.profile.email
-    );
-    const isCommented = post?.comments?.some(
-      (item: any) => item.commentor.email === auth?.profile.email
-    );
 
     return (
       <Fragment>
@@ -300,19 +307,6 @@ const PostDetails = () => {
                 profile={post.creator}
                 onClick={() => navigate(`/profile/${post.creator.email}`)}
               />
-
-              {!isOwnPost && (
-                <Fragment>
-                  &bull;
-                  <Button
-                    px={0}
-                    variant="transparent"
-                    onClick={handleFollowAuthor}
-                  >
-                    Follow
-                  </Button>
-                </Fragment>
-              )}
             </Group>
             <PostReaction
               post={post}
@@ -327,7 +321,6 @@ const PostDetails = () => {
 
         <Stack>
           {content.blocks.map((block: any, index: number) => {
-            console.log(block);
             switch (block.type) {
               case 'paragraph':
                 return (
@@ -358,12 +351,21 @@ const PostDetails = () => {
                 );
               case 'quote':
                 return (
-                  <Blockquote color="green" cite={block.data.caption} mt="xl">
+                  <Blockquote
+                    color="green"
+                    key={block.id}
+                    cite={block.data.caption}
+                    mt="xl"
+                  >
                     {block.data.text}
                   </Blockquote>
                 );
               case 'code':
-                return <Code block>{block.data.code}</Code>;
+                return (
+                  <Code key={block.id} block>
+                    {block.data.code}
+                  </Code>
+                );
               case 'table':
                 const withHeadings = block.data.withHeadings;
                 const rows = withHeadings
@@ -405,7 +407,7 @@ const PostDetails = () => {
                     <Group
                       justify="center"
                       bg="dimmed"
-                      key={index}
+                      key={block.id}
                       style={{
                         borderRadius: theme.radius.sm
                       }}
@@ -425,7 +427,7 @@ const PostDetails = () => {
                 return (
                   <Image
                     radius="sm"
-                    key={index}
+                    key={block.id}
                     src={block.data.file.url}
                     alt={block.data.caption}
                   />
@@ -547,17 +549,19 @@ const PostDetails = () => {
           </Stack>
         </Grid.Col>
         <Grid.Col span={4}>
-          <Stack gap="lg" className="extras-container">
-            <AuthorPanel creatorEmail={postDetails?.creator.email} />
-            <AuthorPostsPanel
-              postId={postDetails?.id}
-              creator={postDetails?.creator.id}
-            />
-            <SuggestionsPanel
-              postId={postDetails?.id}
-              tags={postDetails?.tags}
-            />
-          </Stack>
+          {postDetails && (
+            <Stack gap="lg" className="extras-container">
+              <AuthorPanel creator={postDetails?.creator} />
+              <AuthorPostsPanel
+                postId={postDetails?.id}
+                creator={postDetails?.creator.id}
+              />
+              <SuggestionsPanel
+                postId={postDetails?.id}
+                tags={postDetails?.tags}
+              />
+            </Stack>
+          )}
         </Grid.Col>
       </Grid>
     </ProtectedLayout>

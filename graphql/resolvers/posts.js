@@ -13,7 +13,7 @@ const profileBadgeProj = '_id email firstName lastName profilePhoto';
 
 module.exports = {
   Query: {
-    async getPosts(_, __, context) {
+    async getPosts(_, { limit }, context) {
       try {
         const user = checkAuth(context);
 
@@ -21,37 +21,47 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const posts = await Post.find()
+        const query = Post.find()
           .sort({ createdAt: -1 })
           .populate('creator', profileBadgeProj);
 
-        return posts.map((post) => {
-          const isLiked = post._doc.likes.some(
-            (like) => like.liker.toString() === user.id
-          );
-          const isCommented = post._doc.comments.some(
-            (comment) => comment.commentor.toString() === user.id
-          );
-          const likeCount = post._doc.likes.length ?? 0;
-          const commentCount = post._doc.comments.length ?? 0;
+        if (limit) {
+          query.limit(limit);
+        }
 
-          delete post._doc.likes;
-          delete post._doc.comments;
+        const posts = await query;
+        const totalCount = await Post.countDocuments();
 
-          return {
-            id: post._id,
-            ...post._doc,
-            likeCount,
-            commentCount,
-            isLiked,
-            isCommented
-          };
-        });
+        return {
+          totalCount,
+          posts: posts.map((post) => {
+            const isLiked = post._doc.likes.some(
+              (like) => like.liker.toString() === user.id
+            );
+            const isCommented = post._doc.comments.some(
+              (comment) => comment.commentor.toString() === user.id
+            );
+            const likeCount = post._doc.likes.length ?? 0;
+            const commentCount = post._doc.comments.length ?? 0;
+
+            delete post._doc.likes;
+            delete post._doc.comments;
+
+            return {
+              id: post._id,
+              ...post._doc,
+              likeCount,
+              commentCount,
+              isLiked,
+              isCommented
+            };
+          })
+        };
       } catch (error) {
         throw new Error(error);
       }
     },
-    async getPostsByCreator(_, { creator }, context) {
+    async getPostsByCreator(_, { creator, limit }, context) {
       try {
         const user = checkAuth(context);
 
@@ -59,37 +69,47 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const posts = await Post.find({ creator })
+        const query = Post.find({ creator })
           .sort({ createdAt: -1 })
           .populate('creator', profileBadgeProj);
 
-        return posts.map((post) => {
-          const isLiked = post._doc.likes.some(
-            (like) => like.liker.toString() === user.id
-          );
-          const isCommented = post._doc.comments.some(
-            (comment) => comment.commentor.toString() === user.id
-          );
-          const likeCount = post._doc.likes.length ?? 0;
-          const commentCount = post._doc.comments.length ?? 0;
+        if (limit) {
+          query.limit(limit);
+        }
 
-          delete post._doc.likes;
-          delete post._doc.comments;
+        const posts = await query;
+        const totalCount = await Post.countDocuments({ creator });
 
-          return {
-            id: post._id,
-            ...post._doc,
-            likeCount,
-            commentCount,
-            isLiked,
-            isCommented
-          };
-        });
+        return {
+          totalCount,
+          posts: posts.map((post) => {
+            const isLiked = post._doc.likes.some(
+              (like) => like.liker.toString() === user.id
+            );
+            const isCommented = post._doc.comments.some(
+              (comment) => comment.commentor.toString() === user.id
+            );
+            const likeCount = post._doc.likes.length ?? 0;
+            const commentCount = post._doc.comments.length ?? 0;
+
+            delete post._doc.likes;
+            delete post._doc.comments;
+
+            return {
+              id: post._id,
+              ...post._doc,
+              likeCount,
+              commentCount,
+              isLiked,
+              isCommented
+            };
+          })
+        };
       } catch (error) {
         throw new Error(error);
       }
     },
-    async getPostsByTags(_, { tags }, context) {
+    async getPostsByTags(_, { tags, limit }, context) {
       try {
         const user = checkAuth(context);
 
@@ -97,7 +117,7 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const posts = await Post.find({
+        const query = Post.find({
           tags: {
             $in: [...tags]
           }
@@ -105,28 +125,42 @@ module.exports = {
           .sort({ createdAt: -1 })
           .populate('creator', profileBadgeProj);
 
-        return posts.map((post) => {
-          const isLiked = post._doc.likes.some(
-            (like) => like.liker.toString() === user.id
-          );
-          const isCommented = post._doc.comments.some(
-            (comment) => comment.commentor.toString() === user.id
-          );
-          const likeCount = post._doc.likes.length ?? 0;
-          const commentCount = post._doc.comments.length ?? 0;
+        if (limit) {
+          query.limit(limit);
+        }
 
-          delete post._doc.likes;
-          delete post._doc.comments;
-
-          return {
-            id: post._id,
-            ...post._doc,
-            likeCount,
-            commentCount,
-            isLiked,
-            isCommented
-          };
+        const posts = await query;
+        const totalCount = await Post.countDocuments({
+          tags: {
+            $in: [...tags]
+          }
         });
+
+        return {
+          totalCount,
+          posts: posts.map((post) => {
+            const isLiked = post._doc.likes.some(
+              (like) => like.liker.toString() === user.id
+            );
+            const isCommented = post._doc.comments.some(
+              (comment) => comment.commentor.toString() === user.id
+            );
+            const likeCount = post._doc.likes.length ?? 0;
+            const commentCount = post._doc.comments.length ?? 0;
+
+            delete post._doc.likes;
+            delete post._doc.comments;
+
+            return {
+              id: post._id,
+              ...post._doc,
+              likeCount,
+              commentCount,
+              isLiked,
+              isCommented
+            };
+          })
+        };
       } catch (error) {
         throw new Error(error);
       }
