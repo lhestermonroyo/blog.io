@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Box, SimpleGrid, Tabs, Title } from '@mantine/core';
+import { Box, SimpleGrid, Stack, Tabs, Text, Title } from '@mantine/core';
 import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
@@ -10,6 +10,7 @@ import { GET_FOLLOWS_BY_EMAIL, GET_POSTS } from '../../graphql/queries';
 import ProtectedLayout from '../../layouts/protected';
 import PostCard from '../../components/feed/post-card';
 import LoadingFeed from '../../components/feed/loading-feed';
+import { greetUser } from '../../utils/time.util';
 
 const Feed = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
@@ -70,7 +71,18 @@ const Feed = () => {
 
   return (
     <ProtectedLayout>
-      {profile && <Title order={1}>Good day, {profile?.firstName}!</Title>}
+      {profile && (
+        <Stack gap={0}>
+          <Text size="md" fw={700} c="dimmed">
+            Hello{' '}
+            <Text span c="green" fw={700}>
+              {profile?.firstName}
+            </Text>
+            ,
+          </Text>
+          <Title order={1}>{greetUser()}</Title>
+        </Stack>
+      )}
       <Tabs defaultValue="first">
         <Tabs.List justify="center">
           <Tabs.Tab value="first">For You</Tabs.Tab>
