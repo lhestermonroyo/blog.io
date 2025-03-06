@@ -3,7 +3,15 @@ import { atom } from 'recoil';
 const initialState: any = {
   isAuth: false,
   profile: null,
-  follows: null
+  follows: null,
+  onboarding: {
+    infoForm: null,
+    uploadForm: {
+      avatar: null,
+      cover: null
+    },
+    tagsForm: null
+  }
 };
 
 export const AUTH_STATE = atom({
