@@ -15,6 +15,7 @@ import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { IconPhoto, IconUser } from '@tabler/icons-react';
 import { useRecoilState } from 'recoil';
 import states from '../../../states';
+import UploadAvatar from '../../upload-avatar';
 
 const readFile = (file: any) => {
   return new Promise((resolve) => {
@@ -24,7 +25,7 @@ const readFile = (file: any) => {
   });
 };
 
-const UploadProfilePhoto = () => {
+const StepTwo = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { onboarding } = auth;
 
@@ -57,21 +58,7 @@ const UploadProfilePhoto = () => {
     <Stack gap="xl" mt="xl">
       <Stack gap={6}>
         <Text>Upload Avatar</Text>
-        <FileButton onChange={handleAvatarChange} accept="image/png,image/jpeg">
-          {(props) => (
-            <UnstyledButton {...props} className="upload-avatar">
-              <Avatar
-                src={onboarding.uploadForm.avatar}
-                alt="upload-avatar"
-                radius="md"
-                color="initials"
-                size={120}
-              >
-                <IconUser size={64} />
-              </Avatar>
-            </UnstyledButton>
-          )}
-        </FileButton>
+        <UploadAvatar avatarUri={onboarding.uploadForm.avatar} />
       </Stack>
 
       <Stack gap={6}>
@@ -88,4 +75,4 @@ const UploadProfilePhoto = () => {
   );
 };
 
-export default UploadProfilePhoto;
+export default StepTwo;

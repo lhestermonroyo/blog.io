@@ -10,11 +10,11 @@ import {
 } from '@mantine/core';
 import { useState } from 'react';
 import Logo from '../../components/logo';
-import ProfileInfoForm from '../../components/onboarding/profile-info-form';
-import ProfileCoverPhoto from '../../components/onboarding/upload-profile-photo';
+import StepOne from '../../components/onboarding/step-one';
+import StepTwo from '../../components/onboarding/step-two';
 
 const Onboarding = () => {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(1);
   const nextStep = () => {
     setActive((current) => (current < 3 ? current + 1 : current));
     window.scrollTo(0, 0);
@@ -36,10 +36,10 @@ const Onboarding = () => {
         </Box>
         <Stepper active={active} onStepClick={setActive}>
           <Stepper.Step label="First step" description="Profile Info">
-            <ProfileInfoForm onNextStep={nextStep} />
+            <StepOne onNextStep={nextStep} />
           </Stepper.Step>
           <Stepper.Step label="Second step" description="Avatar & Cover Photo">
-            <ProfileCoverPhoto />
+            <StepTwo />
           </Stepper.Step>
           <Stepper.Step label="Final step" description="Tags & Interests">
             Step 3 content: Get full access

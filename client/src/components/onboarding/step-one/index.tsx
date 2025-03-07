@@ -12,11 +12,11 @@ import { useForm } from '@mantine/form';
 import { useRecoilState } from 'recoil';
 import states from '../../../states';
 
-interface ProfileInfoFormProps {
+interface StepOneProps {
   onNextStep: () => void;
 }
 
-const ProfileInfoForm: FC<ProfileInfoFormProps> = ({ onNextStep }) => {
+const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile } = auth;
 
@@ -122,4 +122,4 @@ const ProfileInfoForm: FC<ProfileInfoFormProps> = ({ onNextStep }) => {
   );
 };
 
-export default ProfileInfoForm;
+export default StepOne;
