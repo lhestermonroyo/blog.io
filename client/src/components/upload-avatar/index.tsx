@@ -1,40 +1,23 @@
-import { FC, Fragment, useCallback, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 import {
   Avatar,
   FileButton,
-  Modal,
-  Stack,
   UnstyledButton,
-  Slider,
-  Text,
   Group,
-  Button
+  Stack,
+  Text
 } from '@mantine/core';
 import { IconUser } from '@tabler/icons-react';
-import Cropper from 'react-easy-crop';
+import ImageCropModal from '../image-crop-modal';
+import { readFile } from '../../utils/upload.util';
 
 interface UploadAvatarProps {
   avatarUri: string;
+  onSelect: (base64Str: string) => void;
 }
 
-const readFile = (file: any) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => resolve(reader.result), false);
-    reader.readAsDataURL(file);
-  });
-};
-
-const UploadAvatar: FC<UploadAvatarProps> = ({ avatarUri }) => {
+const UploadAvatar: FC<UploadAvatarProps> = ({ avatarUri, onSelect }) => {
   const [file, setFile] = useState<any>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [rotation, setRotation] = useState(0);
-  const [zoom, setZoom] = useState(1);
-  const [cropArea, setCropArea] = useState<any>(null);
-
-  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
-    setCropArea(croppedAreaPixels);
-  }, []);
 
   const handleFile = async (file: any) => {
     const imgFile = await readFile(file);
@@ -43,82 +26,35 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ avatarUri }) => {
 
   return (
     <Fragment>
-      <Modal
-        opened={file}
-        centered
-        size="40%"
-        title="Customize Avatar"
+      <ImageCropModal
+        type="Avatar"
+        imgFile={file}
+        onConfirmSelect={onSelect}
         onClose={() => setFile(null)}
-      >
-        <Stack gap="lg">
-          <div
-            style={{
-              position: 'relative',
-              width: '100%',
-              height: 500,
-              backgroundColor: '#f9f9f9'
-            }}
-          >
-            <Cropper
-              image={file}
-              crop={crop}
-              zoom={zoom}
-              rotation={rotation}
-              aspect={1 / 1}
-              onCropChange={setCrop}
-              onCropComplete={onCropComplete}
-              onZoomChange={setZoom}
-            />
-          </div>
-          <Group gap="lg">
-            <Stack gap={6} flex={1}>
-              <Text>Zoom</Text>
-              <Slider
-                value={zoom}
-                min={1}
-                max={3}
-                label={(value) => value.toFixed(1)}
-                step={0.1}
-                styles={{ markLabel: { display: 'none' } }}
-                onChange={(zoom) => setZoom(zoom)}
-              />
-            </Stack>
-            <Stack gap={6} flex={1}>
-              <Text>Rotation</Text>
-              <Slider
-                label={(value) => value.toFixed(1)}
-                value={rotation}
-                min={0}
-                max={360}
-                step={0}
-                styles={{ markLabel: { display: 'none' } }}
-                onChange={(rotation) => setRotation(rotation)}
-              />
-            </Stack>
-          </Group>
-          <Group gap={6}>
-            <Button onClick={() => setFile(null)}>Save Avatar</Button>
-            <Button variant="default" onClick={() => setFile(null)}>
-              Cancel
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <FileButton onChange={handleFile} accept="image/png,image/jpeg,image/jpg">
-        {(props) => (
-          <UnstyledButton {...props} className="upload-avatar">
-            <Avatar
-              src={avatarUri}
-              alt="upload-avatar"
-              radius="md"
-              color="initials"
-              size={120}
-            >
-              <IconUser size={64} />
-            </Avatar>
-          </UnstyledButton>
-        )}
-      </FileButton>
+      />
+      <Group>
+        <FileButton
+          onChange={handleFile}
+          accept="image/png,image/jpeg,image/jpg"
+        >
+          {(props) => (
+            <UnstyledButton {...props} className="button-upload">
+              <Avatar
+                src={avatarUri}
+                alt="upload-avatar"
+                radius="none"
+                color="initials"
+                size={150}
+              >
+                <Stack gap={0} justify="center" align="center">
+                  <IconUser size={64} />
+                  <Text ta="center">Select Avatar</Text>
+                </Stack>
+              </Avatar>
+            </UnstyledButton>
+          )}
+        </FileButton>
+      </Group>
     </Fragment>
   );
 };

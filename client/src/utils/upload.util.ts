@@ -12,6 +12,14 @@ const isBase64 = (str: string) => {
   return base64Regex.test(str);
 };
 
+const readFile = (file: any) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => resolve(reader.result), false);
+    reader.readAsDataURL(file);
+  });
+};
+
 const uploadBlogFiles = async (uploadArr: any[]) => {
   try {
     const uploadRequests = uploadArr.map(async (upload: any) => {
@@ -47,4 +55,4 @@ const deleteBlogFiles = async (blogFiles: any[]) => {
   }
 };
 
-export { uploadBlogFiles, isBase64, deleteBlogFiles };
+export { uploadBlogFiles, readFile, isBase64, deleteBlogFiles };

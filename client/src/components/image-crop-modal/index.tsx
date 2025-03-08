@@ -1,17 +1,19 @@
-import { FC, Fragment, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Stack, Slider, Text, Group, Button } from '@mantine/core';
 import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../../utils/canvas.util';
 
 interface ImageCropModalProps {
-  type: 'avatar' | 'cover';
+  type: 'Avatar' | 'Cover';
   imgFile: string | null;
-  onSave: (img: string) => void;
+  onConfirmSelect: (base64Str: string) => void;
   onClose: () => void;
 }
 
 const ImageCropModal: FC<ImageCropModalProps> = ({
+  type = 'Avatar',
   imgFile,
-  onSave,
+  onConfirmSelect,
   onClose
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -23,12 +25,32 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
     setCropArea(croppedAreaPixels);
   }, []);
 
+  const handleSelect = async () => {
+    const base64Str = (await getCroppedImg(
+      imgFile ?? '',
+      cropArea,
+      rotation
+    )) as any;
+
+    onConfirmSelect(base64Str);
+    onClose();
+  };
+
+  const cropConfig = useMemo(
+    () => ({
+      title: `Customize ${imgFile ? 'Avatar' : 'Cover'}`,
+      buttonLabel: `Select as ${type}`,
+      aspectRatio: type === 'Avatar' ? 1 / 1 : 16 / 9
+    }),
+    [type]
+  );
+
   return (
     <Modal
       opened={!!imgFile}
       centered
-      size="40%"
-      title={`Customize ${imgFile ? 'Avatar' : 'Cover'}`}
+      size={500}
+      title={cropConfig.title}
       onClose={onClose}
     >
       <Stack gap="lg">
@@ -36,7 +58,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
           style={{
             position: 'relative',
             width: '100%',
-            height: 500,
+            height: 300,
             backgroundColor: '#f9f9f9'
           }}
         >
@@ -45,7 +67,8 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
             crop={crop}
             zoom={zoom}
             rotation={rotation}
-            aspect={1 / 1}
+            aspect={cropConfig.aspectRatio}
+            objectFit="vertical-cover"
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
             onZoomChange={setZoom}
@@ -78,7 +101,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
           </Stack>
         </Group>
         <Group gap={6} mt="lg">
-          <Button onClick={() => onSave(cropArea)}>Save Avatar</Button>
+          <Button onClick={handleSelect}>{cropConfig.buttonLabel}</Button>
           <Button variant="default" onClick={onClose}>
             Cancel
           </Button>

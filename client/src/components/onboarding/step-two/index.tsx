@@ -1,55 +1,36 @@
 import React from 'react';
-import {
-  Avatar,
-  Box,
-  Button,
-  Center,
-  FileButton,
-  Group,
-  Image,
-  Stack,
-  Text,
-  UnstyledButton
-} from '@mantine/core';
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
-import { IconPhoto, IconUser } from '@tabler/icons-react';
+import { Box, FileButton, Stack, Text, UnstyledButton } from '@mantine/core';
 import { useRecoilState } from 'recoil';
 import states from '../../../states';
 import UploadAvatar from '../../upload-avatar';
-
-const readFile = (file: any) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => resolve(reader.result), false);
-    reader.readAsDataURL(file);
-  });
-};
+import UploadCover from '../../upload-cover';
 
 const StepTwo = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { onboarding } = auth;
 
-  const handleAvatarChange = async (file: any) => {
-    const avatarUrl = await readFile(file);
-
+  const handleSelectAvatar = async (base64Str: string) => {
     setAuth((prev: any) => ({
       ...prev,
       onboarding: {
         ...prev.onboarding,
         uploadForm: {
           ...prev.onboarding.uploadForm,
-          avatar: avatarUrl
+          avatar: base64Str
         }
       }
     }));
   };
 
-  const handleCoverChange = async (file: any) => {
+  const handleSelectCover = async (base64Str: any) => {
     setAuth((prev: any) => ({
       ...prev,
       onboarding: {
         ...prev.onboarding,
-        cover: file
+        uploadForm: {
+          ...prev.onboarding.uploadForm,
+          cover: base64Str
+        }
       }
     }));
   };
@@ -58,18 +39,18 @@ const StepTwo = () => {
     <Stack gap="xl" mt="xl">
       <Stack gap={6}>
         <Text>Upload Avatar</Text>
-        <UploadAvatar avatarUri={onboarding.uploadForm.avatar} />
+        <UploadAvatar
+          avatarUri={onboarding.uploadForm.avatar}
+          onSelect={handleSelectAvatar}
+        />
       </Stack>
 
       <Stack gap={6}>
         <Text>Upload Cover Photo</Text>
-        <FileButton onChange={handleAvatarChange} accept="image/png,image/jpeg">
-          {(props) => (
-            <UnstyledButton {...props} className="upload-avatar">
-              <Box w="100%" h={200}></Box>
-            </UnstyledButton>
-          )}
-        </FileButton>
+        <UploadCover
+          coverUri={onboarding.uploadForm.cover}
+          onSelect={handleSelectCover}
+        />
       </Stack>
     </Stack>
   );
