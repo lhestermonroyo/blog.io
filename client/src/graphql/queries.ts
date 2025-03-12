@@ -11,9 +11,9 @@ export const GET_PROFILE = gql`
       location
       pronouns
       bio
-      tags
+      avatar
       coverPhoto
-      profilePhoto
+      tags
       age
       createdAt
     }
@@ -31,9 +31,9 @@ export const GET_PROFILE_BY_EMAIL = gql`
       location
       pronouns
       bio
-      tags
+      avatar
       coverPhoto
-      profilePhoto
+      tags
       age
       createdAt
     }
@@ -49,14 +49,14 @@ export const GET_FOLLOWS_BY_EMAIL = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       following {
         id
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       followersCount
       followingCount
@@ -79,7 +79,7 @@ export const GET_POSTS = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         likeCount
         commentCount
@@ -106,7 +106,7 @@ export const GET_POSTS_BY_TAGS = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         likeCount
         commentCount
@@ -133,7 +133,7 @@ export const GET_POSTS_BY_CREATOR = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         likeCount
         commentCount
@@ -157,7 +157,7 @@ export const GET_POST_BY_ID = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -167,7 +167,7 @@ export const GET_POST_BY_ID = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         isEdited
         createdAt
@@ -179,7 +179,7 @@ export const GET_POST_BY_ID = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }

@@ -15,7 +15,7 @@ const ProfileBadge: FC<ProfileBadgeProps> = ({
   return (
     <Group gap={6}>
       <Avatar
-        src={profile?.profilePhoto}
+        src={profile?.avatar}
         alt={profile?.firstName}
         name={`${profile?.firstName} ${profile?.lastName}`}
         radius="xl"

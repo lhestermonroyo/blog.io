@@ -5,12 +5,12 @@ const initialState: any = {
   profile: null,
   follows: null,
   onboarding: {
-    infoForm: null,
+    profileInfoForm: null,
     uploadForm: {
       avatar: null,
       cover: null
     },
-    tagsForm: null
+    tagsForm: []
   }
 };
 

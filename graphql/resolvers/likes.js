@@ -7,7 +7,7 @@ const pubSub = new PubSub();
 
 const LIKE_POST = 'LIKE_POST';
 
-const profileBadgeProj = '_id email firstName lastName profilePhoto';
+const profileBadgeProj = '_id email firstName lastName avatar';
 
 module.exports = {
   Mutation: {

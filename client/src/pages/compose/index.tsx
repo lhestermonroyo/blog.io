@@ -127,8 +127,8 @@ const Compose = () => {
 
       if (!uploadFiles.length) {
         notifications.show({
-          title: 'Create Post failed',
-          message: 'Please add at least one image.',
+          title: 'Validation Error',
+          message: 'Add at least one image to your content.',
           color: 'red',
           position: 'top-center'
         });
@@ -159,8 +159,8 @@ const Compose = () => {
 
       if (data) {
         notifications.show({
-          title: 'Create Post success',
-          message: 'Your post has been created successfully',
+          title: 'Success',
+          message: 'Your post has been created successfully.',
           color: 'green',
           position: 'top-center'
         });
@@ -169,8 +169,8 @@ const Compose = () => {
     } catch (error) {
       console.log('Error:', error);
       notifications.show({
-        title: 'Create Post failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while creating the post.',
         color: 'red',
         position: 'top-center'
       });

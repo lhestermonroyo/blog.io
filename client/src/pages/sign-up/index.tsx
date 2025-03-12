@@ -80,8 +80,8 @@ const SignUp: FC = () => {
     } catch (error) {
       console.error('error', error);
       notifications.show({
-        title: 'Sign Up failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while creating the account.',
         color: 'red',
         position: 'top-center'
       });

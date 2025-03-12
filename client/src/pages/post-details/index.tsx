@@ -151,7 +151,7 @@ const PostDetails = () => {
         await deleteBlogFiles(files);
 
         notifications.show({
-          title: 'Post Deleted',
+          title: 'Success',
           message: 'Your post has been deleted successfully.',
           color: 'teal',
           position: 'top-center'
@@ -161,8 +161,8 @@ const PostDetails = () => {
       }
     } catch (error) {
       notifications.show({
-        title: 'Deleting Post failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while deleting the post.',
         color: 'red',
         position: 'top-center'
       });
@@ -188,8 +188,8 @@ const PostDetails = () => {
     } catch (error) {
       console.log('Error:', error);
       notifications.show({
-        title: 'Like/Unlike Post failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while liking the post.',
         color: 'red',
         position: 'top-center'
       });
@@ -217,7 +217,7 @@ const PostDetails = () => {
         form.reset();
         commentRef.current?.blur();
         notifications.show({
-          title: 'Comment submitted',
+          title: 'Success',
           message: 'Your comment has been submitted successfully.',
           color: 'teal',
           position: 'top-center'
@@ -226,8 +226,8 @@ const PostDetails = () => {
     } catch (error) {
       console.log('Error:', error);
       notifications.show({
-        title: 'Submitting Comment failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while submitting the comment.',
         color: 'red',
         position: 'top-center'
       });
@@ -500,6 +500,7 @@ const PostDetails = () => {
           <Stack gap="lg">
             <Group justify="space-between" align="center">
               <Button
+                variant="default"
                 leftSection={<IconArrowLeft />}
                 onClick={() => navigate('/')}
               >
@@ -551,7 +552,7 @@ const PostDetails = () => {
         <Grid.Col span={4}>
           {postDetails && (
             <Stack gap="lg" className="extras-container">
-              <AuthorPanel creator={postDetails?.creator} />
+              <AuthorPanel authorEmail={postDetails?.creator.email} />
               <AuthorPostsPanel
                 postId={postDetails?.id}
                 creator={postDetails?.creator.id}

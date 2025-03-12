@@ -9,7 +9,7 @@ const pubSub = new PubSub();
 
 const NEW_POST = 'NEW_POST';
 
-const profileBadgeProj = '_id email firstName lastName profilePhoto';
+const profileBadgeProj = '_id email firstName lastName avatar';
 
 module.exports = {
   Query: {
@@ -202,6 +202,24 @@ module.exports = {
           id: post._id,
           ...post._doc
         };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async getTags(_, __, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const tags = await Post.aggregate([
+          { $unwind: '$tags' },
+          { $group: { _id: null, allTags: { $addToSet: '$tags' } } }
+        ]);
+        const uniqueTags = tags.length > 0 ? tags[0].allTags : [];
+        return uniqueTags.sort((a, b) => a.localeCompare(b));
       } catch (error) {
         throw new Error(error);
       }

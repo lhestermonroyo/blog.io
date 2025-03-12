@@ -1,15 +1,10 @@
 import { FC, Fragment, useState } from 'react';
-import {
-  Avatar,
-  FileButton,
-  UnstyledButton,
-  Group,
-  Stack,
-  Text
-} from '@mantine/core';
+import { Avatar, FileButton, UnstyledButton, Group } from '@mantine/core';
 import { IconUser } from '@tabler/icons-react';
-import ImageCropModal from '../image-crop-modal';
+
 import { readFile } from '../../utils/upload.util';
+
+import ImageCropModal from '../image-crop-modal';
 
 interface UploadAvatarProps {
   avatarUri: string;
@@ -44,12 +39,9 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ avatarUri, onSelect }) => {
                 alt="upload-avatar"
                 radius="none"
                 color="initials"
-                size={150}
+                size={120}
               >
-                <Stack gap={0} justify="center" align="center">
-                  <IconUser size={64} />
-                  <Text ta="center">Select Avatar</Text>
-                </Stack>
+                <IconUser size={64} />
               </Avatar>
             </UnstyledButton>
           )}

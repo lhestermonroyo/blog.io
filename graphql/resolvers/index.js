@@ -3,8 +3,6 @@ const postResolver = require('./posts');
 const likeResolver = require('./likes');
 const commentResolver = require('./comments');
 const followResolver = require('./follows');
-const tagsResolver = require('./tags');
-const tags = require('./tags');
 
 module.exports = {
   Posts: {
@@ -33,16 +31,14 @@ module.exports = {
   Query: {
     ...userResolver.Query,
     ...postResolver.Query,
-    ...followResolver.Query,
-    ...tagsResolver.Query
+    ...followResolver.Query
   },
   Mutation: {
     ...userResolver.Mutation,
     ...postResolver.Mutation,
     ...likeResolver.Mutation,
     ...commentResolver.Mutation,
-    ...followResolver.Mutation,
-    ...tagsResolver.Mutation
+    ...followResolver.Mutation
   },
   Subscription: {
     ...postResolver.Subscription,

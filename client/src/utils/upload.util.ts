@@ -20,6 +20,23 @@ const readFile = (file: any) => {
   });
 };
 
+const uploadProfile = async (
+  type: 'cover' | 'avatar',
+  imgFile: any,
+  email: string
+) => {
+  try {
+    const file = `/blog.io-uploads/${type}s/${email}.jpg?v=${Date.now()}`;
+    const storageRef = ref(storage, file);
+
+    await uploadString(storageRef, imgFile, 'data_url');
+
+    return await getDownloadURL(storageRef);
+  } catch (error) {
+    throw new Error();
+  }
+};
+
 const uploadBlogFiles = async (uploadArr: any[]) => {
   try {
     const uploadRequests = uploadArr.map(async (upload: any) => {
@@ -55,4 +72,4 @@ const deleteBlogFiles = async (blogFiles: any[]) => {
   }
 };
 
-export { uploadBlogFiles, readFile, isBase64, deleteBlogFiles };
+export { uploadProfile, uploadBlogFiles, readFile, isBase64, deleteBlogFiles };

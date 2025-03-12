@@ -184,8 +184,8 @@ const EditPost = () => {
 
       if (data) {
         notifications.show({
-          title: 'Update Post success',
-          message: 'Your post has been updated successfully',
+          title: 'Success',
+          message: 'Your post has been updated successfully.',
           color: 'green',
           position: 'top-center'
         });
@@ -194,7 +194,7 @@ const EditPost = () => {
     } catch (error) {
       console.log('Error:', error);
       notifications.show({
-        title: 'Update Post failed',
+        title: 'Error',
         message: 'An error occurred. Please try again.',
         color: 'red',
         position: 'top-center'

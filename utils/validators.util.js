@@ -43,7 +43,12 @@ module.exports.validateProfileInput = (
   firstName,
   lastName,
   birthdate,
-  location
+  location,
+  pronouns,
+  bio,
+  avatar,
+  coverPhoto,
+  tags
 ) => {
   const errors = {};
 
@@ -63,25 +68,24 @@ module.exports.validateProfileInput = (
     errors.location = 'Location must not be empty.';
   }
 
-  return {
-    errors,
-    valid: Object.keys(errors).length < 1
-  };
-};
-
-module.exports.validateProfilePhotoInput = (photoType, photoUri) => {
-  const errors = {};
-
-  if (photoType.trim() === '') {
-    if (photoType !== 'COVER' || photoType !== 'PROFILE') {
-      errors.firstName = 'Photo Type must be either COVER or PROFILE.';
-    } else {
-      errors.firstName = 'Photo Type must not be empty.';
-    }
+  if (pronouns.trim() === '') {
+    errors.pronouns = 'Pronouns must not be empty.';
   }
 
-  if (photoUri.trim() === '') {
-    errors.firstName = 'Photo URI must not be empty.';
+  if (bio.trim() === '') {
+    errors.bio = 'Bio must not be empty.';
+  }
+
+  if (avatar.trim() === '') {
+    errors.avatar = 'Avatar must not be empty.';
+  }
+
+  if (coverPhoto.trim() === '') {
+    errors.coverPhoto = 'Cover photo must not be empty.';
+  }
+
+  if (tags.length < 3) {
+    errors.tags = 'Tags must be at least 3.';
   }
 
   return {

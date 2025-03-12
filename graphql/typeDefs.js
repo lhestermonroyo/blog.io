@@ -1,10 +1,6 @@
 const { gql } = require('graphql-tag');
 
 module.exports = gql`
-  enum PhotoType {
-    COVER
-    PROFILE
-  }
   # Users
   type Session {
     id: ID!
@@ -19,11 +15,10 @@ module.exports = gql`
     location: String
     pronouns: String
     bio: String
-    tags: [String]!
+    avatar: String
     coverPhoto: String
-    profilePhoto: String
+    tags: [String]!
     age: Int
-    postCount: Int
     createdAt: String!
   }
   type ProfileBadge {
@@ -31,7 +26,7 @@ module.exports = gql`
     email: String!
     firstName: String!
     lastName: String!
-    profilePhoto: String
+    avatar: String
   }
   # Posts
   type Posts {
@@ -101,12 +96,11 @@ module.exports = gql`
     lastName: String!
     birthdate: String!
     location: String!
-    pronouns: String
-    bio: String
-  }
-  input ProfilePhotoInput {
-    type: PhotoType!
-    photoUri: String!
+    pronouns: String!
+    bio: String!
+    avatar: String!
+    coverPhoto: String!
+    tags: [String]!
   }
   input PostInput {
     title: String!
@@ -123,10 +117,9 @@ module.exports = gql`
     getPostsByCreator(creator: ID!, limit: Int): Posts!
     getPostsByTags(tags: [String]!, limit: Int): Posts!
     getPostById(postId: ID!): Post!
+    getTags: [String]!
     # Follows
     getFollowsByEmail(email: String!): Follows!
-    # Tags
-    getTags: [String]!
   }
 
   type Mutation {
@@ -135,7 +128,6 @@ module.exports = gql`
     login(email: String!, password: String!): Session!
     logout: Status!
     updateProfile(profileInput: ProfileInput): Profile!
-    updateProfilePhoto(profilePhotoInput: ProfilePhotoInput): Profile!
     # Posts
     createPost(postInput: PostInput): Post!
     updatePost(postId: ID!, postInput: PostInput): Post!
@@ -148,8 +140,6 @@ module.exports = gql`
     likePost(postId: ID!): Post!
     # Follows
     followUser(email: String): Follows!
-    # Tags
-    assignTags(tags: [String]!): Profile
   }
 
   type Subscription {

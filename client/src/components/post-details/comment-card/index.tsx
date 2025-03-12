@@ -62,7 +62,7 @@ const CommentCard: FC<ICommentCardProps> = ({
 
       if (data) {
         notifications.show({
-          title: 'Comment Updated',
+          title: 'Success',
           message: 'Your comment has been updated successfully.',
           color: 'teal',
           position: 'top-center'
@@ -71,8 +71,8 @@ const CommentCard: FC<ICommentCardProps> = ({
       }
     } catch (error) {
       notifications.show({
-        title: 'Submitting Comment failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while updating the comment.',
         color: 'red',
         position: 'top-center'
       });
@@ -87,7 +87,7 @@ const CommentCard: FC<ICommentCardProps> = ({
 
       if (data) {
         notifications.show({
-          title: 'Comment Deleted',
+          title: 'Success',
           message: 'Your comment has been deleted successfully.',
           color: 'teal',
           position: 'top-center'
@@ -96,8 +96,8 @@ const CommentCard: FC<ICommentCardProps> = ({
       }
     } catch (error) {
       notifications.show({
-        title: 'Deleting Comment failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while deleting the comment.',
         color: 'red',
         position: 'top-center'
       });

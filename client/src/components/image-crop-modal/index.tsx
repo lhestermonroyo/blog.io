@@ -1,11 +1,12 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Stack, Slider, Text, Group, Button } from '@mantine/core';
 import Cropper from 'react-easy-crop';
+
 import { getCroppedImg } from '../../utils/canvas.util';
 
 interface ImageCropModalProps {
   type: 'Avatar' | 'Cover';
-  imgFile: string | null;
+  imgFile: string;
   onConfirmSelect: (base64Str: string) => void;
   onClose: () => void;
 }
@@ -17,8 +18,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
   onClose
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [rotation, setRotation] = useState(0);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0);
   const [cropArea, setCropArea] = useState<any>(null);
 
   const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
@@ -26,11 +26,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
   }, []);
 
   const handleSelect = async () => {
-    const base64Str = (await getCroppedImg(
-      imgFile ?? '',
-      cropArea,
-      rotation
-    )) as any;
+    const base64Str = (await getCroppedImg(imgFile, cropArea, 0)) as any;
 
     onConfirmSelect(base64Str);
     onClose();
@@ -38,11 +34,11 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 
   const cropConfig = useMemo(
     () => ({
-      title: `Customize ${imgFile ? 'Avatar' : 'Cover'}`,
+      title: `Customize ${type}`,
       buttonLabel: `Select as ${type}`,
       aspectRatio: type === 'Avatar' ? 1 / 1 : 16 / 9
     }),
-    [type]
+    [type, imgFile]
   );
 
   return (
@@ -63,43 +59,28 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
           }}
         >
           <Cropper
-            image={imgFile || undefined}
+            image={imgFile}
             crop={crop}
             zoom={zoom}
-            rotation={rotation}
             aspect={cropConfig.aspectRatio}
-            objectFit="vertical-cover"
+            objectFit="contain"
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
             onZoomChange={setZoom}
           />
         </div>
-        <Group gap="lg">
-          <Stack gap={6} flex={1}>
-            <Text>Zoom</Text>
-            <Slider
-              value={zoom}
-              min={1}
-              max={3}
-              label={(value) => value.toFixed(1)}
-              step={0.1}
-              styles={{ markLabel: { display: 'none' } }}
-              onChange={(zoom) => setZoom(zoom)}
-            />
-          </Stack>
-          <Stack gap={6} flex={1}>
-            <Text>Rotation</Text>
-            <Slider
-              label={(value) => value.toFixed(1)}
-              value={rotation}
-              min={0}
-              max={360}
-              step={0}
-              styles={{ markLabel: { display: 'none' } }}
-              onChange={(rotation) => setRotation(rotation)}
-            />
-          </Stack>
-        </Group>
+        <Stack gap={6} flex={1}>
+          <Text>Zoom</Text>
+          <Slider
+            value={zoom}
+            min={1}
+            max={3}
+            label={(value) => value.toFixed(1)}
+            step={0.1}
+            styles={{ markLabel: { display: 'none' } }}
+            onChange={(zoom) => setZoom(zoom)}
+          />
+        </Stack>
         <Group gap={6} mt="lg">
           <Button onClick={handleSelect}>{cropConfig.buttonLabel}</Button>
           <Button variant="default" onClick={onClose}>

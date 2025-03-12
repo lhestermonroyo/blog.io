@@ -1,11 +1,18 @@
-import React from 'react';
-import { Box, FileButton, Stack, Text, UnstyledButton } from '@mantine/core';
+import { FC, Fragment } from 'react';
+import { Button, Group, Stack, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useRecoilState } from 'recoil';
+
 import states from '../../../states';
+
 import UploadAvatar from '../../upload-avatar';
 import UploadCover from '../../upload-cover';
+interface StepTwoProps {
+  onNextStep: () => void;
+  onPrevStep: () => void;
+}
 
-const StepTwo = () => {
+const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { onboarding } = auth;
 
@@ -35,24 +42,46 @@ const StepTwo = () => {
     }));
   };
 
-  return (
-    <Stack gap="xl" mt="xl">
-      <Stack gap={6}>
-        <Text>Upload Avatar</Text>
-        <UploadAvatar
-          avatarUri={onboarding.uploadForm.avatar}
-          onSelect={handleSelectAvatar}
-        />
-      </Stack>
+  const handleSubmit = async () => {
+    if (!onboarding.uploadForm.avatar || !onboarding.uploadForm.cover) {
+      notifications.show({
+        title: 'Validation Error',
+        message: 'Please upload avatar and cover photo first.',
+        color: 'red',
+        position: 'top-center'
+      });
+      return;
+    }
 
-      <Stack gap={6}>
-        <Text>Upload Cover Photo</Text>
-        <UploadCover
-          coverUri={onboarding.uploadForm.cover}
-          onSelect={handleSelectCover}
-        />
+    onNextStep();
+  };
+
+  return (
+    <Fragment>
+      <Stack gap="xl" mt="xl">
+        <Stack gap={6}>
+          <Text>Upload Avatar</Text>
+          <UploadAvatar
+            avatarUri={onboarding.uploadForm.avatar}
+            onSelect={handleSelectAvatar}
+          />
+        </Stack>
+
+        <Stack gap={6}>
+          <Text>Upload Cover Photo</Text>
+          <UploadCover
+            coverUri={onboarding.uploadForm.cover}
+            onSelect={handleSelectCover}
+          />
+        </Stack>
       </Stack>
-    </Stack>
+      <Group gap={6} mt="lg">
+        <Button variant="default" onClick={onPrevStep}>
+          Back
+        </Button>
+        <Button onClick={handleSubmit}>Next</Button>
+      </Group>
+    </Fragment>
   );
 };
 

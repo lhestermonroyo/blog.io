@@ -9,7 +9,7 @@ const pubSub = new PubSub();
 
 const NEW_COMMENT = 'NEW_COMMENT';
 
-const profileBadgeProj = '_id email firstName lastName profilePhoto';
+const profileBadgeProj = '_id email firstName lastName avatar';
 
 module.exports = {
   Mutation: {

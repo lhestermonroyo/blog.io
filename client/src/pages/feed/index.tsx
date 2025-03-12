@@ -37,12 +37,22 @@ const Feed = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (profile?.tags.length) {
-      fetchPosts();
-      fetchFollows();
-    } else {
+    console.log('profile', profile);
+    if (
+      profile &&
+      (!profile?.avatar ||
+        !profile?.cover ||
+        !profile?.bio ||
+        !profile?.tags ||
+        !profile?.location ||
+        !profile?.pronouns)
+    ) {
+      console.log('User has not completed onboarding');
       navigate('/onboarding');
     }
+
+    fetchPosts();
+    fetchFollows();
   }, []);
 
   useEffect(() => {

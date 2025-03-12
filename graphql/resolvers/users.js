@@ -5,8 +5,7 @@ const User = require('../../models/User');
 const {
   validateSignUpInput,
   validateLoginInput,
-  validateProfileInput,
-  validateProfilePhotoInput
+  validateProfileInput
 } = require('../../utils/validators.util');
 const {
   checkAuth,
@@ -120,14 +119,28 @@ module.exports = {
           throw new Error('User not authenticated.');
         }
 
-        const { firstName, lastName, birthdate, location, pronouns, bio } =
-          profileInput;
+        const {
+          firstName,
+          lastName,
+          birthdate,
+          location,
+          pronouns,
+          bio,
+          avatar,
+          coverPhoto,
+          tags
+        } = profileInput;
 
         const { valid, errors } = validateProfileInput(
           firstName,
           lastName,
           birthdate,
-          location
+          location,
+          pronouns,
+          bio,
+          avatar,
+          coverPhoto,
+          tags
         );
 
         if (!valid) {
@@ -142,53 +155,10 @@ module.exports = {
             birthdate,
             location,
             pronouns,
-            bio
-          },
-          { new: true }
-        );
-        await response.save();
-
-        return {
-          id: response._id,
-          ...response._doc
-        };
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-    async updateProfilePhoto(_, { profilePhotoInput }, context) {
-      try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated.');
-        }
-
-        const { photoType, photoUri } = profilePhotoInput;
-
-        const { valid, errors } = validateProfilePhotoInput(
-          photoType,
-          photoUri
-        );
-
-        if (!valid) {
-          throw new UserInputError('Validation Error', { errors });
-        }
-
-        let key;
-
-        if (photoType === 'COVER') {
-          key = 'coverPhoto';
-        } else {
-          key = 'profilePhoto';
-        }
-
-        const response = await User.findByIdAndUpdate(
-          user.id,
-          {
-            $set: {
-              [key]: photoUri
-            }
+            bio,
+            avatar,
+            coverPhoto,
+            tags
           },
           { new: true }
         );

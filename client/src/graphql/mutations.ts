@@ -26,10 +26,22 @@ export const LOGOUT = gql`
   }
 `;
 
-export const ASSIGN_TAGS = gql`
-  mutation AssignTags($tags: [String]!) {
-    assignTags(tags: $tags) {
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile($profileInput: ProfileInput) {
+    updateProfile(profileInput: $profileInput) {
+      id
+      email
+      firstName
+      lastName
+      birthdate
+      location
+      pronouns
+      bio
+      avatar
+      coverPhoto
       tags
+      age
+      createdAt
     }
   }
 `;
@@ -43,14 +55,14 @@ export const FOLLOW_USER = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       following {
         id
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       followersCount
       followingCount
@@ -70,7 +82,7 @@ export const CREATE_POST = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -80,7 +92,7 @@ export const CREATE_POST = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -91,7 +103,7 @@ export const CREATE_POST = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -114,7 +126,7 @@ export const UPDATE_POST = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -124,7 +136,7 @@ export const UPDATE_POST = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -135,7 +147,7 @@ export const UPDATE_POST = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -166,7 +178,7 @@ export const LIKE_POST = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -176,7 +188,7 @@ export const LIKE_POST = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -187,7 +199,7 @@ export const LIKE_POST = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -210,7 +222,7 @@ export const CREATE_COMMENT = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -220,7 +232,7 @@ export const CREATE_COMMENT = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         isEdited
         createdAt
@@ -232,7 +244,7 @@ export const CREATE_COMMENT = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -255,7 +267,7 @@ export const UPDATE_COMMENT = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -265,7 +277,7 @@ export const UPDATE_COMMENT = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         isEdited
         createdAt
@@ -277,7 +289,7 @@ export const UPDATE_COMMENT = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }
@@ -300,7 +312,7 @@ export const DELETE_COMMENT = gql`
         email
         firstName
         lastName
-        profilePhoto
+        avatar
       }
       comments {
         id
@@ -310,7 +322,7 @@ export const DELETE_COMMENT = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         isEdited
         createdAt
@@ -322,7 +334,7 @@ export const DELETE_COMMENT = gql`
           email
           firstName
           lastName
-          profilePhoto
+          avatar
         }
         createdAt
       }

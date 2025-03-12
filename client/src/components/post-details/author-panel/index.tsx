@@ -12,7 +12,10 @@ import {
 import { IconAt, IconMapPin } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@apollo/client';
 
-import { GET_FOLLOWS_BY_EMAIL } from '../../../graphql/queries';
+import {
+  GET_FOLLOWS_BY_EMAIL,
+  GET_PROFILE_BY_EMAIL
+} from '../../../graphql/queries';
 import { useRecoilValue } from 'recoil';
 
 import states from '../../../states';
@@ -20,10 +23,10 @@ import { FOLLOW_USER } from '../../../graphql/mutations';
 import { notifications } from '@mantine/notifications';
 
 interface AuthorPanelProps {
-  creator: any;
+  authorEmail: string;
 }
 
-const AuthorPanel: FC<AuthorPanelProps> = ({ creator }) => {
+const AuthorPanel: FC<AuthorPanelProps> = ({ authorEmail }) => {
   const [followDetails, setFollowDetails] = useState<any>(null);
 
   const auth = useRecoilValue(states.auth);
@@ -32,29 +35,37 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ creator }) => {
   const {
     data,
     loading,
+    refetch: fetchAuthor
+  } = useQuery(GET_PROFILE_BY_EMAIL, {
+    variables: { email: authorEmail }
+  });
+  const {
+    data: followsData,
+    loading: followsLoading,
     refetch: fetchFollowsByEmail
   } = useQuery(GET_FOLLOWS_BY_EMAIL, {
-    variables: { email: creator.email }
+    variables: { email: authorEmail }
   });
   const [followUser] = useMutation(FOLLOW_USER);
 
   useEffect(() => {
-    if (creator.email) {
+    if (authorEmail) {
+      fetchAuthor();
       fetchFollowsByEmail();
     }
-  }, [creator.email]);
+  }, [authorEmail]);
 
   useEffect(() => {
-    if (data) {
-      const key = Object.keys(data)[0];
-      setFollowDetails(data[key]);
+    if (followsData) {
+      const key = Object.keys(followsData)[0];
+      setFollowDetails(followsData[key]);
     }
-  }, [data]);
+  }, [followsData]);
 
   const handleFollow = async () => {
     try {
       const response = await followUser({
-        variables: { email: creator.email }
+        variables: { email: authorEmail }
       });
       const key = Object.keys(response.data)[0];
       const data = response.data[key];
@@ -73,8 +84,8 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ creator }) => {
     } catch (error) {
       console.error(error);
       notifications.show({
-        title: 'Follow/Unfollow Author failed',
-        message: 'An error occurred. Please try again.',
+        title: 'Error',
+        message: 'An error occurred while following/unfollowing the author.',
         color: 'red',
         position: 'top-center'
       });
@@ -82,8 +93,8 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ creator }) => {
   };
 
   const isOwnProfile = useMemo(
-    () => auth?.profile.email === creator.email,
-    [creator.email]
+    () => auth?.profile.email === authorEmail,
+    [authorEmail]
   );
   const followersCount = useMemo(
     () => followDetails?.followersCount || 0,
@@ -101,7 +112,9 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ creator }) => {
     [followDetails?.followers, auth?.profile.email]
   );
 
-  if (loading) {
+  console.log('followDetails', followDetails);
+
+  if (followsLoading || loading) {
     return (
       <Card withBorder>
         <Stack gap="lg">
@@ -150,14 +163,17 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ creator }) => {
     );
   }
 
-  if (data) {
+  if (followsData && data) {
+    const key = Object.keys(data)[0];
+    const creator = data[key];
+
     return (
       <Card withBorder>
         <Stack gap="lg">
           <Title order={3}>About the Author</Title>
           <Group gap="md">
             <Avatar
-              src={creator.profilePhoto}
+              src={creator.avatar}
               alt={creator.firstName}
               name={`${creator.firstName} ${creator.lastName}`}
               radius="md"

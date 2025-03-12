@@ -13,9 +13,9 @@ const userSchema = new Schema({
   location: String,
   pronouns: String,
   bio: String,
-  tags: [String],
+  avatar: String,
   coverPhoto: String,
-  profilePhoto: String,
+  tags: [String],
   createdAt: String
 });
 

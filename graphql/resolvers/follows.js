@@ -4,7 +4,7 @@ const User = require('../../models/User');
 const Follow = require('../../models/Follow');
 const { checkAuth } = require('../../utils/auth.util');
 
-const profileBadgeProj = '_id email firstName lastName profilePhoto';
+const profileBadgeProj = '_id email firstName lastName avatar';
 
 module.exports = {
   Mutation: {

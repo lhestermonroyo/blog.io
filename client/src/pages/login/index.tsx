@@ -65,7 +65,7 @@ const Login = () => {
     } catch (error) {
       console.error('error', error);
       notifications.show({
-        title: 'Login failed',
+        title: 'Error',
         message: 'Invalid email or password. Please try again.',
         color: 'red',
         position: 'top-center'

@@ -61,7 +61,7 @@ const Navbar = () => {
     } catch (error) {
       console.error(error);
       notifications.show({
-        title: 'Logout failed',
+        title: 'Error',
         message: 'An error occurred while logging out.',
         color: 'red',
         position: 'top-center'
@@ -118,7 +118,7 @@ const Navbar = () => {
                   >
                     <Group gap={6}>
                       <Avatar
-                        src={profile?.profilePhoto}
+                        src={profile?.avatar}
                         alt={profile?.firstName}
                         name={`${profile?.firstName} ${profile?.lastName}`}
                         radius="xl"
