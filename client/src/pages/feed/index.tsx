@@ -37,23 +37,23 @@ const Feed = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('profile', profile);
-    if (
-      profile &&
-      (!profile?.avatar ||
-        !profile?.cover ||
-        !profile?.bio ||
-        !profile?.tags ||
+    if (profile) {
+      const needsOnboarding =
         !profile?.location ||
-        !profile?.pronouns)
-    ) {
-      console.log('User has not completed onboarding');
-      navigate('/onboarding');
-    }
+        !profile?.bio ||
+        !profile?.pronouns ||
+        !profile?.avatar ||
+        !profile?.coverPhoto ||
+        !profile?.tags.length;
 
-    fetchPosts();
-    fetchFollows();
-  }, []);
+      if (needsOnboarding) {
+        navigate('/onboarding');
+      } else {
+        fetchPosts();
+        fetchFollows();
+      }
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (postsData) {

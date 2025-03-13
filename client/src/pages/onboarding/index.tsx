@@ -51,8 +51,8 @@ const Onboarding = () => {
       const { profileInfoForm, uploadForm, tagsForm } = onboarding;
 
       const [avatarUrl, coverUrl] = await Promise.all([
-        uploadProfile('avatar', uploadForm.avatar, profile.email),
-        uploadProfile('cover', uploadForm.cover, profile.email)
+        uploadProfile('avatar', uploadForm.avatar, profile?.email),
+        uploadProfile('cover', uploadForm.cover, profile?.email)
       ]);
 
       const response = await updateProfile({

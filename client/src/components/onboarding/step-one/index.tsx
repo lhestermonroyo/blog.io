@@ -46,13 +46,15 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
       const formData = onboarding.profileInfoForm;
 
       form.setValues({
-        email: formData?.email || profile.email,
-        firstName: formData?.firstName || profile.firstName,
-        lastName: formData?.lastName || profile.lastName,
-        birthdate: formData?.birthdate || profile.birthdate,
-        location: formData?.location || profile.location,
-        pronouns: formData?.pronouns || profile.pronouns,
-        bio: formData?.bio || profile.bio
+        email: formData?.email || profile?.email,
+        firstName: formData?.firstName || profile?.firstName,
+        lastName: formData?.lastName || profile?.lastName,
+        birthdate:
+          formData?.birthdate ||
+          (profile?.birthdate && new Date(profile?.birthdate)),
+        location: formData?.location || profile?.location,
+        pronouns: formData?.pronouns || profile?.pronouns,
+        bio: formData?.bio || profile?.bio
       });
     }
   }, [profile]);
