@@ -12,8 +12,9 @@ import { useForm } from '@mantine/form';
 import { useRecoilState } from 'recoil';
 
 import states from '../../../states';
+import { TAuthState } from '../../../../types';
 
-interface StepOneProps {
+type StepOneProps = {
   onNextStep: () => void;
 }
 
@@ -26,7 +27,7 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
       email: '',
       firstName: '',
       lastName: '',
-      birthdate: '',
+      birthdate: null as Date | null,
       location: '',
       pronouns: '',
       bio: ''
@@ -49,9 +50,11 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
         email: formData?.email || profile?.email,
         firstName: formData?.firstName || profile?.firstName,
         lastName: formData?.lastName || profile?.lastName,
-        birthdate:
-          formData?.birthdate ||
-          (profile?.birthdate && new Date(profile?.birthdate)),
+        birthdate: formData?.birthdate
+          ? new Date(formData.birthdate)
+          : profile?.birthdate
+          ? new Date(profile.birthdate)
+          : null,
         location: formData?.location || profile?.location,
         pronouns: formData?.pronouns || profile?.pronouns,
         bio: formData?.bio || profile?.bio
@@ -60,7 +63,7 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
   }, [profile]);
 
   const handleSubmit = (values: typeof form.values) => {
-    setAuth((prev: any) => ({
+    setAuth((prev: TAuthState) => ({
       ...prev,
       onboarding: {
         ...prev.onboarding,

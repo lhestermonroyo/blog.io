@@ -91,6 +91,33 @@ export const GET_POSTS = gql`
   }
 `;
 
+export const GET_POSTS_BY_FOLLOWING = gql`
+  query GetPostsByFollowing($limit: Int) {
+    getPostsByFollowing(limit: $limit) {
+      totalCount
+      currentCount
+      posts {
+        id
+        title
+        content
+        tags
+        creator {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        likeCount
+        commentCount
+        isLiked
+        isCommented
+        createdAt
+      }
+    }
+  }
+`;
+
 export const GET_POSTS_BY_TAGS = gql`
   query GetPostsByTags($tags: [String!]!, $limit: Int) {
     getPostsByTags(tags: $tags, limit: $limit) {

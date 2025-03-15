@@ -4,13 +4,14 @@ import { useForm } from '@mantine/form';
 import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
-import { GET_TAGS } from '../../../graphql/queries';
 import states from '../../../states';
+import { GET_TAGS } from '../../../graphql/queries';
+import { TAuthState } from '../../../../types';
 
-interface StepThreeProps {
+type StepThreeProps = {
   onNextStep: () => void;
   onPrevStep: () => void;
-}
+};
 
 const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
@@ -18,10 +19,11 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
 
   const form = useForm({
     initialValues: {
-      tags: []
+      tags: [] as string[]
     },
     validate: {
-      tags: (value) => (value.length < 3 ? 'Select atleast 3 topics' : null)
+      tags: (value) =>
+        value.length < 3 ? 'Select atleast 3 topics/tags' : null
     },
     mode: 'uncontrolled',
     validateInputOnBlur: true
@@ -34,7 +36,7 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
   const { data } = useQuery(GET_TAGS);
 
   const handleSubmit = (values: typeof form.values) => {
-    setAuth((prev: any) => ({
+    setAuth((prev: TAuthState) => ({
       ...prev,
       onboarding: {
         ...prev.onboarding,
@@ -57,8 +59,8 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
               personalize your feed.
             </Title>
             <MultiSelect
-              label="Select Topics"
-              placeholder="Select minumum of 3 topics"
+              label="Select Topics/tags"
+              placeholder="Select minumum of 3 topics/tags"
               data={tags}
               searchable
               clearable

@@ -4,20 +4,22 @@ import { notifications } from '@mantine/notifications';
 import { useRecoilState } from 'recoil';
 
 import states from '../../../states';
+import { TAuthState } from '../../../../types';
 
 import UploadAvatar from '../../upload-avatar';
 import UploadCover from '../../upload-cover';
-interface StepTwoProps {
+
+type StepTwoProps = {
   onNextStep: () => void;
   onPrevStep: () => void;
-}
+};
 
 const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { onboarding } = auth;
 
   const handleSelectAvatar = async (base64Str: string) => {
-    setAuth((prev: any) => ({
+    setAuth((prev: TAuthState) => ({
       ...prev,
       onboarding: {
         ...prev.onboarding,
@@ -30,20 +32,20 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
   };
 
   const handleSelectCover = async (base64Str: any) => {
-    setAuth((prev: any) => ({
+    setAuth((prev: TAuthState) => ({
       ...prev,
       onboarding: {
         ...prev.onboarding,
         uploadForm: {
           ...prev.onboarding.uploadForm,
-          cover: base64Str
+          coverPhoto: base64Str
         }
       }
     }));
   };
 
   const handleSubmit = async () => {
-    if (!onboarding.uploadForm.avatar || !onboarding.uploadForm.cover) {
+    if (!onboarding.uploadForm.avatar || !onboarding.uploadForm.coverPhoto) {
       notifications.show({
         title: 'Validation Error',
         message: 'Please upload avatar and cover photo first.',
@@ -70,7 +72,7 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
         <Stack gap={6}>
           <Text>Upload Cover Photo</Text>
           <UploadCover
-            coverUri={onboarding.uploadForm.cover}
+            coverUri={onboarding.uploadForm.coverPhoto}
             onSelect={handleSelectCover}
           />
         </Stack>

@@ -6,14 +6,15 @@ import {
   IconMessage,
   IconMessageFilled
 } from '@tabler/icons-react';
+import { TPostDetails } from '../../../../types';
 
-interface PostReactionProps {
-  post: any;
+type PostReactionProps = {
+  post: TPostDetails;
   isLiked: boolean;
   isCommented: boolean;
   onLike: () => void;
   onComment: () => void;
-}
+};
 
 const PostReaction: FC<PostReactionProps> = ({
   post,

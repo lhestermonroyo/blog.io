@@ -1,10 +1,10 @@
 import { Divider, Group, Skeleton, Stack } from '@mantine/core';
 import { FC, ReactNode } from 'react';
 
-interface LoadingPostProps {
+type LoadingPostProps = {
   loading: boolean;
   children: ReactNode;
-}
+};
 
 const LoadingPost: FC<LoadingPostProps> = ({ loading, children }) => {
   if (loading) {

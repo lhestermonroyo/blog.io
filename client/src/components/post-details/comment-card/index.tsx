@@ -22,16 +22,17 @@ import {
 import { format } from 'date-fns';
 
 import ProfileBadge from '../../profile-badge';
+import { TCommentItem } from '../../../../types';
 
-interface ICommentCardProps {
-  comment: any;
+type CommentCardProps = {
+  comment: TCommentItem;
   isOwnComment: boolean;
   isLastComment: boolean;
   updateComment: (commentId: string, values: any) => Promise<any>;
   deleteComment: (commentId: string) => Promise<any>;
-}
+};
 
-const CommentCard: FC<ICommentCardProps> = ({
+const CommentCard: FC<CommentCardProps> = ({
   comment,
   isOwnComment,
   isLastComment,

@@ -29,6 +29,7 @@ import { useMutation } from '@apollo/client';
 
 import states from '../../states';
 import { LOGOUT } from '../../graphql/mutations';
+import { TAuthState } from '../../../types';
 
 import Logo from '../logo';
 import classes from './style.module.css';
@@ -51,7 +52,7 @@ const Navbar = () => {
       const data = response.data[key];
 
       if (data && data.success) {
-        setAuth((prev: any) => ({
+        setAuth((prev: TAuthState) => ({
           ...prev,
           isAuth: false,
           profile: null
@@ -71,7 +72,7 @@ const Navbar = () => {
 
   return (
     <header className={classes.header}>
-      <Container size="xl" h="100%">
+      <Container size="lg" h="100%">
         <Group justify="space-between" h="100%">
           <Group>
             <Anchor onClick={() => navigate('/')}>
@@ -88,7 +89,7 @@ const Navbar = () => {
             <Group gap="lg" justify="center">
               <Button
                 onClick={() => navigate('/compose')}
-                variant="outline"
+                variant="filled"
                 leftSection={<IconEdit size={20} />}
               >
                 Compose

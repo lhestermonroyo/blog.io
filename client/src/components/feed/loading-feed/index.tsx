@@ -12,12 +12,12 @@ import {
 } from '@mantine/core';
 import { FC, ReactNode } from 'react';
 
-interface LoadingFeedProps {
+type LoadingFeedProps = {
   loading: boolean;
   error: any;
   refetch: () => Promise<any>;
   children: ReactNode;
-}
+};
 
 const LoadingFeed: FC<LoadingFeedProps> = ({
   loading,

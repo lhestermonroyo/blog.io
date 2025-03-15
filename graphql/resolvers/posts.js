@@ -2,8 +2,10 @@ const { UserInputError } = require('apollo-server');
 const { PubSub } = require('graphql-subscriptions');
 
 const Post = require('../../models/Post');
+const Follow = require('../../models/Follow');
 const { checkAuth } = require('../../utils/auth.util');
 const { validatePostInput } = require('../../utils/validators.util');
+const User = require('../../models/User');
 
 const pubSub = new PubSub();
 
@@ -61,7 +63,7 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getPostsByCreator(_, { creator, limit }, context) {
+    async getPostsByFollowing(_, { limit }, context) {
       try {
         const user = checkAuth(context);
 
@@ -69,7 +71,19 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const query = Post.find({ creator })
+        const following = await Follow.find({ follower: user.email });
+        const followingEmails = following.map((follow) => follow.following);
+        const followingUsers = await User.find(
+          { email: { $in: followingEmails } },
+          profileBadgeProj
+        );
+        const creatorIds = followingUsers.map((user) => user._id);
+
+        const query = Post.find({
+          creator: {
+            $in: creatorIds
+          }
+        })
           .sort({ createdAt: -1 })
           .populate('creator', profileBadgeProj);
 
@@ -78,7 +92,11 @@ module.exports = {
         }
 
         const posts = await query;
-        const totalCount = await Post.countDocuments({ creator });
+        const totalCount = await Post.countDocuments({
+          creator: {
+            $in: creatorIds
+          }
+        });
 
         return {
           totalCount,
@@ -135,6 +153,54 @@ module.exports = {
             $in: [...tags]
           }
         });
+
+        return {
+          totalCount,
+          posts: posts.map((post) => {
+            const isLiked = post._doc.likes.some(
+              (like) => like.liker.toString() === user.id
+            );
+            const isCommented = post._doc.comments.some(
+              (comment) => comment.commentor.toString() === user.id
+            );
+            const likeCount = post._doc.likes.length ?? 0;
+            const commentCount = post._doc.comments.length ?? 0;
+
+            delete post._doc.likes;
+            delete post._doc.comments;
+
+            return {
+              id: post._id,
+              ...post._doc,
+              likeCount,
+              commentCount,
+              isLiked,
+              isCommented
+            };
+          })
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async getPostsByCreator(_, { creator, limit }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const query = Post.find({ creator })
+          .sort({ createdAt: -1 })
+          .populate('creator', profileBadgeProj);
+
+        if (limit) {
+          query.limit(limit);
+        }
+
+        const posts = await query;
+        const totalCount = await Post.countDocuments({ creator });
 
         return {
           totalCount,

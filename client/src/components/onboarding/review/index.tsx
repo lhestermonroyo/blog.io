@@ -14,14 +14,14 @@ import {
 } from '@mantine/core';
 import { format } from 'date-fns';
 
-interface IReviewProps {
+type ReviewProps = {
   submitting: boolean;
   onNavigateStep: (step: number) => void;
   onPrevStep: () => void;
   onSave: () => void;
-}
+};
 
-const Review: FC<IReviewProps> = ({
+const Review: FC<ReviewProps> = ({
   submitting,
   onNavigateStep,
   onPrevStep,
@@ -57,13 +57,10 @@ const Review: FC<IReviewProps> = ({
           />
           <ReviewItem
             label="Birthdate"
-            value={
-              onboarding.profileInfoForm?.birthdate &&
-              format(
-                new Date(onboarding.profileInfoForm?.birthdate),
-                'MMMM dd, yyyy'
-              )
-            }
+            value={format(
+              onboarding.profileInfoForm?.birthdate as Date,
+              'MMMM dd, yyyy'
+            )}
           />
           <ReviewItem
             label="Location"
@@ -108,7 +105,7 @@ const Review: FC<IReviewProps> = ({
               Cover Photo
             </Text>
             <Image
-              src={onboarding.uploadForm?.cover}
+              src={onboarding.uploadForm?.coverPhoto}
               alt="avatar"
               radius="md"
               color="initials"

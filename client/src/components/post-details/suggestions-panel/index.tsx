@@ -1,20 +1,20 @@
 import { FC } from 'react';
 import { Card, Divider, Skeleton, Stack, Title } from '@mantine/core';
-import { useQuery } from '@apollo/client';
+import { useRecoilValue } from 'recoil';
 
-import { GET_POSTS_BY_TAGS } from '../../../graphql/queries';
+import states from '../../../states';
+import { TPostItem } from '../../../../types';
 
 import ExtrasPostCard from '../extras-post-card';
 
-interface SuggestionsPanelProps {
-  postId: string;
-  tags: string[];
-}
+type SuggestionsPanelProps = {
+  loading: boolean;
+  list: TPostItem[];
+};
 
-const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ postId, tags }) => {
-  const { data, loading } = useQuery(GET_POSTS_BY_TAGS, {
-    variables: { tags, limit: 5 }
-  });
+const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ loading, list }) => {
+  const post = useRecoilValue(states.post);
+  const { postDetails } = post;
 
   if (loading) {
     return (
@@ -31,14 +31,13 @@ const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ postId, tags }) => {
     );
   }
 
-  if (data) {
-    const key = Object.keys(data)[0];
-    const { posts } = data[key];
-
-    const filteredPosts = posts.filter((post: any) => post.id !== postId);
+  if (list) {
+    const filteredPosts = list.filter(
+      (post: TPostItem) => post.id !== postDetails?.id
+    );
 
     const renderList = () => {
-      return filteredPosts.map((item: any, index: number) => (
+      return filteredPosts.map((item: TPostItem, index: number) => (
         <ExtrasPostCard
           key={item.id}
           item={item}

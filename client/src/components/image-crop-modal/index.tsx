@@ -1,15 +1,15 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { Modal, Stack, Slider, Text, Group, Button } from '@mantine/core';
-import Cropper from 'react-easy-crop';
+import Cropper, { Area } from 'react-easy-crop';
 
 import { getCroppedImg } from '../../utils/canvas.util';
 
-interface ImageCropModalProps {
+type ImageCropModalProps = {
   type: 'Avatar' | 'Cover';
   imgFile: string;
   onConfirmSelect: (base64Str: string) => void;
   onClose: () => void;
-}
+};
 
 const ImageCropModal: FC<ImageCropModalProps> = ({
   type = 'Avatar',
@@ -19,14 +19,14 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(0);
-  const [cropArea, setCropArea] = useState<any>(null);
+  const [cropArea, setCropArea] = useState<Area | null>(null);
 
-  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
+  const onCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
     setCropArea(croppedAreaPixels);
   }, []);
 
   const handleSelect = async () => {
-    const base64Str = (await getCroppedImg(imgFile, cropArea, 0)) as any;
+    const base64Str = (await getCroppedImg(imgFile, cropArea, 0)) as string;
 
     onConfirmSelect(base64Str);
     onClose();

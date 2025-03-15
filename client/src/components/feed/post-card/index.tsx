@@ -21,13 +21,15 @@ import {
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 
+import { TPostItem } from '../../../../types';
+
 import ProfileBadge from '../../profile-badge';
 
-interface IPostCardProps {
-  item: any;
-}
+type PostCardProps = {
+  item: TPostItem;
+};
 
-const PostCard: FC<IPostCardProps> = ({ item }) => {
+const PostCard: FC<PostCardProps> = ({ item }) => {
   const content = JSON.parse(item.content);
   const thumbnail = content.blocks.find((block: any) => block.type === 'image');
   const paragraph = content.blocks.find(
@@ -38,7 +40,7 @@ const PostCard: FC<IPostCardProps> = ({ item }) => {
 
   return (
     <UnstyledButton key={item.id} onClick={() => navigate(`/post/${item.id}`)}>
-      <Card>
+      <Card p={0}>
         <Grid>
           <Grid.Col span={thumbnail ? 8 : 12}>
             <Stack>
@@ -69,7 +71,9 @@ const PostCard: FC<IPostCardProps> = ({ item }) => {
               ></Text>
               <Group gap={6}>
                 {item.tags.map((tag: string) => (
-                  <Badge key={tag}>{tag}</Badge>
+                  <Badge key={tag} variant="light">
+                    {tag}
+                  </Badge>
                 ))}
               </Group>
             </Stack>
@@ -78,7 +82,6 @@ const PostCard: FC<IPostCardProps> = ({ item }) => {
             <Grid.Col flex={1} display="flex" span={4}>
               <Image
                 radius="sm"
-                mah={120}
                 src={thumbnail?.data.file.url}
                 fallbackSrc="https://placehold.co/600x400?text=No%20Image%20Available"
                 alt="thumbnail"

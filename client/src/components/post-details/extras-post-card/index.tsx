@@ -2,7 +2,6 @@ import { FC, Fragment } from 'react';
 import {
   Badge,
   Divider,
-  Grid,
   Group,
   Stack,
   Text,
@@ -13,13 +12,15 @@ import { IconClock } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 
+import { TPostItem } from '../../../../types';
+
 import ProfileBadge from '../../profile-badge';
 
-interface IExtrasPostCardProps {
-  item: any;
+type IExtrasPostCardProps = {
+  item: TPostItem;
   isLastPost: boolean;
   displayProfile?: boolean;
-}
+};
 
 const ExtrasPostCard: FC<IExtrasPostCardProps> = ({
   item,
@@ -58,7 +59,9 @@ const ExtrasPostCard: FC<IExtrasPostCardProps> = ({
           </Stack>
           <Group gap={6}>
             {item.tags.map((tag: string) => (
-              <Badge key={tag}>{tag}</Badge>
+              <Badge key={tag} variant="light">
+                {tag}
+              </Badge>
             ))}
           </Group>
         </Stack>

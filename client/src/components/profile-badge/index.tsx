@@ -1,11 +1,13 @@
 import { FC } from 'react';
 import { Avatar, Group, Text, UnstyledButton } from '@mantine/core';
 
-interface ProfileBadgeProps {
-  profile: any;
+import { TProfileBadge } from '../../../types';
+
+type ProfileBadgeProps = {
+  profile: TProfileBadge;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   avatarSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-}
+};
 
 const ProfileBadge: FC<ProfileBadgeProps> = ({
   profile,

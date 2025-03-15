@@ -6,10 +6,10 @@ import { readFile } from '../../utils/upload.util';
 
 import ImageCropModal from '../image-crop-modal';
 
-interface UploadAvatarProps {
-  avatarUri: string;
+type UploadAvatarProps = {
+  avatarUri: string | null;
   onSelect: (base64Str: string) => void;
-}
+};
 
 const UploadAvatar: FC<UploadAvatarProps> = ({ avatarUri, onSelect }) => {
   const [file, setFile] = useState<any>(null);

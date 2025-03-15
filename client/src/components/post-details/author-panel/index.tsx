@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   Avatar,
   Button,
@@ -10,68 +10,65 @@ import {
   Title
 } from '@mantine/core';
 import { IconAt, IconMapPin } from '@tabler/icons-react';
-import { useMutation, useQuery } from '@apollo/client';
-
-import {
-  GET_FOLLOWS_BY_EMAIL,
-  GET_PROFILE_BY_EMAIL
-} from '../../../graphql/queries';
-import { useRecoilValue } from 'recoil';
+import { useMutation } from '@apollo/client';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
 import { FOLLOW_USER } from '../../../graphql/mutations';
 import { notifications } from '@mantine/notifications';
+import { TPostState, TProfileBadge } from '../../../../types';
 
-interface AuthorPanelProps {
-  authorEmail: string;
-}
-
-const AuthorPanel: FC<AuthorPanelProps> = ({ authorEmail }) => {
-  const [followDetails, setFollowDetails] = useState<any>(null);
-
+const AuthorPanel = ({ loading }: { loading: boolean }) => {
   const auth = useRecoilValue(states.auth);
-  const { creatorTotalPosts } = useRecoilValue(states.post);
+  const [post, setPost] = useRecoilState(states.post);
+  const {
+    creatorProfile,
+    creatorStats: {
+      followers: { count: followersCount, list: followersList },
+      following: { count: followingCount },
+      posts: { count: creatorPostCount }
+    }
+  } = post;
 
-  const {
-    data,
-    loading,
-    refetch: fetchAuthor
-  } = useQuery(GET_PROFILE_BY_EMAIL, {
-    variables: { email: authorEmail }
-  });
-  const {
-    data: followsData,
-    loading: followsLoading,
-    refetch: fetchFollowsByEmail
-  } = useQuery(GET_FOLLOWS_BY_EMAIL, {
-    variables: { email: authorEmail }
-  });
   const [followUser] = useMutation(FOLLOW_USER);
 
-  useEffect(() => {
-    if (authorEmail) {
-      fetchAuthor();
-      fetchFollowsByEmail();
-    }
-  }, [authorEmail]);
-
-  useEffect(() => {
-    if (followsData) {
-      const key = Object.keys(followsData)[0];
-      setFollowDetails(followsData[key]);
-    }
-  }, [followsData]);
+  const profileEmail = auth?.profile?.email as string;
+  const isOwnProfile = useMemo(
+    () => profileEmail === creatorProfile?.email,
+    [creatorProfile?.email]
+  );
+  const isFollowed = useMemo(
+    () =>
+      followersList.some(
+        (follower: TProfileBadge) => follower?.email === profileEmail
+      ),
+    [followersList, profileEmail]
+  );
 
   const handleFollow = async () => {
     try {
       const response = await followUser({
-        variables: { email: authorEmail }
+        variables: { email: creatorProfile?.email }
       });
       const key = Object.keys(response.data)[0];
       const data = response.data[key];
 
       if (data) {
-        setFollowDetails(data);
+        setPost((prev: TPostState) => ({
+          ...prev,
+          creatorStats: {
+            ...prev.creatorStats,
+            followers: {
+              count: data.followersCount,
+              list: data.followers
+            },
+            following: {
+              count: data.followingCount,
+              list: data.following
+            }
+          }
+        }));
+
         notifications.show({
           title: 'Success',
           message: `You have ${
@@ -92,29 +89,7 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ authorEmail }) => {
     }
   };
 
-  const isOwnProfile = useMemo(
-    () => auth?.profile.email === authorEmail,
-    [authorEmail]
-  );
-  const followersCount = useMemo(
-    () => followDetails?.followersCount || 0,
-    [followDetails?.followersCount]
-  );
-  const followingCount = useMemo(
-    () => followDetails?.followingCount || 0,
-    [followDetails?.followingCount]
-  );
-  const isFollowed = useMemo(
-    () =>
-      followDetails?.followers.some(
-        (follower: any) => follower.email === auth?.profile.email
-      ),
-    [followDetails?.followers, auth?.profile.email]
-  );
-
-  console.log('followDetails', followDetails);
-
-  if (followsLoading || loading) {
+  if (loading) {
     return (
       <Card withBorder>
         <Stack gap="lg">
@@ -163,19 +138,16 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ authorEmail }) => {
     );
   }
 
-  if (followsData && data) {
-    const key = Object.keys(data)[0];
-    const creator = data[key];
-
+  if (creatorProfile) {
     return (
       <Card withBorder>
         <Stack gap="lg">
           <Title order={3}>About the Author</Title>
           <Group gap="md">
             <Avatar
-              src={creator.avatar}
-              alt={creator.firstName}
-              name={`${creator.firstName} ${creator.lastName}`}
+              src={creatorProfile?.avatar}
+              alt={creatorProfile?.firstName}
+              name={`${creatorProfile?.firstName} ${creatorProfile?.lastName}`}
               radius="md"
               color="initials"
               size="xl"
@@ -183,11 +155,11 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ authorEmail }) => {
             <Stack flex={1} gap={6}>
               <Group gap={4} align="center">
                 <Title order={5}>
-                  {`${creator.firstName} ${creator.lastName}`}
+                  {`${creatorProfile?.firstName} ${creatorProfile?.lastName}`}
                 </Title>
-                {creator.pronouns && (
+                {creatorProfile?.pronouns && (
                   <Text size="xs" color="dimmed" mt={2}>
-                    ({creator.pronouns})
+                    ({creatorProfile?.pronouns})
                   </Text>
                 )}
               </Group>
@@ -196,28 +168,28 @@ const AuthorPanel: FC<AuthorPanelProps> = ({ authorEmail }) => {
                 <Group gap={4} align="center">
                   <IconAt size={16} />
                   <Text size="sm" c="dimmed">
-                    {creator.email}
+                    {creatorProfile?.email}
                   </Text>
                 </Group>
 
                 <Group gap={4} align="center">
                   <IconMapPin size={16} />
                   <Text size="sm" c="dimmed">
-                    {creator.location || 'Not set a location yet'}
+                    {creatorProfile?.location || 'Not set a location yet'}
                   </Text>
                 </Group>
               </Stack>
             </Stack>
           </Group>
 
-          <Text>{creator.bio || 'No bio yet.'}</Text>
+          <Text>{creatorProfile?.bio || 'No bio yet.'}</Text>
 
           <Group>
             <Stack gap={4} flex={1}>
               <Text size="sm" color="dimmed">
                 Post Written
               </Text>
-              <Text size="lg">{creatorTotalPosts}</Text>
+              <Text size="lg">{creatorPostCount}</Text>
             </Stack>
             <Stack gap={4} flex={1}>
               <Text size="sm" color="dimmed">

@@ -1,9 +1,9 @@
 import { Loader, useMantineTheme } from '@mantine/core';
 import { FC, ReactNode } from 'react';
 
-interface LoadingPageProps {
+type LoadingPageProps = {
   loading: boolean;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const LoadingPage: FC<LoadingPageProps> = ({ loading, children }) => {

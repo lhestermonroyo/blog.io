@@ -15,6 +15,7 @@ import { GET_PROFILE } from './graphql/queries';
 
 import AppRouter from './routes';
 import LoadingPage from './components/loading-page';
+import { TAuthState } from '../types';
 
 const theme = createTheme({
   defaultRadius: 'sm',
@@ -94,7 +95,7 @@ function App() {
       const key = Object.keys(data)[0];
       const profile = data[key];
 
-      setAuth((prev: any) => ({
+      setAuth((prev: TAuthState) => ({
         ...prev,
         isAuth: true,
         profile
@@ -104,7 +105,7 @@ function App() {
 
   useEffect(() => {
     if (error) {
-      setAuth((prev: any) => ({
+      setAuth((prev: TAuthState) => ({
         ...prev,
         isAuth: false,
         profile: null

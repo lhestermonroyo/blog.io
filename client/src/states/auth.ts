@@ -1,14 +1,36 @@
 import { atom } from 'recoil';
+import { TAuthState } from '../../types';
 
-const initialState: any = {
-  isAuth: false,
+const initialState: TAuthState = {
+  isAuth: null,
   profile: null,
-  follows: null,
+  stats: {
+    posts: {
+      count: 0,
+      list: []
+    },
+    followers: {
+      count: 0,
+      list: []
+    },
+    following: {
+      count: 0,
+      list: []
+    }
+  },
   onboarding: {
-    profileInfoForm: null,
+    profileInfoForm: {
+      email: '',
+      firstName: '',
+      lastName: '',
+      birthdate: null as Date | null,
+      location: '',
+      pronouns: '',
+      bio: ''
+    },
     uploadForm: {
       avatar: null,
-      cover: null
+      coverPhoto: null
     },
     tagsForm: []
   }

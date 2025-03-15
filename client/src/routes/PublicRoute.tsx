@@ -5,11 +5,11 @@ import states from '../states';
 const PublicRoute = () => {
   const auth = useRecoilValue(states.auth);
 
-  if (!auth.isAuth) {
-    return <Outlet />;
+  if (auth.isAuth === null) {
+    return null;
   }
 
-  return <Navigate to="/" />;
+  return auth.isAuth ? <Navigate to="/" /> : <Outlet />;
 };
 
 export default PublicRoute;

@@ -41,17 +41,17 @@ import {
   LIKE_POST,
   UPDATE_COMMENT
 } from '../../graphql/mutations';
+
 import states from '../../states';
 import { deleteBlogFiles } from '../../utils/upload.util';
+import { TPostState } from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
 import LoadingPost from '../../components/post-details/loading-post';
 import ProfileBadge from '../../components/profile-badge';
 import PostReaction from '../../components/post-details/post-reaction';
 import CommentCard from '../../components/post-details/comment-card';
-import AuthorPanel from '../../components/post-details/author-panel';
-import SuggestionsPanel from '../../components/post-details/suggestions-panel';
-import AuthorPostsPanel from '../../components/post-details/author-posts-panel';
+import PostSidebar from '../../components/post-details/post-sidebar';
 
 const PostDetails = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -105,7 +105,7 @@ const PostDetails = () => {
       const key = Object.keys(data)[0];
       const postDetails = data[key];
 
-      setPost((prev: any) => ({
+      setPost((prev: TPostState) => ({
         ...prev,
         postDetails
       }));
@@ -134,7 +134,7 @@ const PostDetails = () => {
 
   const handleDeletePost = async () => {
     try {
-      const content = JSON.parse(postDetails?.content);
+      const content = JSON.parse(postDetails?.content as string);
       const files = content.blocks.filter(
         (block: any) => block.type === 'image'
       );
@@ -180,10 +180,10 @@ const PostDetails = () => {
       const data = response.data[key];
 
       if (data) {
-        setPost({
-          ...post,
+        setPost((prev: TPostState) => ({
+          ...prev,
           postDetails: data
-        });
+        }));
       }
     } catch (error) {
       console.log('Error:', error);
@@ -274,16 +274,20 @@ const PostDetails = () => {
       onConfirm: () => handleDeletePost()
     });
 
-  const isOwnPost = useMemo(() => {
-    return postDetails?.creator.email === auth?.profile.email;
-  }, [postDetails?.creator.email, auth?.profile.email]);
+  const profileEmail = auth?.profile?.email as string;
 
-  const isLiked = postDetails?.likes?.some(
-    (item: any) => item.liker.email === auth?.profile.email
-  );
-  const isCommented = postDetails?.comments?.some(
-    (item: any) => item.commentor.email === auth?.profile.email
-  );
+  const isOwnPost = useMemo(() => {
+    return postDetails?.creator.email === profileEmail;
+  }, [postDetails?.creator.email, profileEmail]);
+
+  const isLiked =
+    postDetails?.likes?.some(
+      (item: any) => item.liker.email === profileEmail
+    ) || false;
+  const isCommented =
+    postDetails?.comments?.some(
+      (item: any) => item.commentor.email === profileEmail
+    ) || false;
 
   const renderPost = (post: any) => {
     const content = JSON.parse(post?.content);
@@ -320,7 +324,7 @@ const PostDetails = () => {
         </Stack>
 
         <Stack>
-          {content.blocks.map((block: any, index: number) => {
+          {content.blocks.map((block: any) => {
             switch (block.type) {
               case 'paragraph':
                 return (
@@ -440,7 +444,9 @@ const PostDetails = () => {
 
         <Group gap={6} mb="lg">
           {post.tags.map((tag: string) => (
-            <Badge key={tag}>{tag}</Badge>
+            <Badge key={tag} variant="light">
+              {tag}
+            </Badge>
           ))}
         </Group>
 
@@ -482,7 +488,7 @@ const PostDetails = () => {
                 key={comment.id}
                 comment={comment}
                 isLastComment={post.comments.length === index + 1}
-                isOwnComment={comment.commentor.email === auth?.profile.email}
+                isOwnComment={comment.commentor.email === profileEmail}
                 updateComment={handleUpdateComment}
                 deleteComment={handleDeleteComment}
               />
@@ -549,21 +555,7 @@ const PostDetails = () => {
             </LoadingPost>
           </Stack>
         </Grid.Col>
-        <Grid.Col span={4}>
-          {postDetails && (
-            <Stack gap="lg" className="extras-container">
-              <AuthorPanel authorEmail={postDetails?.creator.email} />
-              <AuthorPostsPanel
-                postId={postDetails?.id}
-                creator={postDetails?.creator.id}
-              />
-              <SuggestionsPanel
-                postId={postDetails?.id}
-                tags={postDetails?.tags}
-              />
-            </Stack>
-          )}
-        </Grid.Col>
+        <Grid.Col span={4}>{postDetails && <PostSidebar />}</Grid.Col>
       </Grid>
     </ProtectedLayout>
   );

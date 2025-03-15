@@ -17,6 +17,7 @@ import { useRecoilState } from 'recoil';
 
 import states from '../../states';
 import { uploadProfile } from '../../utils/upload.util';
+import { TAuthState } from '../../../types';
 
 import Logo from '../../components/logo';
 import StepOne from '../../components/onboarding/step-one';
@@ -49,10 +50,11 @@ const Onboarding = () => {
       setSubmitting(true);
 
       const { profileInfoForm, uploadForm, tagsForm } = onboarding;
+      const email = profile?.email as string;
 
       const [avatarUrl, coverUrl] = await Promise.all([
-        uploadProfile('avatar', uploadForm.avatar, profile?.email),
-        uploadProfile('cover', uploadForm.cover, profile?.email)
+        uploadProfile('avatar', uploadForm.avatar, email),
+        uploadProfile('cover', uploadForm.coverPhoto, email)
       ]);
 
       const response = await updateProfile({
@@ -74,14 +76,22 @@ const Onboarding = () => {
       const data = response.data[key];
 
       if (data) {
-        setAuth((prev: any) => ({
+        setAuth((prev: TAuthState) => ({
           ...prev,
           profile: data,
           onboarding: {
-            profileInfoForm: null,
+            profileInfoForm: {
+              email: '',
+              firstName: '',
+              lastName: '',
+              birthdate: '',
+              location: '',
+              pronouns: '',
+              bio: ''
+            },
             uploadForm: {
               avatar: null,
-              cover: null
+              coverPhoto: null
             },
             tagsForm: []
           }

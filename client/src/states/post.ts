@@ -1,9 +1,38 @@
 import { atom } from 'recoil';
+import { TPostState } from '../../types';
 
-const initialState: any = {
-  posts: [],
+const initialState: TPostState = {
+  feed: {
+    forYou: {
+      filters: [],
+      count: 0,
+      list: []
+    },
+    explore: {
+      count: 0,
+      list: []
+    },
+    following: {
+      count: 0,
+      list: []
+    }
+  },
   postDetails: null,
-  creatorTotalPosts: 0
+  creatorProfile: null,
+  creatorStats: {
+    posts: {
+      count: 0,
+      list: []
+    },
+    followers: {
+      count: 0,
+      list: []
+    },
+    following: {
+      count: 0,
+      list: []
+    }
+  }
 };
 
 export const POST_STATE = atom({

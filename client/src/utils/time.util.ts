@@ -9,5 +9,5 @@ export const greetUser = () => {
   } else {
     greeting = 'Good Evening';
   }
-  return greeting + '!';
+  return greeting;
 };

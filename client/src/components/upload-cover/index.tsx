@@ -6,10 +6,10 @@ import { readFile } from '../../utils/upload.util';
 
 import ImageCropModal from '../image-crop-modal';
 
-interface UploadCoverProps {
-  coverUri: string;
+type UploadCoverProps = {
+  coverUri: string | null;
   onSelect: (base64Str: string) => void;
-}
+};
 
 const UploadCover: FC<UploadCoverProps> = ({ coverUri, onSelect }) => {
   const [file, setFile] = useState<any>(null);

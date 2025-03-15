@@ -1,42 +1,26 @@
-import { FC, useEffect } from 'react';
 import { Card, Divider, Skeleton, Stack, Title } from '@mantine/core';
-import { useQuery } from '@apollo/client';
-import { GET_POSTS_BY_CREATOR } from '../../../graphql/queries';
+import { useRecoilValue } from 'recoil';
+
+import states from '../../../states';
+import { TPostItem } from '../../../../types';
 
 import ExtrasPostCard from '../extras-post-card';
-import { useSetRecoilState } from 'recoil';
-import states from '../../../states';
 
-interface AuthorPostsPanelProps {
-  postId: string;
-  creator: string;
-}
-
-const AuthorPostsPanel: FC<AuthorPostsPanelProps> = ({ postId, creator }) => {
-  const { data, loading } = useQuery(GET_POSTS_BY_CREATOR, {
-    variables: { creator, limit: 5 }
-  });
-
-  const setPost = useSetRecoilState(states.post);
-
-  useEffect(() => {
-    if (data) {
-      const key = Object.keys(data)[0];
-      const { totalCount } = data[key];
-
-      setPost((prev: any) => ({
-        ...prev,
-        creatorTotalPosts: totalCount
-      }));
+const AuthorPostsPanel = ({ loading }: { loading: boolean }) => {
+  const post = useRecoilValue(states.post);
+  const {
+    postDetails,
+    creatorStats: {
+      posts: { list }
     }
-  }, [data]);
+  } = post;
 
   if (loading) {
     return (
       <Card withBorder>
         <Stack gap="lg">
           <Title order={3}>More Posts from the Author</Title>
-          <Stack gap="xs">
+          <Stack gap="lg">
             <Skeleton height={100} />
             <Divider />
             <Skeleton height={100} />
@@ -46,14 +30,13 @@ const AuthorPostsPanel: FC<AuthorPostsPanelProps> = ({ postId, creator }) => {
     );
   }
 
-  if (data) {
-    const key = Object.keys(data)[0];
-    const { posts } = data[key];
-
-    const filteredPosts = posts.filter((post: any) => post.id !== postId);
+  if (list) {
+    const filteredPosts = list.filter(
+      (post: TPostItem) => post.id !== postDetails?.id
+    );
 
     const renderList = () => {
-      return filteredPosts.map((item: any, index: number) => (
+      return filteredPosts.map((item: TPostItem, index: number) => (
         <ExtrasPostCard
           key={item.id}
           item={item}
