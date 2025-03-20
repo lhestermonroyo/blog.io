@@ -9,12 +9,20 @@ const userSchema = new Schema({
   password: String,
   firstName: String,
   lastName: String,
-  birthdate: String,
-  location: String,
   pronouns: String,
+  title: String,
+  location: String,
+  birthdate: String,
   bio: String,
   avatar: String,
   coverPhoto: String,
+  socials: {
+    facebook: String,
+    twitter: String,
+    instagram: String,
+    linkedin: String,
+    github: String
+  },
   tags: [String],
   createdAt: String
 });

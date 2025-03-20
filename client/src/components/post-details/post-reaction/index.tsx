@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import { ActionIcon, Group, Text } from '@mantine/core';
 import {
+  IconBookmark,
+  IconBookmarkFilled,
   IconHeart,
   IconHeartFilled,
   IconMessage,
@@ -37,6 +39,16 @@ const PostReaction: FC<PostReactionProps> = ({
             <IconMessageFilled size={24} />
           ) : (
             <IconMessage size={24} />
+          )}
+        </ActionIcon>
+        <Text c="dimmed">{post.commentCount}</Text>
+      </Group>
+      <Group justify="center" align="center" gap={4}>
+        <ActionIcon variant="transparent" onClick={onComment}>
+          {isCommented ? (
+            <IconBookmarkFilled size={24} />
+          ) : (
+            <IconBookmark size={24} />
           )}
         </ActionIcon>
         <Text c="dimmed">{post.commentCount}</Text>

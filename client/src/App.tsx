@@ -12,10 +12,10 @@ import { useRecoilState } from 'recoil';
 
 import states from './states';
 import { GET_PROFILE } from './graphql/queries';
+import { TAuthState } from '../types';
 
 import AppRouter from './routes';
 import LoadingPage from './components/loading-page';
-import { TAuthState } from '../types';
 
 const theme = createTheme({
   defaultRadius: 'sm',
@@ -36,43 +36,7 @@ const theme = createTheme({
     ]
   },
   primaryColor: 'green',
-  components: {
-    // Modal: {
-    //   styles: {
-    //     overlay: {
-    //       zIndex: 100 // Set higher or lower as needed
-    //     }
-    //   }
-    // }
-    // Input: {
-    //   styles: (theme: any) => ({
-    //     input: {
-    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5' // Darker gray in light mode, lighter gray in dark mode
-    //     }
-    //   })
-    // },
-    // TextInput: {
-    //   styles: (theme: any) => ({
-    //     input: {
-    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
-    //     }
-    //   })
-    // },
-    // Select: {
-    //   styles: (theme: any) => ({
-    //     input: {
-    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
-    //     }
-    //   })
-    // },
-    // Textarea: {
-    //   styles: (theme: any) => ({
-    //     input: {
-    //       backgroundColor: theme.colorScheme === 'dark' ? '#1e1e1e' : '#f5f5f5'
-    //     }
-    //   })
-    // }
-  }
+  components: {}
 });
 
 function App() {

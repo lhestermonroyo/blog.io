@@ -1,11 +1,20 @@
 export type TProfile = TProfileBadge & {
-  birthdate: string;
-  location: string;
   pronouns: string;
+  title: string;
+  location: string;
+  birthdate: string;
   bio: string;
-  coverPhoto: string;
-  tags: string[];
   age: string;
+  coverPhoto: string;
+  socials: {
+    facebook: string;
+    twitter: string;
+    instagram: string;
+    linkedin: string;
+    github: string;
+    website: string;
+  };
+  tags: string[];
   createdAt: string;
 };
 
@@ -16,6 +25,7 @@ export type TProfileBadge = {
   lastName: string;
   avatar: string;
 };
+
 
 export type TPosts = TPostItem[];
 
@@ -56,6 +66,10 @@ export type TStats = {
     count: number;
     list: TPostItem[];
   };
+  savedPosts: {
+    count: number;
+    list: TPostItem[];
+  };
   followers: {
     count: number;
     list: TProfileBadge[];
@@ -75,10 +89,17 @@ export type TAuthState = {
       email: string;
       firstName: string;
       lastName: string;
-      birthdate: Date | null;
-      location: string;
       pronouns: string;
+      title: string;
+      location: string;
+      birthdate: Date | null;
       bio: string;
+      facebook: string;
+      twitter: string;
+      instagram: string;
+      linkedin: string;
+      github: string;
+      website: string;
     };
     uploadForm: {
       avatar: string | null;

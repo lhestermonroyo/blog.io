@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Container,
@@ -36,6 +36,12 @@ const Onboarding = () => {
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
+  useEffect(() => {
+    if (profile?.tags.length) {
+      navigate('/');
+    }
+  }, [profile?.tags]);
+
   const nextStep = () => {
     setActive((current) => (current < 3 ? current + 1 : current));
     window.scrollTo(0, 0);
@@ -62,13 +68,22 @@ const Onboarding = () => {
           profileInput: {
             firstName: profileInfoForm.firstName,
             lastName: profileInfoForm.lastName,
-            birthdate: profileInfoForm.birthdate,
-            location: profileInfoForm.location,
             pronouns: profileInfoForm.pronouns,
+            title: profileInfoForm.title,
+            location: profileInfoForm.location,
+            birthdate: profileInfoForm.birthdate,
             bio: profileInfoForm.bio,
+            socials: {
+              facebook: profileInfoForm.facebook,
+              twitter: profileInfoForm.twitter,
+              instagram: profileInfoForm.instagram,
+              linkedin: profileInfoForm.linkedin,
+              github: profileInfoForm.github,
+              website: profileInfoForm.website
+            },
+            tags: [...tagsForm],
             avatar: avatarUrl,
-            coverPhoto: coverUrl,
-            tags: [...tagsForm]
+            coverPhoto: coverUrl
           }
         }
       });
@@ -84,10 +99,17 @@ const Onboarding = () => {
               email: '',
               firstName: '',
               lastName: '',
-              birthdate: '',
-              location: '',
               pronouns: '',
-              bio: ''
+              title: '',
+              location: '',
+              birthdate: null,
+              bio: '',
+              facebook: '',
+              twitter: '',
+              instagram: '',
+              linkedin: '',
+              github: '',
+              website: ''
             },
             uploadForm: {
               avatar: null,

@@ -266,7 +266,9 @@ module.exports = {
 
         return {
           id: post._id,
-          ...post._doc
+          ...post._doc,
+          likeCount: post._doc.likes.length ?? 0,
+          commentCount: post._doc.comments.length ?? 0
         };
       } catch (error) {
         throw new Error(error);

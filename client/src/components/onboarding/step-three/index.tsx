@@ -15,7 +15,7 @@ type StepThreeProps = {
 
 const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
-  const { onboarding } = auth;
+  const { onboarding, profile } = auth;
 
   const form = useForm({
     initialValues: {
@@ -31,7 +31,7 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
 
   useEffect(() => {
     form.setFieldValue('tags', onboarding.tagsForm);
-  }, [onboarding.tagsForm]);
+  }, [onboarding.tagsForm, profile?.tags]);
 
   const { data } = useQuery(GET_TAGS);
 

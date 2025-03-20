@@ -5,7 +5,7 @@ import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
 import states from '../../states';
-import { GET_FOLLOWS_BY_EMAIL } from '../../graphql/queries';
+import { GET_STATS_BY_EMAIL } from '../../graphql/queries';
 import { greetUser } from '../../utils/time.util';
 import { TAuthState } from '../../../types';
 
@@ -22,10 +22,11 @@ const Feed = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile } = auth;
 
-  const { data: followsData, refetch: fetchFollows } = useQuery(
-    GET_FOLLOWS_BY_EMAIL,
+  const { data: statsResponse, refetch: fetchStats } = useQuery(
+    GET_STATS_BY_EMAIL,
     {
-      variables: { email: profile?.email }
+      variables: { email: profile?.email },
+      skip: !profile?.email
     }
   );
 
@@ -33,13 +34,7 @@ const Feed = () => {
 
   useEffect(() => {
     if (profile) {
-      const needsOnboarding =
-        !profile?.location ||
-        !profile?.bio ||
-        !profile?.pronouns ||
-        !profile?.avatar ||
-        !profile?.coverPhoto ||
-        !profile?.tags.length;
+      const needsOnboarding = !profile?.tags.length;
 
       if (needsOnboarding) {
         navigate('/onboarding');
@@ -50,30 +45,26 @@ const Feed = () => {
   }, [profile]);
 
   useEffect(() => {
-    if (followsData) {
-      const key = Object.keys(followsData)[0];
-      const follows = followsData[key];
+    if (statsResponse) {
+      const key = Object.keys(statsResponse)[0];
+      const data = statsResponse[key];
 
       setAuth((prev: TAuthState) => ({
         ...prev,
         stats: {
           ...prev.stats,
-          followers: {
-            count: follows?.followersCount,
-            list: follows?.followers || []
-          },
-          following: {
-            count: follows?.followingCount,
-            list: follows?.following || []
-          }
+          posts: data.posts,
+          savedPosts: data.savedPosts,
+          followers: data.followers,
+          following: data.following
         }
       }));
     }
-  }, [followsData]);
+  }, [statsResponse]);
 
   const init = async () => {
     try {
-      await fetchFollows();
+      await fetchStats();
     } catch (error) {
       console.error(error);
     }
@@ -95,7 +86,7 @@ const Feed = () => {
         </Stack>
       )}
       <Tabs defaultValue="1">
-        <Tabs.List>
+        <Tabs.List justify="center">
           <Tabs.Tab value="1">For You</Tabs.Tab>
           <Tabs.Tab value="2">Explore</Tabs.Tab>
           <Tabs.Tab value="3">Following</Tabs.Tab>

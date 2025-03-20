@@ -44,7 +44,7 @@ import {
 
 import states from '../../states';
 import { deleteBlogFiles } from '../../utils/upload.util';
-import { TPostState } from '../../../types';
+import { TCommentItem, TLikeItem, TPostState } from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
 import LoadingPost from '../../components/post-details/loading-post';
@@ -120,7 +120,7 @@ const PostDetails = () => {
   }, [error]);
 
   const stickyListener = () => {
-    const extras = document.querySelector('.extras-container');
+    const extras = document.querySelector('.sidebar-container');
     const scrollTop = window.scrollY;
 
     if (extras) {
@@ -282,222 +282,14 @@ const PostDetails = () => {
 
   const isLiked =
     postDetails?.likes?.some(
-      (item: any) => item.liker.email === profileEmail
+      (item: TLikeItem) => item.liker.email === profileEmail
     ) || false;
   const isCommented =
     postDetails?.comments?.some(
-      (item: any) => item.commentor.email === profileEmail
+      (item: TCommentItem) => item.commentor.email === profileEmail
     ) || false;
 
-  const renderPost = (post: any) => {
-    const content = JSON.parse(post?.content);
-
-    return (
-      <Fragment>
-        <Stack gap={4}>
-          <Title order={1}>{post.title}</Title>
-          <Group gap={4} align="center">
-            <IconClock size={14} />
-            <Text fz="xs" c="dimmed">
-              {format(new Date(post.createdAt), 'MMMM dd - hh:mm a')}
-            </Text>
-          </Group>
-        </Stack>
-
-        <Stack gap="xs">
-          <Group align="center" justify="space-between">
-            <Group gap={6}>
-              <ProfileBadge
-                profile={post.creator}
-                onClick={() => navigate(`/profile/${post.creator.email}`)}
-              />
-            </Group>
-            <PostReaction
-              post={post}
-              isLiked={isLiked}
-              isCommented={isCommented}
-              onLike={handleLike}
-              onComment={() => commentRef.current?.focus()}
-            />
-          </Group>
-          <Divider />
-        </Stack>
-
-        <Stack>
-          {content.blocks.map((block: any) => {
-            switch (block.type) {
-              case 'paragraph':
-                return (
-                  <Text
-                    key={block.id}
-                    dangerouslySetInnerHTML={{ __html: block.data.text }}
-                  />
-                );
-              case 'header':
-                return (
-                  <Title
-                    key={block.id}
-                    order={block.data.level + 1}
-                    dangerouslySetInnerHTML={{ __html: block.data.text }}
-                  />
-                );
-              case 'list':
-                return (
-                  <List withPadding key={block.id} type={block.data.style}>
-                    {block.data.items.map((item: any, index: number) => (
-                      <List.Item key={index}>
-                        <span
-                          dangerouslySetInnerHTML={{ __html: item.content }}
-                        />
-                      </List.Item>
-                    ))}
-                  </List>
-                );
-              case 'quote':
-                return (
-                  <Blockquote
-                    color="green"
-                    key={block.id}
-                    cite={block.data.caption}
-                    mt="xl"
-                  >
-                    {block.data.text}
-                  </Blockquote>
-                );
-              case 'code':
-                return (
-                  <Code key={block.id} block>
-                    {block.data.code}
-                  </Code>
-                );
-              case 'table':
-                const withHeadings = block.data.withHeadings;
-                const rows = withHeadings
-                  ? block.data.content.slice(1)
-                  : block.data.content;
-
-                return (
-                  <Table
-                    withTableBorder
-                    withColumnBorders
-                    key={block.id}
-                    layout="fixed"
-                  >
-                    {withHeadings && (
-                      <Table.Thead>
-                        <Table.Tr>
-                          {block.data.content[0].map(
-                            (heading: string, index: number) => (
-                              <Table.Th key={index}>{heading}</Table.Th>
-                            )
-                          )}
-                        </Table.Tr>
-                      </Table.Thead>
-                    )}
-                    <Table.Tbody>
-                      {rows.map((row: any, index: number) => (
-                        <Table.Tr key={index}>
-                          {row.map((cell: string, index: number) => (
-                            <Table.Td key={index}>{cell}</Table.Td>
-                          ))}
-                        </Table.Tr>
-                      ))}
-                    </Table.Tbody>
-                  </Table>
-                );
-              case 'image':
-                if (block.data.withBackground) {
-                  return (
-                    <Group
-                      justify="center"
-                      bg="dimmed"
-                      key={block.id}
-                      style={{
-                        borderRadius: theme.radius.sm
-                      }}
-                    >
-                      <Image
-                        fit="contain"
-                        w="100%"
-                        h="auto"
-                        src={block.data.file.url}
-                        alt={block.data.caption}
-                      />
-                      <Text>{block.data.caption}</Text>
-                    </Group>
-                  );
-                }
-
-                return (
-                  <Image
-                    radius="sm"
-                    key={block.id}
-                    src={block.data.file.url}
-                    alt={block.data.caption}
-                  />
-                );
-              default:
-                return null;
-            }
-          })}
-        </Stack>
-
-        <Group gap={6} mb="lg">
-          {post.tags.map((tag: string) => (
-            <Badge key={tag} variant="light">
-              {tag}
-            </Badge>
-          ))}
-        </Group>
-
-        <Stack gap="xs">
-          <Divider />
-          <PostReaction
-            post={post}
-            isLiked={isLiked}
-            isCommented={isCommented}
-            onLike={handleLike}
-            onComment={() => commentRef.current?.focus()}
-          />
-        </Stack>
-
-        <Title order={2}>Comments ({post.commentCount})</Title>
-
-        <form onSubmit={form.onSubmit(handleSubmitComment)}>
-          <Stack>
-            <Textarea
-              ref={commentRef}
-              label="Comment"
-              placeholder="Enter your comment"
-              name="comment"
-              key={form.key('comment')}
-              {...form.getInputProps('comment')}
-            />
-            <Group>
-              <Button type="submit" loading={submitting}>
-                Submit
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-
-        {post.comments.length > 0 && (
-          <Stack gap="lg" my="xl">
-            {post.comments.map((comment: any, index: number) => (
-              <CommentCard
-                key={comment.id}
-                comment={comment}
-                isLastComment={post.comments.length === index + 1}
-                isOwnComment={comment.commentor.email === profileEmail}
-                updateComment={handleUpdateComment}
-                deleteComment={handleDeleteComment}
-              />
-            ))}
-          </Stack>
-        )}
-      </Fragment>
-    );
-  };
+  const content = postDetails && JSON.parse(postDetails?.content);
 
   return (
     <ProtectedLayout>
@@ -507,7 +299,7 @@ const PostDetails = () => {
             <Group justify="space-between" align="center">
               <Button
                 variant="default"
-                leftSection={<IconArrowLeft />}
+                leftSection={<IconArrowLeft size={16} />}
                 onClick={() => navigate('/')}
               >
                 Back
@@ -551,7 +343,240 @@ const PostDetails = () => {
               )}
             </Group>
             <LoadingPost loading={loading}>
-              {postDetails && renderPost(postDetails)}
+              {postDetails && (
+                <Fragment>
+                  <Stack gap={4}>
+                    <Title order={1}>{postDetails?.title}</Title>
+                    <Group gap={4} align="center">
+                      <IconClock size={14} />
+                      <Text fz="xs" c="dimmed">
+                        {format(
+                          new Date(postDetails?.createdAt),
+                          'MMMM dd - hh:mm a'
+                        )}
+                      </Text>
+                    </Group>
+                  </Stack>
+
+                  <Stack gap="xs">
+                    <Group align="center" justify="space-between">
+                      <Group gap={6}>
+                        <ProfileBadge
+                          profile={postDetails?.creator}
+                          onClick={() =>
+                            navigate(`/profile/${postDetails?.creator.email}`)
+                          }
+                        />
+                      </Group>
+                      <PostReaction
+                        post={postDetails}
+                        isLiked={isLiked}
+                        isCommented={isCommented}
+                        onLike={handleLike}
+                        onComment={() => commentRef.current?.focus()}
+                      />
+                    </Group>
+                    <Divider />
+                  </Stack>
+
+                  <Stack>
+                    {content.blocks.map((block: any) => {
+                      switch (block.type) {
+                        case 'paragraph':
+                          return (
+                            <Text
+                              key={block.id}
+                              dangerouslySetInnerHTML={{
+                                __html: block.data.text
+                              }}
+                            />
+                          );
+                        case 'header':
+                          return (
+                            <Title
+                              key={block.id}
+                              order={block.data.level + 1}
+                              dangerouslySetInnerHTML={{
+                                __html: block.data.text
+                              }}
+                            />
+                          );
+                        case 'list':
+                          return (
+                            <List
+                              withPadding
+                              key={block.id}
+                              type={block.data.style}
+                            >
+                              {block.data.items.map(
+                                (item: any, index: number) => (
+                                  <List.Item key={index}>
+                                    <span
+                                      dangerouslySetInnerHTML={{
+                                        __html: item.content
+                                      }}
+                                    />
+                                  </List.Item>
+                                )
+                              )}
+                            </List>
+                          );
+                        case 'quote':
+                          return (
+                            <Blockquote
+                              color="green"
+                              key={block.id}
+                              cite={block.data.caption}
+                              mt="xl"
+                            >
+                              {block.data.text}
+                            </Blockquote>
+                          );
+                        case 'code':
+                          return (
+                            <Code key={block.id} block>
+                              {block.data.code}
+                            </Code>
+                          );
+                        case 'table':
+                          const withHeadings = block.data.withHeadings;
+                          const rows = withHeadings
+                            ? block.data.content.slice(1)
+                            : block.data.content;
+
+                          return (
+                            <Table
+                              withTableBorder
+                              withColumnBorders
+                              key={block.id}
+                              layout="fixed"
+                            >
+                              {withHeadings && (
+                                <Table.Thead>
+                                  <Table.Tr>
+                                    {block.data.content[0].map(
+                                      (heading: string, index: number) => (
+                                        <Table.Th key={index}>
+                                          {heading}
+                                        </Table.Th>
+                                      )
+                                    )}
+                                  </Table.Tr>
+                                </Table.Thead>
+                              )}
+                              <Table.Tbody>
+                                {rows.map((row: any, index: number) => (
+                                  <Table.Tr key={index}>
+                                    {row.map((cell: string, index: number) => (
+                                      <Table.Td key={index}>{cell}</Table.Td>
+                                    ))}
+                                  </Table.Tr>
+                                ))}
+                              </Table.Tbody>
+                            </Table>
+                          );
+                        case 'image':
+                          if (block.data.withBackground) {
+                            return (
+                              <Group
+                                justify="center"
+                                bg="dimmed"
+                                key={block.id}
+                                style={{
+                                  borderRadius: theme.radius.sm
+                                }}
+                              >
+                                <Image
+                                  fit="contain"
+                                  w="100%"
+                                  h="auto"
+                                  src={block.data.file.url}
+                                  alt={block.data.caption}
+                                />
+                                <Text>{block.data.caption}</Text>
+                              </Group>
+                            );
+                          }
+
+                          return (
+                            <Image
+                              radius="sm"
+                              key={block.id}
+                              src={block.data.file.url}
+                              alt={block.data.caption}
+                            />
+                          );
+                        default:
+                          return null;
+                      }
+                    })}
+                  </Stack>
+
+                  <Group gap={6} mb="lg">
+                    {postDetails.tags.map((tag: string) => (
+                      <Badge key={tag} variant="light">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </Group>
+
+                  <Stack gap="xs">
+                    <Divider />
+                    <PostReaction
+                      post={postDetails}
+                      isLiked={isLiked}
+                      isCommented={isCommented}
+                      onLike={handleLike}
+                      onComment={() => commentRef.current?.focus()}
+                    />
+                  </Stack>
+
+                  <Title order={2}>Comments ({postDetails.commentCount})</Title>
+
+                  <form onSubmit={form.onSubmit(handleSubmitComment)}>
+                    <Stack>
+                      <Textarea
+                        ref={commentRef}
+                        label="Comment"
+                        placeholder="Enter your comment"
+                        name="comment"
+                        key={form.key('comment')}
+                        {...form.getInputProps('comment')}
+                      />
+                      <Group>
+                        <Button type="submit" loading={submitting}>
+                          Submit
+                        </Button>
+                      </Group>
+                    </Stack>
+                  </form>
+
+                  {postDetails.comments.length > 0 ? (
+                    <Stack gap="lg" my="xl">
+                      {postDetails.comments.map(
+                        (comment: TCommentItem, index: number) => (
+                          <CommentCard
+                            key={comment.id}
+                            comment={comment}
+                            isLastComment={
+                              postDetails.comments.length === index + 1
+                            }
+                            isOwnComment={
+                              comment.commentor.email === profileEmail
+                            }
+                            updateComment={handleUpdateComment}
+                            deleteComment={handleDeleteComment}
+                          />
+                        )
+                      )}
+                    </Stack>
+                  ) : (
+                    <Text size="sm" c="dimmed">
+                      No comments yet.
+                    </Text>
+                  )}
+                </Fragment>
+              )}
             </LoadingPost>
           </Stack>
         </Grid.Col>

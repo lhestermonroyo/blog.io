@@ -1,11 +1,13 @@
 import { FC, useEffect } from 'react';
 import {
   Button,
+  Divider,
   Group,
   Select,
   Stack,
   Textarea,
-  TextInput
+  TextInput,
+  Title
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -16,7 +18,7 @@ import { TAuthState } from '../../../../types';
 
 type StepOneProps = {
   onNextStep: () => void;
-}
+};
 
 const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
@@ -27,18 +29,21 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
       email: '',
       firstName: '',
       lastName: '',
-      birthdate: null as Date | null,
-      location: '',
       pronouns: '',
-      bio: ''
+      title: '',
+      location: '',
+      birthdate: null as Date | null,
+      bio: '',
+      facebook: '',
+      twitter: '',
+      instagram: '',
+      linkedin: '',
+      github: '',
+      website: ''
     },
     validate: {
       firstName: (value) => (value ? null : 'First name is required'),
-      lastName: (value) => (value ? null : 'Last name is required'),
-      birthdate: (value) => (value ? null : 'Birthdate is required'),
-      location: (value) => (value ? null : 'Location is required'),
-      pronouns: (value) => (value ? null : 'Pronouns are required'),
-      bio: (value) => (value ? null : 'Bio is required')
+      lastName: (value) => (value ? null : 'Last name is required')
     }
   });
 
@@ -57,7 +62,13 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
           : null,
         location: formData?.location || profile?.location,
         pronouns: formData?.pronouns || profile?.pronouns,
-        bio: formData?.bio || profile?.bio
+        bio: formData?.bio || profile?.bio,
+        facebook: formData?.facebook || profile?.socials.facebook,
+        twitter: formData?.twitter || profile?.socials.twitter,
+        instagram: formData?.instagram || profile?.socials.instagram,
+        linkedin: formData?.linkedin || profile?.socials.linkedin,
+        github: formData?.github || profile?.socials.github,
+        website: formData?.website || profile?.socials.website
       });
     }
   }, [profile]);
@@ -97,18 +108,6 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
           key={form.key('lastName')}
           {...form.getInputProps('lastName')}
         />
-        <DateInput
-          label="Birthdate"
-          placeholder="Enter your birthdate"
-          key={form.key('birthdate')}
-          {...form.getInputProps('birthdate')}
-        />
-        <TextInput
-          label="Location"
-          placeholder="Enter your location"
-          key={form.key('location')}
-          {...form.getInputProps('location')}
-        />
         <Select
           label="Pronouns"
           placeholder="Select your pronouns"
@@ -116,11 +115,75 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
           key={form.key('pronouns')}
           {...form.getInputProps('pronouns')}
         />
+        <TextInput
+          label="Title"
+          placeholder="Enter your title (e.g. Software Engineer)"
+          key={form.key('title')}
+          {...form.getInputProps('title')}
+        />
+        <TextInput
+          label="Location"
+          placeholder="Enter your location"
+          key={form.key('location')}
+          {...form.getInputProps('location')}
+        />
+        <DateInput
+          label="Birthdate"
+          placeholder="Enter your birthdate"
+          key={form.key('birthdate')}
+          {...form.getInputProps('birthdate')}
+        />
+
         <Textarea
           label="Bio"
           placeholder="Enter your bio"
           key={form.key('bio')}
           {...form.getInputProps('bio')}
+        />
+
+        <Divider
+          label={
+            <Title c="dark" order={2}>
+              Socials
+            </Title>
+          }
+          labelPosition="left"
+        />
+        <TextInput
+          label="Facebook"
+          placeholder="Enter your facebook link"
+          key={form.key('facebook')}
+          {...form.getInputProps('facebook')}
+        />
+        <TextInput
+          label="Twitter"
+          placeholder="Enter your twitter link"
+          key={form.key('twitter')}
+          {...form.getInputProps('twitter')}
+        />
+        <TextInput
+          label="Instagram"
+          placeholder="Enter your instagram link"
+          key={form.key('instagram')}
+          {...form.getInputProps('instagram')}
+        />
+        <TextInput
+          label="LinkedIn"
+          placeholder="Enter your linkedin link"
+          key={form.key('linkedin')}
+          {...form.getInputProps('linkedin')}
+        />
+        <TextInput
+          label="GitHub"
+          placeholder="Enter your github link"
+          key={form.key('github')}
+          {...form.getInputProps('github')}
+        />
+        <TextInput
+          label="Website"
+          placeholder="Enter your website link"
+          key={form.key('website')}
+          {...form.getInputProps('website')}
         />
       </Stack>
       <Group mt="lg">

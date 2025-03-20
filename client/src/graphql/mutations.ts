@@ -49,23 +49,26 @@ export const UPDATE_PROFILE = gql`
 export const FOLLOW_USER = gql`
   mutation FollowUser($email: String!) {
     followUser(email: $email) {
-      email
       followers {
-        id
-        email
-        firstName
-        lastName
-        avatar
+        count
+        list {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
       }
       following {
-        id
-        email
-        firstName
-        lastName
-        avatar
+        count
+        list {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
       }
-      followersCount
-      followingCount
     }
   }
 `;

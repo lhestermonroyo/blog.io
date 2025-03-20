@@ -9,6 +9,10 @@ const initialState: TAuthState = {
       count: 0,
       list: []
     },
+    savedPosts: {
+      count: 0,
+      list: []
+    },
     followers: {
       count: 0,
       list: []

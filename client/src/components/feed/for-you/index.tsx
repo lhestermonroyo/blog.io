@@ -80,7 +80,7 @@ const ForYou = () => {
                 <Group justify="flex-end">
                   <Button
                     variant="default"
-                    rightSection={<IconFilter size={20} />}
+                    leftSection={<IconFilter size={16} />}
                     onClick={() => setOpenFilters(true)}
                   >
                     Filters {filters.length ? `(${filters.length})` : ''}

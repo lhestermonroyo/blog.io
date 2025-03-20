@@ -21,6 +21,14 @@ div {
   line-height: 1.5;
 }
 
+.profile-avatar {
+  border: 2px solid #fff;
+}
+
+.profile-badge-name:hover {
+  text-decoration: underline;
+}
+
 .ce-block__content,
 .ce-toolbar__content {
   font-size: 15px !important;
@@ -38,11 +46,10 @@ div {
   --border-color: #ccc !important;
 }
 
-.extras-container.is-sticky {
+.sidebar-container.is-sticky {
   position: sticky !important;
   top: 80px !important;
   padding-bottom: 10em !important;
-  /* height: 100vh !important; */
   width: 100% !important;
 }
 

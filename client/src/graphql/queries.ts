@@ -7,14 +7,23 @@ export const GET_PROFILE = gql`
       email
       firstName
       lastName
-      birthdate
-      location
       pronouns
+      title
+      location
+      birthdate
       bio
+      age
       avatar
       coverPhoto
+      socials {
+        facebook
+        twitter
+        linkedin
+        instagram
+        github
+        website
+      }
       tags
-      age
       createdAt
     }
   }
@@ -27,39 +36,94 @@ export const GET_PROFILE_BY_EMAIL = gql`
       email
       firstName
       lastName
-      birthdate
-      location
       pronouns
+      title
+      location
+      birthdate
       bio
+      age
       avatar
       coverPhoto
+      socials {
+        facebook
+        twitter
+        linkedin
+        instagram
+        github
+        website
+      }
       tags
-      age
       createdAt
     }
   }
 `;
 
-export const GET_FOLLOWS_BY_EMAIL = gql`
-  query GetFollowsByEmail($email: String!) {
-    getFollowsByEmail(email: $email) {
+export const GET_STATS_BY_EMAIL = gql`
+  query GetStatsByEmail($email: String!) {
+    getStatsByEmail(email: $email) {
       email
       followers {
-        id
-        email
-        firstName
-        lastName
-        avatar
+        count
+        list {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
       }
       following {
-        id
-        email
-        firstName
-        lastName
-        avatar
+        count
+        list {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
       }
-      followersCount
-      followingCount
+      posts {
+        count
+        list {
+          id
+          title
+          content
+          tags
+          creator {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likeCount
+          commentCount
+          isLiked
+          isCommented
+          createdAt
+        }
+      }
+      savedPosts {
+        count
+        list {
+          id
+          title
+          content
+          tags
+          creator {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likeCount
+          commentCount
+          isLiked
+          isCommented
+          createdAt
+        }
+      }
     }
   }
 `;

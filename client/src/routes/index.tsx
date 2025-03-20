@@ -26,7 +26,7 @@ const AppRouter = () => {
           <Route path="/post/:id" element={<PostDetails />} />
           <Route path="/compose" element={<Compose />} />
           <Route path="/edit-post/:id" element={<EditPost />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:email?" element={<Profile />} />
         </Route>
       </Routes>
     </HashRouter>

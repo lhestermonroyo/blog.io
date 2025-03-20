@@ -39,17 +39,7 @@ module.exports.validateSignUpInput = (
   };
 };
 
-module.exports.validateProfileInput = (
-  firstName,
-  lastName,
-  birthdate,
-  location,
-  pronouns,
-  bio,
-  avatar,
-  coverPhoto,
-  tags
-) => {
+module.exports.validateProfileInput = (firstName, lastName) => {
   const errors = {};
 
   if (firstName.trim() === '') {
@@ -58,34 +48,6 @@ module.exports.validateProfileInput = (
 
   if (lastName.trim() === '') {
     errors.firstName = 'Firstname must not be empty.';
-  }
-
-  if (birthdate.trim() === '') {
-    errors.birthdate = 'Birthdate must not be empty.';
-  }
-
-  if (location.trim() === '') {
-    errors.location = 'Location must not be empty.';
-  }
-
-  if (pronouns.trim() === '') {
-    errors.pronouns = 'Pronouns must not be empty.';
-  }
-
-  if (bio.trim() === '') {
-    errors.bio = 'Bio must not be empty.';
-  }
-
-  if (avatar.trim() === '') {
-    errors.avatar = 'Avatar must not be empty.';
-  }
-
-  if (coverPhoto.trim() === '') {
-    errors.coverPhoto = 'Cover photo must not be empty.';
-  }
-
-  if (tags.length < 3) {
-    errors.tags = 'Tags must be at least 3.';
   }
 
   return {

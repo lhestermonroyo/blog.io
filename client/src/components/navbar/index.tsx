@@ -14,9 +14,9 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
+  IconBallpen,
   IconBell,
   IconChevronDown,
-  IconEdit,
   IconLogout,
   IconSearch,
   IconSettings,
@@ -55,7 +55,48 @@ const Navbar = () => {
         setAuth((prev: TAuthState) => ({
           ...prev,
           isAuth: false,
-          profile: null
+          profile: null,
+          stats: {
+            posts: {
+              count: 0,
+              list: []
+            },
+            savedPosts: {
+              count: 0,
+              list: []
+            },
+            followers: {
+              count: 0,
+              list: []
+            },
+            following: {
+              count: 0,
+              list: []
+            }
+          },
+          onboarding: {
+            profileInfoForm: {
+              email: '',
+              firstName: '',
+              lastName: '',
+              pronouns: '',
+              title: '',
+              location: '',
+              birthdate: null as Date | null,
+              bio: '',
+              facebook: '',
+              twitter: '',
+              instagram: '',
+              linkedin: '',
+              github: '',
+              website: ''
+            },
+            uploadForm: {
+              avatar: null,
+              coverPhoto: null
+            },
+            tagsForm: []
+          }
         }));
         navigate('/login');
       }
@@ -85,12 +126,12 @@ const Navbar = () => {
             />
           </Group>
 
-          {isAuth ? (
+          {isAuth && profile ? (
             <Group gap="lg" justify="center">
               <Button
                 onClick={() => navigate('/compose')}
                 variant="filled"
-                leftSection={<IconEdit size={20} />}
+                leftSection={<IconBallpen size={20} />}
               >
                 Compose
               </Button>
@@ -142,6 +183,7 @@ const Navbar = () => {
                         stroke={1.5}
                       />
                     }
+                    onClick={() => navigate('/profile')}
                   >
                     Profile
                   </Menu.Item>

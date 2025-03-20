@@ -6,6 +6,7 @@ import {
   Badge,
   Button,
   Card,
+  Divider,
   Group,
   Image,
   Stack,
@@ -56,21 +57,74 @@ const Review: FC<ReviewProps> = ({
             value={onboarding.profileInfoForm?.lastName}
           />
           <ReviewItem
+            label="Pronouns"
+            value={onboarding.profileInfoForm?.pronouns}
+          />
+          <ReviewItem label="Title" value={onboarding.profileInfoForm?.title} />
+          <ReviewItem
+            label="Location"
+            value={onboarding.profileInfoForm?.location}
+          />
+
+          <ReviewItem
             label="Birthdate"
             value={format(
               onboarding.profileInfoForm?.birthdate as Date,
               'MMMM dd, yyyy'
             )}
           />
-          <ReviewItem
-            label="Location"
-            value={onboarding.profileInfoForm?.location}
-          />
-          <ReviewItem
-            label="Pronouns"
-            value={onboarding.profileInfoForm?.pronouns}
-          />
           <ReviewItem label="Bio" value={onboarding.profileInfoForm?.bio} />
+
+          <Divider
+            label={
+              <Title c="dark" order={2}>
+                Socials
+              </Title>
+            }
+            labelPosition="left"
+          />
+
+          {onboarding.profileInfoForm?.facebook && (
+            <ReviewItem
+              label="Facebook"
+              value={onboarding.profileInfoForm?.facebook}
+            />
+          )}
+
+          {onboarding.profileInfoForm?.twitter && (
+            <ReviewItem
+              label="Twitter"
+              value={onboarding.profileInfoForm?.twitter}
+            />
+          )}
+
+          {onboarding.profileInfoForm?.instagram && (
+            <ReviewItem
+              label="Instagram"
+              value={onboarding.profileInfoForm?.instagram}
+            />
+          )}
+
+          {onboarding.profileInfoForm?.linkedin && (
+            <ReviewItem
+              label="LinkedIn"
+              value={onboarding.profileInfoForm?.linkedin}
+            />
+          )}
+
+          {onboarding.profileInfoForm?.github && (
+            <ReviewItem
+              label="Github"
+              value={onboarding.profileInfoForm?.github}
+            />
+          )}
+
+          {onboarding.profileInfoForm?.website && (
+            <ReviewItem
+              label="Website"
+              value={onboarding.profileInfoForm?.website}
+            />
+          )}
         </Stack>
       </Card>
 
@@ -134,7 +188,9 @@ const Review: FC<ReviewProps> = ({
           </Group>
           <Group gap={6}>
             {onboarding.tagsForm.map((tag: string) => (
-              <Badge key={tag}>{tag}</Badge>
+              <Badge key={tag} variant="light">
+                {tag}
+              </Badge>
             ))}
           </Group>
         </Stack>

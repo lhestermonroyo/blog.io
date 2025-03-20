@@ -24,7 +24,7 @@ const ProfileBadge: FC<ProfileBadgeProps> = ({
         color="initials"
         size={avatarSize}
       />
-      <UnstyledButton onClick={onClick}>
+      <UnstyledButton className="profile-badge-name" onClick={onClick}>
         <Text fw={500} size="sm" mx={2}>
           {`${profile?.firstName} ${profile?.lastName}`}
         </Text>

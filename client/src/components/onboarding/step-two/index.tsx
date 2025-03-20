@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useEffect } from 'react';
 import { Button, Group, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useRecoilState } from 'recoil';
@@ -16,7 +16,23 @@ type StepTwoProps = {
 
 const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
-  const { onboarding } = auth;
+  const { profile, onboarding } = auth;
+
+  useEffect(() => {
+    if (profile) {
+      setAuth((prev: TAuthState) => ({
+        ...prev,
+        onboarding: {
+          ...prev.onboarding,
+          uploadForm: {
+            ...prev.onboarding.uploadForm,
+            avatar: profile.avatar,
+            coverPhoto: profile.coverPhoto
+          }
+        }
+      }));
+    }
+  }, [profile]);
 
   const handleSelectAvatar = async (base64Str: string) => {
     setAuth((prev: TAuthState) => ({

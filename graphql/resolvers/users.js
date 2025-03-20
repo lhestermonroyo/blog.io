@@ -49,11 +49,21 @@ module.exports = {
           lastName,
           email,
           password: cryptedPassword,
-          birthdate: '',
-          location: '',
-          age: 0,
           pronouns: '',
+          title: '',
+          location: '',
+          birthdate: '',
           bio: '',
+          avatar: '',
+          coverPhoto: '',
+          tags: [],
+          socials: {
+            facebook: '',
+            twitter: '',
+            instagram: '',
+            linkedin: '',
+            github: ''
+          },
           createdAt: new Date().toISOString()
         });
 
@@ -122,24 +132,28 @@ module.exports = {
         const {
           firstName,
           lastName,
-          birthdate,
-          location,
           pronouns,
+          title,
+          location,
+          birthdate,
           bio,
           avatar,
           coverPhoto,
+          socials,
           tags
         } = profileInput;
 
         const { valid, errors } = validateProfileInput(
           firstName,
           lastName,
-          birthdate,
-          location,
           pronouns,
+          title,
+          location,
+          birthdate,
           bio,
           avatar,
           coverPhoto,
+          socials,
           tags
         );
 
@@ -152,13 +166,15 @@ module.exports = {
           {
             firstName,
             lastName,
-            birthdate,
-            location,
             pronouns,
+            title,
+            location,
+            birthdate,
             bio,
+            socials,
+            tags,
             avatar,
-            coverPhoto,
-            tags
+            coverPhoto
           },
           { new: true }
         );

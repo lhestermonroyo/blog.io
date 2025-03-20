@@ -9,6 +9,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import { useNavigate } from 'react-router';
 import { IconAt, IconMapPin } from '@tabler/icons-react';
 import { useMutation } from '@apollo/client';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -31,6 +32,8 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
   } = post;
 
   const [followUser] = useMutation(FOLLOW_USER);
+
+  const navigate = useNavigate();
 
   const profileEmail = auth?.profile?.email as string;
   const isOwnProfile = useMemo(
@@ -59,12 +62,12 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
           creatorStats: {
             ...prev.creatorStats,
             followers: {
-              count: data.followersCount,
-              list: data.followers
+              count: data.followers.count,
+              list: data.followers.list
             },
             following: {
-              count: data.followingCount,
-              list: data.following
+              count: data.following.count,
+              list: data.following.list
             }
           }
         }));
@@ -153,16 +156,21 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
               size="xl"
             />
             <Stack flex={1} gap={6}>
-              <Group gap={4} align="center">
-                <Title order={5}>
-                  {`${creatorProfile?.firstName} ${creatorProfile?.lastName}`}
-                </Title>
-                {creatorProfile?.pronouns && (
-                  <Text size="xs" color="dimmed" mt={2}>
-                    ({creatorProfile?.pronouns})
-                  </Text>
-                )}
-              </Group>
+              <Stack gap={0}>
+                <Text size="xs" tt="uppercase" c="dimmed">
+                  {creatorProfile?.title}
+                </Text>
+                <Group gap={4} align="center">
+                  <Title order={5}>
+                    {`${creatorProfile?.firstName} ${creatorProfile?.lastName}`}
+                  </Title>
+                  {creatorProfile?.pronouns && (
+                    <Text size="xs" color="dimmed" mt={2}>
+                      ({creatorProfile?.pronouns})
+                    </Text>
+                  )}
+                </Group>
+              </Stack>
 
               <Stack gap={2}>
                 <Group gap={4} align="center">
@@ -215,7 +223,12 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
                 {isFollowed ? 'Unfollow' : 'Follow'}
               </Button>
             )}
-            <Button flex={1}>View Profile</Button>
+            <Button
+              flex={1}
+              onClick={() => navigate(`/profile/${creatorProfile?.email}`)}
+            >
+              View Profile
+            </Button>
           </Group>
         </Stack>
       </Card>

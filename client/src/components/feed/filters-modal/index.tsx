@@ -109,9 +109,11 @@ const FiltersModal: FC<FiltersModalProps> = ({ opened, onClose }) => {
           <Button type="submit" value="filled">
             Save Filters
           </Button>
-          <Button value="filled" onClick={clearFilters}>
-            Clear Filters
-          </Button>
+          {filters.length && (
+            <Button value="filled" onClick={clearFilters}>
+              Clear Filters
+            </Button>
+          )}
           <Button variant="default" onClick={onClose}>
             Cancel
           </Button>

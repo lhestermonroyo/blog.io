@@ -9,11 +9,11 @@ import {
   Text,
   Title
 } from '@mantine/core';
-import { useMutation, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRecoilState } from 'recoil';
 
 import {
-  GET_FOLLOWS_BY_EMAIL,
+  GET_STATS_BY_EMAIL,
   GET_POSTS_BY_CREATOR,
   GET_POSTS_BY_TAGS,
   GET_PROFILE_BY_EMAIL
@@ -36,35 +36,37 @@ const PostSidebar = () => {
     loading: creatorLoading,
     refetch: fetchProfileByEmail
   } = useQuery(GET_PROFILE_BY_EMAIL, {
-    variables: { email: creatorEmail }
+    variables: { email: creatorEmail },
+    skip: !creatorEmail
   });
   const {
-    data: followsResponse,
-    loading: followsLoading,
-    refetch: fetchFollowsByEmail
-  } = useQuery(GET_FOLLOWS_BY_EMAIL, {
-    variables: { email: creatorEmail }
+    data: statsResponse,
+    loading: statsLoading,
+    refetch: fetchStatsByEmail
+  } = useQuery(GET_STATS_BY_EMAIL, {
+    variables: { email: creatorEmail },
+    skip: !creatorEmail
   });
   const {
     data: postsResponse,
     loading: postsLoading,
     refetch: fetchPostsByCreator
   } = useQuery(GET_POSTS_BY_CREATOR, {
-    variables: { creator: creatorId, limit: 5 }
+    variables: { creator: creatorId, limit: 5 },
+    skip: !creatorId
   });
   const {
     data: tagPostsResponse,
     loading: tagPostsLoading,
     refetch: fetchPostsByTags
   } = useQuery(GET_POSTS_BY_TAGS, {
-    variables: { tags: postDetails?.tags, limit: 5 }
+    variables: { tags: postDetails?.tags, limit: 5 },
+    skip: !postDetails?.tags
   });
 
   useEffect(() => {
-    if (creatorId && creatorEmail) {
-      init();
-    }
-  }, [creatorId, creatorEmail]);
+    init();
+  }, []);
 
   useEffect(() => {
     if (creatorResponse) {
@@ -79,26 +81,24 @@ const PostSidebar = () => {
   }, [creatorResponse]);
 
   useEffect(() => {
-    if (followsResponse) {
-      const key = Object.keys(followsResponse)[0];
-      const data = followsResponse[key];
+    if (statsResponse) {
+      const key = Object.keys(statsResponse)[0];
+      const data = statsResponse[key];
 
       setPost((prev: TPostState) => ({
         ...prev,
         creatorStats: {
-          ...prev.creatorStats,
-          followers: {
-            count: data.followersCount,
-            list: data.followers
+          posts: {
+            ...prev.creatorStats.posts,
+            count: data.posts.count || 0
           },
-          following: {
-            count: data.followingCount,
-            list: data.following
-          }
+          savedPosts: data.savedPosts,
+          followers: data.followers,
+          following: data.following
         }
       }));
     }
-  }, [followsResponse]);
+  }, [statsResponse]);
 
   useEffect(() => {
     if (postsResponse) {
@@ -110,7 +110,7 @@ const PostSidebar = () => {
         creatorStats: {
           ...prev.creatorStats,
           posts: {
-            count: data.totalCount,
+            ...prev.creatorStats.posts,
             list: data.posts
           }
         }
@@ -122,7 +122,7 @@ const PostSidebar = () => {
     try {
       const requests = [
         fetchProfileByEmail(),
-        fetchFollowsByEmail(),
+        fetchStatsByEmail(),
         fetchPostsByCreator(),
         fetchPostsByTags()
       ];
@@ -142,8 +142,8 @@ const PostSidebar = () => {
   }, [tagPostsResponse]);
 
   return (
-    <Stack gap="lg" className="extras-container">
-      <AuthorPanel loading={creatorLoading || followsLoading || postsLoading} />
+    <Stack gap="lg" className="sidebar-container">
+      <AuthorPanel loading={creatorLoading || statsLoading || postsLoading} />
       <AuthorPostsPanel loading={postsLoading} />
       <SuggestionsPanel loading={tagPostsLoading} list={tagPostList} />
     </Stack>

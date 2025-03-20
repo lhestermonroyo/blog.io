@@ -11,14 +11,16 @@ module.exports = gql`
     email: String!
     firstName: String!
     lastName: String!
-    birthdate: String
-    location: String
     pronouns: String
+    title: String
+    location: String
+    birthdate: String
     bio: String
+    age: Int
     avatar: String
     coverPhoto: String
+    socials: Socials
     tags: [String]!
-    age: Int
     createdAt: String!
   }
   type ProfileBadge {
@@ -27,6 +29,14 @@ module.exports = gql`
     firstName: String!
     lastName: String!
     avatar: String
+  }
+  type Socials {
+    facebook: String
+    twitter: String
+    instagram: String
+    linkedin: String
+    github: String
+    website: String
   }
   # Posts
   type Posts {
@@ -70,13 +80,28 @@ module.exports = gql`
     liker: ProfileBadge!
     createdAt: String!
   }
-  # Follows
-  type Follows {
+  # Stats
+  type Stats {
     email: String!
-    followers: [ProfileBadge]!
-    following: [ProfileBadge]!
-    followersCount: Int!
-    followingCount: Int!
+    followers: StatProfileBadge!
+    following: StatProfileBadge!
+    posts: StatPostItem!
+    savedPosts: StatPostItem!
+  }
+  type FollowResponse {
+    followers: StatProfileBadge!
+    following: StatProfileBadge!
+  }
+  type SavePostResponse {
+    savedPosts: StatPostItem!
+  }
+  type StatPostItem {
+    count: Int!
+    list: [PostItem]!
+  }
+  type StatProfileBadge {
+    count: Int!
+    list: [ProfileBadge]!
   }
   # Status
   type Status {
@@ -94,13 +119,23 @@ module.exports = gql`
   input ProfileInput {
     firstName: String!
     lastName: String!
-    birthdate: String!
-    location: String!
-    pronouns: String!
-    bio: String!
-    avatar: String!
-    coverPhoto: String!
+    pronouns: String
+    title: String
+    location: String
+    birthdate: String
+    bio: String
+    avatar: String
+    coverPhoto: String
+    socials: SocialsInput!
     tags: [String]!
+  }
+  input SocialsInput {
+    facebook: String
+    twitter: String
+    instagram: String
+    linkedin: String
+    github: String
+    website: String
   }
   input PostInput {
     title: String!
@@ -120,7 +155,7 @@ module.exports = gql`
     getPostById(postId: ID!): Post!
     getTags: [String]!
     # Follows
-    getFollowsByEmail(email: String!): Follows!
+    getStatsByEmail(email: String!): Stats!
   }
 
   type Mutation {
@@ -139,8 +174,9 @@ module.exports = gql`
     deleteComment(postId: ID!, commentId: ID!): Post!
     # Likes
     likePost(postId: ID!): Post!
-    # Follows
-    followUser(email: String): Follows!
+    # Stats
+    followUser(email: String): FollowResponse!
+    savePost(postId: ID!): SavePostResponse!
   }
 
   type Subscription {
