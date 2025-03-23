@@ -5,9 +5,9 @@ import { useForm } from '@mantine/form';
 import { useMutation, useQuery } from '@apollo/client';
 import { useRecoilState } from 'recoil';
 
+import states from '../../../states';
 import { UPDATE_PROFILE } from '../../../graphql/mutations';
 import { GET_TAGS } from '../../../graphql/queries';
-import states from '../../../states';
 
 const TagsForm = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -119,7 +119,7 @@ const TagsForm = () => {
             {...form.getInputProps('tags')}
           />
 
-          <Group gap={6}>
+          <Group gap={6} mt="xl">
             <Button variant="filled" type="submit" loading={submitting}>
               Save Changes
             </Button>

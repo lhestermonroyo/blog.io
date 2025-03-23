@@ -121,6 +121,40 @@ module.exports = {
         throw new Error(error);
       }
     },
+    async changePassword(_, { oldPassword, newPassword }, ctx) {
+      try {
+        const user = checkAuth(ctx);
+
+        if (!user) {
+          throw new Error('User not authenticated.');
+        }
+
+        const response = await User.findById(user.id);
+
+        const match = await bcrypt.compare(oldPassword, response.password);
+
+        if (!match) {
+          throw new UserInputError('Current password is incorrect.', {
+            errors: {
+              general: 'Current password is incorrect.'
+            }
+          });
+        }
+
+        const cryptedPassword = await bcrypt.hash(newPassword, 12);
+
+        response.password = cryptedPassword;
+        await response.save();
+
+        await clearToken(ctx);
+
+        return {
+          success: true
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
     async updateProfile(_, { profileInput }, ctx) {
       try {
         const user = checkAuth(ctx);

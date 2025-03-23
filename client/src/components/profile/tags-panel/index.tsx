@@ -48,7 +48,7 @@ const TagsPanel = ({
   return (
     <Card withBorder>
       <Stack gap="lg">
-        <Title order={3}>Topics/Tags</Title>
+        <Title order={3}>Liked Topics/Tags</Title>
         {tags.length > 0 ? renderList() : renderEmpty()}
         {ownProfile && (
           <Group>
@@ -69,7 +69,7 @@ const Loading = () => {
   return (
     <Card withBorder>
       <Stack gap="lg">
-        <Title order={3}>Topics/Tags</Title>
+        <Title order={3}>Liked Topics/Tags</Title>
         <Group gap={6}>
           <Skeleton height={24} radius="sm" width={120} />
           <Skeleton height={24} radius="sm" width={80} />

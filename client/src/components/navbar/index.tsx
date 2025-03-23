@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   ActionIcon,
   Anchor,
-  Autocomplete,
   Avatar,
   Button,
   Container,
@@ -18,7 +17,6 @@ import {
   IconBell,
   IconChevronDown,
   IconLogout,
-  IconSearch,
   IconSettings,
   IconUserCircle
 } from '@tabler/icons-react';
@@ -32,8 +30,9 @@ import { LOGOUT } from '../../graphql/mutations';
 import { TAuthState } from '../../../types';
 
 import Logo from '../logo';
-import classes from './style.module.css';
 import SearchField from '../search-field';
+
+import classes from './style.module.css';
 
 const Navbar = () => {
   const [userMenuOpened, setUserMenuOpened] = useState(false);
@@ -186,6 +185,7 @@ const Navbar = () => {
                     Profile
                   </Menu.Item>
                   <Menu.Item
+                    onClick={() => navigate('/profile/edit?tab=5')}
                     leftSection={
                       <IconSettings
                         size={16}

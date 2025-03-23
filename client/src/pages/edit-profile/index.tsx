@@ -6,12 +6,10 @@ import ProtectedLayout from '../../layouts/protected';
 import UserInfoForm from '../../components/edit-profile/user-info-form';
 import SocialsForm from '../../components/edit-profile/socials-form';
 import TagsForm from '../../components/edit-profile/tags-form';
-import { useEffect, useState } from 'react';
 import AvatarCoverForm from '../../components/edit-profile/avatar-cover-form';
+import AccountSettingsForm from '../../components/edit-profile/account-settings-form';
 
 const EditProfile = () => {
-  const [currTab, setCurrTab] = useState('1');
-
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -51,6 +49,9 @@ const EditProfile = () => {
           </Tabs.Panel>
           <Tabs.Panel value="4">
             <AvatarCoverForm />
+          </Tabs.Panel>
+          <Tabs.Panel value="5">
+            <AccountSettingsForm />
           </Tabs.Panel>
         </Tabs>
       </Stack>

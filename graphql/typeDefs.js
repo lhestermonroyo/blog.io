@@ -176,6 +176,7 @@ module.exports = gql`
     signUp(signUpInput: SignUpInput): Session!
     login(email: String!, password: String!): Session!
     logout: Status!
+    changePassword(oldPassword: String!, newPassword: String!): Status!
     updateProfile(profileInput: ProfileInput): Profile!
     # Posts
     createPost(postInput: PostInput): PostDetails!
