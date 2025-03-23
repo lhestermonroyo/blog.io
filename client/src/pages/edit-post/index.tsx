@@ -212,7 +212,7 @@ const EditPost = () => {
         <Stack display="flex" justify="stretch" gap="lg">
           <Group>
             <Button
-              leftSection={<IconArrowLeft />}
+              leftSection={<IconArrowLeft size={16} />}
               onClick={() => navigate(`/post/${params.id}`)}
             >
               Back

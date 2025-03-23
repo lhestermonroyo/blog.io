@@ -33,11 +33,13 @@ import { TAuthState } from '../../../types';
 
 import Logo from '../logo';
 import classes from './style.module.css';
+import SearchField from '../search-field';
 
 const Navbar = () => {
   const [userMenuOpened, setUserMenuOpened] = useState(false);
 
   const [auth, setAuth] = useRecoilState(states.auth);
+  const [post, setPost] = useRecoilState(states.post);
   const { isAuth, profile } = auth;
 
   const [logout] = useMutation(LOGOUT);
@@ -119,11 +121,7 @@ const Navbar = () => {
             <Anchor onClick={() => navigate('/')}>
               <Logo />
             </Anchor>
-            <Autocomplete
-              placeholder="Search"
-              leftSection={<IconSearch size={16} stroke={1.5} />}
-              data={[]}
-            />
+            <SearchField />
           </Group>
 
           {isAuth && profile ? (

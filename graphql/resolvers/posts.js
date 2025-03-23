@@ -2,10 +2,10 @@ const { UserInputError } = require('apollo-server');
 const { PubSub } = require('graphql-subscriptions');
 
 const Post = require('../../models/Post');
+const User = require('../../models/User');
 const Follow = require('../../models/Follow');
 const { checkAuth } = require('../../utils/auth.util');
 const { validatePostInput } = require('../../utils/validators.util');
-const User = require('../../models/User');
 
 const pubSub = new PubSub();
 
@@ -36,26 +36,21 @@ module.exports = {
 
         return {
           totalCount,
-          posts: posts.map((post) => {
-            const isLiked = post._doc.likes.some(
-              (like) => like.liker.toString() === user.id
-            );
-            const isCommented = post._doc.comments.some(
-              (comment) => comment.commentor.toString() === user.id
-            );
+          posts: posts.map(async (post) => {
             const likeCount = post._doc.likes.length ?? 0;
             const commentCount = post._doc.comments.length ?? 0;
+            const saveCount = post._doc.saves.length ?? 0;
 
             delete post._doc.likes;
             delete post._doc.comments;
+            delete post._doc.saves;
 
             return {
               id: post._id,
               ...post._doc,
               likeCount,
               commentCount,
-              isLiked,
-              isCommented
+              saveCount
             };
           })
         };
@@ -100,26 +95,21 @@ module.exports = {
 
         return {
           totalCount,
-          posts: posts.map((post) => {
-            const isLiked = post._doc.likes.some(
-              (like) => like.liker.toString() === user.id
-            );
-            const isCommented = post._doc.comments.some(
-              (comment) => comment.commentor.toString() === user.id
-            );
+          posts: posts.map(async (post) => {
             const likeCount = post._doc.likes.length ?? 0;
             const commentCount = post._doc.comments.length ?? 0;
+            const saveCount = post._doc.saves.length ?? 0;
 
             delete post._doc.likes;
             delete post._doc.comments;
+            delete post._doc.saves;
 
             return {
               id: post._id,
               ...post._doc,
               likeCount,
               commentCount,
-              isLiked,
-              isCommented
+              saveCount
             };
           })
         };
@@ -156,26 +146,21 @@ module.exports = {
 
         return {
           totalCount,
-          posts: posts.map((post) => {
-            const isLiked = post._doc.likes.some(
-              (like) => like.liker.toString() === user.id
-            );
-            const isCommented = post._doc.comments.some(
-              (comment) => comment.commentor.toString() === user.id
-            );
+          posts: posts.map(async (post) => {
             const likeCount = post._doc.likes.length ?? 0;
             const commentCount = post._doc.comments.length ?? 0;
+            const saveCount = post._doc.saves.length ?? 0;
 
             delete post._doc.likes;
             delete post._doc.comments;
+            delete post._doc.saves;
 
             return {
               id: post._id,
               ...post._doc,
               likeCount,
               commentCount,
-              isLiked,
-              isCommented
+              saveCount
             };
           })
         };
@@ -204,26 +189,21 @@ module.exports = {
 
         return {
           totalCount,
-          posts: posts.map((post) => {
-            const isLiked = post._doc.likes.some(
-              (like) => like.liker.toString() === user.id
-            );
-            const isCommented = post._doc.comments.some(
-              (comment) => comment.commentor.toString() === user.id
-            );
+          posts: posts.map(async (post) => {
             const likeCount = post._doc.likes.length ?? 0;
             const commentCount = post._doc.comments.length ?? 0;
+            const saveCount = post._doc.saves.length ?? 0;
 
             delete post._doc.likes;
             delete post._doc.comments;
+            delete post._doc.saves;
 
             return {
               id: post._id,
               ...post._doc,
               likeCount,
               commentCount,
-              isLiked,
-              isCommented
+              saveCount
             };
           })
         };
@@ -240,7 +220,7 @@ module.exports = {
         }
 
         const post = await Post.findById(postId)
-          .populate('creator', profileBadgeProj)
+          .populate('creator')
           .populate({
             path: 'likes',
             model: 'Like',
@@ -258,17 +238,37 @@ module.exports = {
               model: 'User',
               select: profileBadgeProj
             }
+          })
+          .populate({
+            path: 'saves',
+            model: 'Save',
+            populate: {
+              path: 'user',
+              model: 'User',
+              select: profileBadgeProj
+            }
           });
 
         if (!post) {
           throw new Error('Post not found');
         }
 
+        const isLiked = post.likes.some(
+          (like) => like.liker._id.toString() === user.id
+        );
+        const isCommented = post.comments.some(
+          (comment) => comment.commentor._id.toString() === user.id
+        );
+        const isSaved = post.saves.some(
+          (save) => save.user._id.toString() === user.id
+        );
+
         return {
           id: post._id,
           ...post._doc,
-          likeCount: post._doc.likes.length ?? 0,
-          commentCount: post._doc.comments.length ?? 0
+          isLiked,
+          isCommented,
+          isSaved
         };
       } catch (error) {
         throw new Error(error);
@@ -323,8 +323,7 @@ module.exports = {
         await newPost.populate([
           {
             path: 'creator',
-            model: 'User',
-            select: profileBadgeProj
+            model: 'User'
           },
           {
             path: 'comments',
@@ -343,11 +342,34 @@ module.exports = {
               model: 'User',
               select: profileBadgeProj
             }
+          },
+          {
+            path: 'saves',
+            model: 'Save',
+            populate: {
+              path: 'user',
+              model: 'User',
+              select: profileBadgeProj
+            }
           }
         ]);
+
+        const isLiked = newPost.likes.some(
+          (like) => like.liker._id.toString() === user.id
+        );
+        const isCommented = newPost.comments.some(
+          (comment) => comment.commentor._id.toString() === user.id
+        );
+        const isSaved = newPost.saves.some(
+          (save) => save.user._id.toString() === user.id
+        );
+
         const post = {
           id: newPost._id,
-          ...newPost._doc
+          ...newPost._doc,
+          isLiked,
+          isCommented,
+          isSaved
         };
 
         pubSub.publish(NEW_POST, {
@@ -393,15 +415,15 @@ module.exports = {
         await post.populate([
           {
             path: 'creator',
-            model: 'User',
-            select: profileBadgeProj
+            model: 'User'
           },
           {
             path: 'comments',
             model: 'Comment',
             populate: {
               path: 'commentor',
-              model: 'User'
+              model: 'User',
+              select: profileBadgeProj
             }
           },
           {
@@ -409,14 +431,37 @@ module.exports = {
             model: 'Like',
             populate: {
               path: 'liker',
-              model: 'User'
+              model: 'User',
+              select: profileBadgeProj
+            }
+          },
+          {
+            path: 'saves',
+            model: 'Save',
+            populate: {
+              path: 'user',
+              model: 'User',
+              select: profileBadgeProj
             }
           }
         ]);
 
+        const isLiked = post.likes.some(
+          (like) => like.liker._id.toString() === user.id
+        );
+        const isCommented = post.comments.some(
+          (comment) => comment.commentor._id.toString() === user.id
+        );
+        const isSaved = post.saves.some(
+          (save) => save.user._id.toString() === user.id
+        );
+
         return {
           id: post._id,
-          ...post._doc
+          ...post._doc,
+          isLiked,
+          isCommented,
+          isSaved
         };
       } catch (error) {
         throw new Error(error);
@@ -443,6 +488,90 @@ module.exports = {
         await post.deleteOne();
         return {
           success: true
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async savePost(_, { postId }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+          throw new UserInputError('Post not found.');
+        }
+
+        const alreadySaved = post.saves.some(
+          (save) => save.user.toString() === user.id
+        );
+
+        if (alreadySaved) {
+          post.saves = post.saves.filter(
+            (save) => save.user.toString() !== user.id
+          );
+        } else {
+          post.saves.push({
+            user: user.id,
+            createdAt: new Date().toISOString()
+          });
+        }
+        await post.save();
+        await post.populate([
+          {
+            path: 'creator',
+            model: 'User'
+          },
+          {
+            path: 'comments',
+            model: 'Comment',
+            populate: {
+              path: 'commentor',
+              model: 'User',
+              select: profileBadgeProj
+            }
+          },
+          {
+            path: 'likes',
+            model: 'Like',
+            populate: {
+              path: 'liker',
+              model: 'User',
+              select: profileBadgeProj
+            }
+          },
+          {
+            path: 'saves',
+            model: 'Save',
+            populate: {
+              path: 'user',
+              model: 'User',
+              select: profileBadgeProj
+            }
+          }
+        ]);
+
+        const isLiked = post.likes.some(
+          (like) => like.liker._id.toString() === user.id
+        );
+        const isCommented = post.comments.some(
+          (comment) => comment.commentor._id.toString() === user.id
+        );
+        const isSaved = post.saves.some(
+          (save) => save.user._id.toString() === user.id
+        );
+
+        return {
+          id: post._id,
+          ...post._doc,
+          isLiked,
+          isCommented,
+          isSaved
         };
       } catch (error) {
         throw new Error(error);

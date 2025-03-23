@@ -46,26 +46,30 @@ module.exports = gql`
   }
   type PostItem {
     id: ID!
+    tags: [String]!
     title: String!
     content: String!
     creator: ProfileBadge!
-    tags: [String]!
     likeCount: Int!
     commentCount: Int!
-    isLiked: Boolean!
-    isCommented: Boolean!
+    saveCount: Int!
     createdAt: String!
   }
-  type Post {
+  type PostDetails {
     id: ID!
+    tags: [String]!
     title: String!
     content: String!
-    tags: [String]!
     creator: Profile!
-    comments: [Comment]!
     likes: [Like]!
-    commentCount: Int!
+    comments: [Comment]!
+    saves: [Save]!
     likeCount: Int!
+    commentCount: Int!
+    saveCount: Int!
+    isLiked: Boolean!
+    isCommented: Boolean!
+    isSaved: Boolean!
     createdAt: String!
   }
   type Comment {
@@ -80,6 +84,11 @@ module.exports = gql`
     liker: ProfileBadge!
     createdAt: String!
   }
+  type Save {
+    id: ID!
+    user: ProfileBadge!
+    createdAt: String!
+  }
   # Stats
   type Stats {
     email: String!
@@ -92,9 +101,6 @@ module.exports = gql`
     followers: StatProfileBadge!
     following: StatProfileBadge!
   }
-  type SavePostResponse {
-    savedPosts: StatPostItem!
-  }
   type StatPostItem {
     count: Int!
     list: [PostItem]!
@@ -102,6 +108,13 @@ module.exports = gql`
   type StatProfileBadge {
     count: Int!
     list: [ProfileBadge]!
+  }
+  # Search
+  type SearchResults {
+    totalCount: Int!
+    users: [ProfileBadge]!
+    tags: [String]!
+    posts: [PostItem]!
   }
   # Status
   type Status {
@@ -152,7 +165,7 @@ module.exports = gql`
     getPostsByTags(tags: [String]!, limit: Int): Posts!
     getPostsByFollowing(limit: Int): Posts!
     getPostsByCreator(creator: ID!, limit: Int): Posts!
-    getPostById(postId: ID!): Post!
+    getPostById(postId: ID!): PostDetails!
     getTags: [String]!
     # Follows
     getStatsByEmail(email: String!): Stats!
@@ -165,23 +178,25 @@ module.exports = gql`
     logout: Status!
     updateProfile(profileInput: ProfileInput): Profile!
     # Posts
-    createPost(postInput: PostInput): Post!
-    updatePost(postId: ID!, postInput: PostInput): Post!
+    createPost(postInput: PostInput): PostDetails!
+    updatePost(postId: ID!, postInput: PostInput): PostDetails!
     deletePost(postId: ID!): Status!
+    savePost(postId: ID!): PostDetails!
     # Comments
-    createComment(postId: ID!, body: String!): Post!
-    updateComment(postId: ID!, commentId: ID!, body: String!): Post!
-    deleteComment(postId: ID!, commentId: ID!): Post!
+    createComment(postId: ID!, body: String!): PostDetails!
+    updateComment(postId: ID!, commentId: ID!, body: String!): PostDetails!
+    deleteComment(postId: ID!, commentId: ID!): PostDetails!
     # Likes
-    likePost(postId: ID!): Post!
+    likePost(postId: ID!): PostDetails!
     # Stats
     followUser(email: String): FollowResponse!
-    savePost(postId: ID!): SavePostResponse!
+    # Search
+    getSearchResults(query: String!): SearchResults
   }
 
   type Subscription {
-    onNewPost: Post!
-    onNewComment: Post!
-    onLikePost: Post!
+    onNewPost: PostDetails!
+    onNewComment: PostDetails!
+    onLikePost: PostDetails!
   }
 `;

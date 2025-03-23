@@ -1,3 +1,5 @@
+declare module 'lodash';
+
 export type TProfile = TProfileBadge & {
   pronouns: string;
   title: string;
@@ -26,7 +28,6 @@ export type TProfileBadge = {
   avatar: string;
 };
 
-
 export type TPosts = TPostItem[];
 
 export type TPostItem = {
@@ -37,14 +38,17 @@ export type TPostItem = {
   tags: string[];
   likeCount: number;
   commentCount: number;
-  isLiked: boolean;
-  isCommented: boolean;
+  saveCount: number;
   createdAt: string;
 };
 
 export type TPostDetails = TPostItem & {
   likes: TLikeItem[];
   comments: TCommentItem[];
+  saves: TSaveItem[];
+  isLiked: boolean;
+  isCommented: boolean;
+  isSaved: boolean;
 };
 
 export type TLikeItem = {
@@ -58,6 +62,12 @@ export type TCommentItem = {
   body: string;
   commentor: TProfileBadge;
   isEdited: boolean;
+  createdAt: string;
+};
+
+export type TSaveItem = {
+  id: string;
+  user: TProfileBadge;
   createdAt: string;
 };
 
@@ -128,4 +138,5 @@ export type TPostState = {
   postDetails: TPostDetails | null;
   creatorProfile: TProfile | null;
   creatorStats: TStats;
+  tags: string[];
 };

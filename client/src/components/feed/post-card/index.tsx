@@ -12,11 +12,10 @@ import {
   UnstyledButton
 } from '@mantine/core';
 import {
+  IconBookmark,
   IconClock,
   IconHeart,
-  IconHeartFilled,
-  IconMessage,
-  IconMessageFilled
+  IconMessage
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
@@ -44,14 +43,7 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
         <Grid>
           <Grid.Col span={thumbnail ? 8 : 12}>
             <Stack>
-              <ProfileBadge
-                avatarSize="sm"
-                profile={item.creator}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/profile/${item.creator.email}`);
-                }}
-              />
+              <ProfileBadge avatarSize="sm" profile={item.creator} />
               <Stack gap={0}>
                 <Title order={4} lineClamp={2}>
                   {item.title}
@@ -68,7 +60,7 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
                 dangerouslySetInnerHTML={{
                   __html: paragraph?.data.text
                 }}
-              ></Text>
+              />
               <Group gap={6}>
                 {item.tags.map((tag: string) => (
                   <Badge key={tag} variant="light">
@@ -93,26 +85,24 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
             </Grid.Col>
           )}
         </Grid>
-        <Group mt="lg" gap="lg">
+        <Group mt="md" gap="lg">
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              {item.isLiked ? (
-                <IconHeartFilled size={24} />
-              ) : (
-                <IconHeart size={24} />
-              )}
+              <IconHeart size={24} />
             </ActionIcon>
             <Text c="dimmed">{item.likeCount}</Text>
           </Group>
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              {item.isCommented ? (
-                <IconMessageFilled size={24} />
-              ) : (
-                <IconMessage size={24} />
-              )}
+              <IconMessage size={24} />
             </ActionIcon>
             <Text c="dimmed">{item.commentCount}</Text>
+          </Group>
+          <Group justify="center" align="center" gap={4}>
+            <ActionIcon variant="transparent">
+              <IconBookmark size={24} />
+            </ActionIcon>
+            <Text c="dimmed">{item.saveCount}</Text>
           </Group>
         </Group>
       </Card>

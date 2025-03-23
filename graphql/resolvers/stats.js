@@ -3,76 +3,12 @@ const { UserInputError } = require('apollo-server');
 const User = require('../../models/User');
 const Follow = require('../../models/Follow');
 const Post = require('../../models/Post');
-const SavedPost = require('../../models/SavedPost');
 const { checkAuth } = require('../../utils/auth.util');
 
 const profileBadgeProj = '_id email firstName lastName avatar';
 
 module.exports = {
   Mutation: {
-    async savePost(_, { postId }, context) {
-      try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
-        const post = await Post.findById(postId);
-
-        if (!post) {
-          throw new UserInputError('Post not found.');
-        }
-
-        const isSaved = await SavedPost.findOne({
-          user: user.id,
-          post: postId
-        });
-
-        if (!isSaved) {
-          const newSavedPost = new SavedPost({
-            user: user.id,
-            post: postId
-          });
-
-          await newSavedPost.save();
-        } else {
-          await SavedPost.deleteOne({ user: user.id, post: postId });
-        }
-
-        const savedPostIds = (await SavedPost.find({ user: user.id })).map(
-          (savedPost) => savedPost.post
-        );
-        const savedPosts = await Post.find({ _id: { $in: savedPostIds } })
-          .sort({ createdAt: -1 })
-          .populate('creator', profileBadgeProj);
-        const savedPostList = savedPosts.map((post) => {
-          const isLiked = post._doc.likes.some(
-            (like) => like.liker.toString() === user.id
-          );
-          const isCommented = post._doc.comments.some(
-            (comment) => comment.commentor.toString() === user.id
-          );
-          const likeCount = post._doc.likes.length ?? 0;
-          const commentCount = post._doc.comments.length ?? 0;
-          return {
-            id: post._id,
-            ...post._doc,
-            likeCount,
-            commentCount,
-            isLiked,
-            isCommented
-          };
-        });
-
-        return {
-          count: savedPostList.length,
-          list: savedPostList || []
-        };
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
     async followUser(_, { email }, context) {
       try {
         const user = checkAuth(context);
@@ -150,25 +86,22 @@ module.exports = {
           throw new UserInputError('User not found.');
         }
 
-        const [followers, following, savedPostIds] = await Promise.all([
+        const [followers, following] = await Promise.all([
           (
             await Follow.find({ following: email })
           ).map((follow) => follow.follower),
           (
             await Follow.find({ follower: email })
-          ).map((follow) => follow.following),
-          (
-            await SavedPost.find({ user: statUser.id })
-          ).map((savedPost) => savedPost.post)
+          ).map((follow) => follow.following)
         ]);
 
         const requests = [
           Post.find({ creator: statUser.id })
             .sort({ createdAt: -1 })
             .populate('creator', profileBadgeProj),
-          Post.find({ _id: { $in: savedPostIds } })
-            .sort({ createdAt: -1 })
-            .populate('creator', profileBadgeProj),
+          Post.find({
+            saves: { $elemMatch: { user: statUser.id } }
+          }).populate('creator', profileBadgeProj),
           User.find({ email: { $in: followers } }, profileBadgeProj),
           User.find({ email: { $in: following } }, profileBadgeProj)
         ];
@@ -177,39 +110,37 @@ module.exports = {
           await Promise.all(requests);
 
         const postList = posts.map((post) => {
-          const isLiked = post._doc.likes.some(
-            (like) => like.liker.toString() === user.id
-          );
-          const isCommented = post._doc.comments.some(
-            (comment) => comment.commentor.toString() === user.id
-          );
           const likeCount = post._doc.likes.length ?? 0;
           const commentCount = post._doc.comments.length ?? 0;
+          const saveCount = post._doc.saves.length ?? 0;
+
+          delete post._doc.likes;
+          delete post._doc.comments;
+          delete post._doc.saves;
+
           return {
             id: post._id,
             ...post._doc,
             likeCount,
             commentCount,
-            isLiked,
-            isCommented
+            saveCount
           };
         });
         const savedPostList = savedPosts.map((post) => {
-          const isLiked = post._doc.likes.some(
-            (like) => like.liker.toString() === user.id
-          );
-          const isCommented = post._doc.comments.some(
-            (comment) => comment.commentor.toString() === user.id
-          );
           const likeCount = post._doc.likes.length ?? 0;
           const commentCount = post._doc.comments.length ?? 0;
+          const saveCount = post._doc.saves.length ?? 0;
+
+          delete post._doc.likes;
+          delete post._doc.comments;
+          delete post._doc.saves;
+
           return {
             id: post._id,
             ...post._doc,
             likeCount,
             commentCount,
-            isLiked,
-            isCommented
+            saveCount
           };
         });
 

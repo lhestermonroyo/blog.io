@@ -37,6 +37,15 @@ const uploadProfile = async (
   }
 };
 
+const deleteProfile = async (fileUrl: string) => {
+  try {
+    const storageRef = ref(storage, fileUrl);
+    await deleteObject(storageRef);
+  } catch (error) {
+    throw new Error();
+  }
+};
+
 const uploadBlogFiles = async (uploadArr: any[]) => {
   try {
     const uploadRequests = uploadArr.map(async (upload: any) => {
@@ -72,4 +81,11 @@ const deleteBlogFiles = async (blogFiles: any[]) => {
   }
 };
 
-export { uploadProfile, uploadBlogFiles, readFile, isBase64, deleteBlogFiles };
+export {
+  uploadProfile,
+  deleteProfile,
+  uploadBlogFiles,
+  readFile,
+  isBase64,
+  deleteBlogFiles
+};

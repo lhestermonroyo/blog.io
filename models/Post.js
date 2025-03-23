@@ -27,6 +27,15 @@ const postSchema = new Schema({
       createdAt: String
     }
   ],
+  saves: [
+    {
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      createdAt: String
+    }
+  ],
   createdAt: String
 });
 

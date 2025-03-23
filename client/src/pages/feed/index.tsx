@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Tabs, Text, Title } from '@mantine/core';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
 import states from '../../states';
-import { GET_STATS_BY_EMAIL } from '../../graphql/queries';
+import { GET_STATS_BY_EMAIL, GET_TAGS } from '../../graphql/queries';
 import { greetUser } from '../../utils/time.util';
-import { TAuthState } from '../../../types';
+import { TAuthState, TPostState } from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
 import ForYou from '../../components/feed/for-you';
@@ -19,6 +19,7 @@ import Following from '../../components/feed/following';
 // Following tab - show posts from users that the user follows
 
 const Feed = () => {
+  const setPost = useSetRecoilState(states.post);
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile } = auth;
 
@@ -29,6 +30,7 @@ const Feed = () => {
       skip: !profile?.email
     }
   );
+  const { data: tagsResponse } = useQuery(GET_TAGS);
 
   const navigate = useNavigate();
 
@@ -61,6 +63,18 @@ const Feed = () => {
       }));
     }
   }, [statsResponse]);
+
+  useEffect(() => {
+    if (tagsResponse) {
+      const key = Object.keys(tagsResponse)[0];
+      const data = tagsResponse[key];
+
+      setPost((prev: TPostState) => ({
+        ...prev,
+        tags: data
+      }));
+    }
+  }, [tagsResponse]);
 
   const init = async () => {
     try {

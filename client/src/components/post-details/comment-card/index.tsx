@@ -126,10 +126,7 @@ const CommentCard: FC<CommentCardProps> = ({
         <Stack key={comment.id} gap="lg">
           <Stack gap={6}>
             <Group justify="space-between" align="center">
-              <ProfileBadge
-                profile={comment.commentor}
-                onClick={() => navigate(`/profile/${comment.commentor.email}`)}
-              />
+              <ProfileBadge profile={comment.commentor} />
             </Group>
             <form onSubmit={form.onSubmit(handleSubmitUpdate)}>
               <Stack>
@@ -166,10 +163,7 @@ const CommentCard: FC<CommentCardProps> = ({
       <Stack key={comment.id} gap="lg">
         <Stack gap={6}>
           <Group justify="space-between" align="center">
-            <ProfileBadge
-              profile={comment.commentor}
-              onClick={() => navigate(`/profile/${comment.commentor.email}`)}
-            />
+            <ProfileBadge profile={comment.commentor} />
             {isOwnComment && (
               <Menu
                 width={120}

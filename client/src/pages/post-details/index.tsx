@@ -35,11 +35,12 @@ import { format } from 'date-fns';
 
 import { GET_POST_BY_ID } from '../../graphql/queries';
 import {
-  CREATE_COMMENT,
-  DELETE_COMMENT,
   DELETE_POST,
+  CREATE_COMMENT,
+  UPDATE_COMMENT,
+  DELETE_COMMENT,
   LIKE_POST,
-  UPDATE_COMMENT
+  SAVE_POST
 } from '../../graphql/mutations';
 
 import states from '../../states';
@@ -52,6 +53,7 @@ import ProfileBadge from '../../components/profile-badge';
 import PostReaction from '../../components/post-details/post-reaction';
 import CommentCard from '../../components/post-details/comment-card';
 import PostSidebar from '../../components/post-details/post-sidebar';
+import ExpandableImage from '../../components/expandable-image';
 
 const PostDetails = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -84,6 +86,7 @@ const PostDetails = () => {
 
   const [deletePost] = useMutation(DELETE_POST);
   const [likePost] = useMutation(LIKE_POST);
+  const [savePost] = useMutation(SAVE_POST);
   const [createComment] = useMutation(CREATE_COMMENT);
   const [updateComment] = useMutation(UPDATE_COMMENT);
   const [deleteComment] = useMutation(DELETE_COMMENT);
@@ -259,6 +262,33 @@ const PostDetails = () => {
     return response.data[key];
   };
 
+  const handleSavePost = async () => {
+    try {
+      const response = await savePost({
+        variables: {
+          postId: params.id
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
+
+      if (data) {
+        setPost({
+          ...post,
+          postDetails: data
+        });
+      }
+    } catch (error) {
+      console.log('Error:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'An error occurred while saving the post.',
+        color: 'red',
+        position: 'top-center'
+      });
+    }
+  };
+
   const showDeleteModal = () =>
     modals.openConfirmModal({
       id: 'delete-post',
@@ -279,15 +309,6 @@ const PostDetails = () => {
   const isOwnPost = useMemo(() => {
     return postDetails?.creator.email === profileEmail;
   }, [postDetails?.creator.email, profileEmail]);
-
-  const isLiked =
-    postDetails?.likes?.some(
-      (item: TLikeItem) => item.liker.email === profileEmail
-    ) || false;
-  const isCommented =
-    postDetails?.comments?.some(
-      (item: TCommentItem) => item.commentor.email === profileEmail
-    ) || false;
 
   const content = postDetails && JSON.parse(postDetails?.content);
 
@@ -361,19 +382,13 @@ const PostDetails = () => {
                   <Stack gap="xs">
                     <Group align="center" justify="space-between">
                       <Group gap={6}>
-                        <ProfileBadge
-                          profile={postDetails?.creator}
-                          onClick={() =>
-                            navigate(`/profile/${postDetails?.creator.email}`)
-                          }
-                        />
+                        <ProfileBadge profile={postDetails?.creator} />
                       </Group>
                       <PostReaction
                         post={postDetails}
-                        isLiked={isLiked}
-                        isCommented={isCommented}
                         onLike={handleLike}
                         onComment={() => commentRef.current?.focus()}
+                        onSave={handleSavePost}
                       />
                     </Group>
                     <Divider />
@@ -486,25 +501,29 @@ const PostDetails = () => {
                                   borderRadius: theme.radius.sm
                                 }}
                               >
-                                <Image
-                                  fit="contain"
-                                  w="100%"
-                                  h="auto"
-                                  src={block.data.file.url}
-                                  alt={block.data.caption}
-                                />
+                                <ExpandableImage src={block.data.file.url}>
+                                  <Image
+                                    fit="contain"
+                                    w="100%"
+                                    h="auto"
+                                    src={block.data.file.url}
+                                    alt={block.data.caption}
+                                  />
+                                </ExpandableImage>
                                 <Text>{block.data.caption}</Text>
                               </Group>
                             );
                           }
 
                           return (
-                            <Image
-                              radius="sm"
-                              key={block.id}
-                              src={block.data.file.url}
-                              alt={block.data.caption}
-                            />
+                            <ExpandableImage src={block.data.file.url}>
+                              <Image
+                                radius="sm"
+                                key={block.id}
+                                src={block.data.file.url}
+                                alt={block.data.caption}
+                              />
+                            </ExpandableImage>
                           );
                         default:
                           return null;
@@ -524,10 +543,9 @@ const PostDetails = () => {
                     <Divider />
                     <PostReaction
                       post={postDetails}
-                      isLiked={isLiked}
-                      isCommented={isCommented}
                       onLike={handleLike}
                       onComment={() => commentRef.current?.focus()}
+                      onSave={handleSavePost}
                     />
                   </Stack>
 

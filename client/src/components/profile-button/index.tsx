@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router';
 import { Avatar, Group, Stack, Text, UnstyledButton } from '@mantine/core';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useRecoilValue } from 'recoil';
@@ -10,21 +11,26 @@ import classes from './style.module.css';
 
 type ProfileBadgeProps = {
   profile: TProfileBadge;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   avatarSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
 const ProfileButton: FC<ProfileBadgeProps> = ({
   profile,
-  onClick,
   avatarSize = 'md'
 }) => {
   const auth = useRecoilValue(states.auth);
 
   const ownProfile = auth?.profile?.id === profile?.id;
 
+  const navigate = useNavigate();
+
+  const handleNavigate = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    navigate(`/profile/${profile?.email}`);
+  };
+
   return (
-    <UnstyledButton onClick={onClick} className={classes.user} py="md">
+    <UnstyledButton onClick={handleNavigate} className={classes.user} py="md">
       <Group gap={6}>
         <Avatar
           src={profile?.avatar}

@@ -25,11 +25,11 @@ module.exports = {
           throw new Error('Post not found');
         }
 
-        const isLiked = post.likes.find(
+        const alreadyLiked = post.likes.find(
           (like) => like.liker.toString() === user.id.toString()
         );
 
-        if (isLiked) {
+        if (alreadyLiked) {
           post.likes = post.likes.filter(
             (like) => like.liker.toString() !== user.id.toString()
           );
@@ -64,6 +64,15 @@ module.exports = {
               model: 'User',
               select: profileBadgeProj
             }
+          },
+          {
+            path: 'saves',
+            model: 'Save',
+            populate: {
+              path: 'user',
+              model: 'User',
+              select: profileBadgeProj
+            }
           }
         ]);
 
@@ -74,9 +83,22 @@ module.exports = {
           }
         });
 
+        const isLiked = post.likes.some(
+          (like) => like.liker._id.toString() === user.id
+        );
+        const isCommented = post.comments.some(
+          (comment) => comment.commentor._id.toString() === user.id
+        );
+        const isSaved = post.saves.some(
+          (save) => save.user._id.toString() === user.id
+        );
+
         return {
           id: post._id,
-          ...post._doc
+          ...post._doc,
+          isLiked,
+          isCommented,
+          isSaved
         };
       } catch (error) {
         throw new Error(error);

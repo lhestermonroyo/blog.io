@@ -33,14 +33,23 @@ export const UPDATE_PROFILE = gql`
       email
       firstName
       lastName
-      birthdate
-      location
       pronouns
+      title
+      location
+      birthdate
       bio
+      age
       avatar
       coverPhoto
+      socials {
+        facebook
+        twitter
+        instagram
+        linkedin
+        github
+        website
+      }
       tags
-      age
       createdAt
     }
   }
@@ -73,6 +82,66 @@ export const FOLLOW_USER = gql`
   }
 `;
 
+export const SAVE_POST = gql`
+  mutation SavePost($postId: ID!) {
+    savePost(postId: $postId) {
+      id
+      title
+      content
+      tags
+      creator {
+        id
+        email
+        firstName
+        lastName
+        avatar
+      }
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        isEdited
+        createdAt
+      }
+      likes {
+        id
+        liker {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
+      commentCount
+      likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
+      createdAt
+    }
+  }
+`;
+
 export const CREATE_POST = gql`
   mutation CreatePost($postInput: PostInput) {
     createPost(postInput: $postInput) {
@@ -97,6 +166,7 @@ export const CREATE_POST = gql`
           lastName
           avatar
         }
+        isEdited
         createdAt
       }
       likes {
@@ -110,8 +180,23 @@ export const CREATE_POST = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
     }
   }
@@ -141,6 +226,7 @@ export const UPDATE_POST = gql`
           lastName
           avatar
         }
+        isEdited
         createdAt
       }
       likes {
@@ -154,8 +240,23 @@ export const UPDATE_POST = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
     }
   }
@@ -193,6 +294,7 @@ export const LIKE_POST = gql`
           lastName
           avatar
         }
+        isEdited
         createdAt
       }
       likes {
@@ -206,8 +308,23 @@ export const LIKE_POST = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
     }
   }
@@ -251,8 +368,23 @@ export const CREATE_COMMENT = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
     }
   }
@@ -296,8 +428,23 @@ export const UPDATE_COMMENT = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
     }
   }
@@ -341,9 +488,57 @@ export const DELETE_COMMENT = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
+    }
+  }
+`;
+
+export const GET_SEARCH_RESULTS = gql`
+  mutation GetSearchResults($query: String!) {
+    getSearchResults(query: $query) {
+      totalCount
+      users {
+        id
+        email
+        firstName
+        lastName
+        avatar
+      }
+      tags
+      posts {
+        id
+        title
+        content
+        tags
+        creator {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        likeCount
+        commentCount
+        saveCount
+        createdAt
+      }
     }
   }
 `;

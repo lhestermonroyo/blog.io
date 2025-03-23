@@ -12,30 +12,32 @@ import { TPostDetails } from '../../../../types';
 
 type PostReactionProps = {
   post: TPostDetails;
-  isLiked: boolean;
-  isCommented: boolean;
   onLike: () => void;
   onComment: () => void;
+  onSave: () => void;
 };
 
 const PostReaction: FC<PostReactionProps> = ({
   post,
-  isLiked,
-  isCommented,
   onLike,
-  onComment
+  onComment,
+  onSave
 }) => {
   return (
     <Group gap="lg">
       <Group justify="center" align="center" gap={4}>
         <ActionIcon variant="transparent" onClick={onLike}>
-          {isLiked ? <IconHeartFilled size={24} /> : <IconHeart size={24} />}
+          {post?.isLiked ? (
+            <IconHeartFilled size={24} />
+          ) : (
+            <IconHeart size={24} />
+          )}
         </ActionIcon>
         <Text c="dimmed">{post.likeCount}</Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
         <ActionIcon variant="transparent" onClick={onComment}>
-          {isCommented ? (
+          {post?.isCommented ? (
             <IconMessageFilled size={24} />
           ) : (
             <IconMessage size={24} />
@@ -44,14 +46,14 @@ const PostReaction: FC<PostReactionProps> = ({
         <Text c="dimmed">{post.commentCount}</Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
-        <ActionIcon variant="transparent" onClick={onComment}>
-          {isCommented ? (
+        <ActionIcon variant="transparent" onClick={onSave}>
+          {post?.isSaved ? (
             <IconBookmarkFilled size={24} />
           ) : (
             <IconBookmark size={24} />
           )}
         </ActionIcon>
-        <Text c="dimmed">{post.commentCount}</Text>
+        <Text c="dimmed">{post.saveCount}</Text>
       </Group>
     </Group>
   );

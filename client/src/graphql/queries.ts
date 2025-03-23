@@ -18,8 +18,8 @@ export const GET_PROFILE = gql`
       socials {
         facebook
         twitter
-        linkedin
         instagram
+        linkedin
         github
         website
       }
@@ -47,8 +47,8 @@ export const GET_PROFILE_BY_EMAIL = gql`
       socials {
         facebook
         twitter
-        linkedin
         instagram
+        linkedin
         github
         website
       }
@@ -98,8 +98,7 @@ export const GET_STATS_BY_EMAIL = gql`
           }
           likeCount
           commentCount
-          isLiked
-          isCommented
+          saveCount
           createdAt
         }
       }
@@ -119,8 +118,7 @@ export const GET_STATS_BY_EMAIL = gql`
           }
           likeCount
           commentCount
-          isLiked
-          isCommented
+          saveCount
           createdAt
         }
       }
@@ -147,8 +145,7 @@ export const GET_POSTS = gql`
         }
         likeCount
         commentCount
-        isLiked
-        isCommented
+        saveCount
         createdAt
       }
     }
@@ -174,8 +171,7 @@ export const GET_POSTS_BY_FOLLOWING = gql`
         }
         likeCount
         commentCount
-        isLiked
-        isCommented
+        saveCount
         createdAt
       }
     }
@@ -201,8 +197,7 @@ export const GET_POSTS_BY_TAGS = gql`
         }
         likeCount
         commentCount
-        isLiked
-        isCommented
+        saveCount
         createdAt
       }
     }
@@ -228,8 +223,7 @@ export const GET_POSTS_BY_CREATOR = gql`
         }
         likeCount
         commentCount
-        isLiked
-        isCommented
+        saveCount
         createdAt
       }
     }
@@ -274,8 +268,23 @@ export const GET_POST_BY_ID = gql`
         }
         createdAt
       }
+      saves {
+        id
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        createdAt
+      }
       commentCount
       likeCount
+      saveCount
+      isLiked
+      isCommented
+      isSaved
       createdAt
     }
   }

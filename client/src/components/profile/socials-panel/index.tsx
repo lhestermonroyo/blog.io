@@ -18,6 +18,7 @@ import {
   IconEdit,
   IconGlobeFilled
 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
 
 import { TProfile } from '../../../../types';
 
@@ -25,39 +26,50 @@ import classes from './style.module.css';
 
 const SocialsPanel = ({
   loading,
+  ownProfile,
   socials
 }: {
   loading: boolean;
+  ownProfile: boolean;
   socials: TProfile['socials'];
 }) => {
-  if (loading) {
-    return <Loading />;
-  }
+  const navigate = useNavigate();
 
   const isEmpty = Object.entries(socials)
     .filter(([key]) => key !== '__typename')
     .every(([_, link]) => !link);
 
-  if (isEmpty) {
-    return <Empty />;
+  if (loading) {
+    return <Loading />;
   }
 
   return (
     <Card withBorder>
       <Stack gap="lg">
         <Title order={3}>Socials</Title>
-        <Card.Section>
-          <Stack gap={0}>
-            {Object.entries(socials)
-              .filter(([key]) => key !== '__typename')
-              .map((link) => (
-                <SocialItem key={link[0]} type={link[0]} link={link[1]} />
-              ))}
-          </Stack>
-        </Card.Section>
-        <Group>
-          <Button leftSection={<IconEdit size={16} />}>Edit</Button>
-        </Group>
+        {isEmpty ? (
+          <Text>No social links added yet.</Text>
+        ) : (
+          <Card.Section>
+            <Stack gap={0}>
+              {Object.entries(socials)
+                .filter(([key]) => key !== '__typename')
+                .map((link) => (
+                  <SocialItem key={link[0]} type={link[0]} link={link[1]} />
+                ))}
+            </Stack>
+          </Card.Section>
+        )}
+        {ownProfile && (
+          <Group>
+            <Button
+              leftSection={<IconEdit size={16} />}
+              onClick={() => navigate('edit?tab=2')}
+            >
+              Edit
+            </Button>
+          </Group>
+        )}
       </Stack>
     </Card>
   );
@@ -75,23 +87,6 @@ const Loading = () => {
           <Skeleton height={40} radius="md" />
           <Skeleton height={40} radius="md" />
         </Stack>
-        <Group>
-          <Button leftSection={<IconEdit size={16} />}>Edit</Button>
-        </Group>
-      </Stack>
-    </Card>
-  );
-};
-
-const Empty = () => {
-  return (
-    <Card withBorder>
-      <Stack gap="lg">
-        <Title order={3}>Socials</Title>
-        <Text>No social links added yet.</Text>
-        <Group>
-          <Button leftSection={<IconEdit size={16} />}>Edit</Button>
-        </Group>
       </Stack>
     </Card>
   );

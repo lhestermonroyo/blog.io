@@ -40,10 +40,6 @@ const ExtrasPostCard: FC<IExtrasPostCardProps> = ({
             <ProfileBadge
               avatarSize="sm"
               profile={item.creator}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/profile/${item.creator.email}`);
-              }}
             />
           )}
           <Stack gap={0}>

@@ -4,7 +4,6 @@ const { SECRET_KEY } = require('../config');
 
 module.exports.checkAuth = (ctx) => {
   const token = ctx.req.cookies.JWT_TOKEN;
-  console.log('token', token);
 
   if (token) {
     try {

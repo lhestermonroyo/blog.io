@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { Modal, Stack, Slider, Text, Group, Button } from '@mantine/core';
 import Cropper, { Area } from 'react-easy-crop';
 
@@ -32,14 +32,11 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
     onClose();
   };
 
-  const cropConfig = useMemo(
-    () => ({
-      title: `Customize ${type}`,
-      buttonLabel: `Select as ${type}`,
-      aspectRatio: type === 'Avatar' ? 1 / 1 : 16 / 9
-    }),
-    [type, imgFile]
-  );
+  const cropConfig = {
+    title: `Customize ${type}`,
+    buttonLabel: `Select as ${type}`,
+    aspectRatio: type === 'Avatar' ? 1 / 1 : 16 / 9
+  };
 
   return (
     <Modal

@@ -24,6 +24,10 @@ const initialState: TPostState = {
       count: 0,
       list: []
     },
+    savedPosts: {
+      count: 0,
+      list: []
+    },
     followers: {
       count: 0,
       list: []
@@ -32,7 +36,8 @@ const initialState: TPostState = {
       count: 0,
       list: []
     }
-  }
+  },
+  tags: []
 };
 
 export const POST_STATE = atom({

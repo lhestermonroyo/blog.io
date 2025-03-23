@@ -3,10 +3,16 @@ const postResolver = require('./posts');
 const likeResolver = require('./likes');
 const commentResolver = require('./comments');
 const statResolver = require('./stats');
+const searchResolver = require('./search');
 
 module.exports = {
   Posts: {
     currentCount: (parent) => parent.posts.length
+  },
+  PostDetails: {
+    likeCount: (parent) => parent.likes.length,
+    commentCount: (parent) => parent.comments.length,
+    saveCount: (parent) => parent.saves.length
   },
   Profile: {
     age: (parent) => {
@@ -20,6 +26,10 @@ module.exports = {
       return Math.abs(ageDate.getUTCFullYear() - 1970);
     }
   },
+  SearchResults: {
+    totalCount: (parent) =>
+      parent.users.length + parent.tags.length + parent.posts.length
+  },
   Query: {
     ...userResolver.Query,
     ...postResolver.Query,
@@ -30,7 +40,8 @@ module.exports = {
     ...postResolver.Mutation,
     ...likeResolver.Mutation,
     ...commentResolver.Mutation,
-    ...statResolver.Mutation
+    ...statResolver.Mutation,
+    ...searchResolver.Mutation
   },
   Subscription: {
     ...postResolver.Subscription,
