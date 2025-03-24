@@ -4,6 +4,7 @@ const { PubSub } = require('graphql-subscriptions');
 const Post = require('../../models/Post');
 const User = require('../../models/User');
 const Follow = require('../../models/Follow');
+const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
 const { validatePostInput } = require('../../utils/validators.util');
 
@@ -372,6 +373,31 @@ module.exports = {
           isSaved
         };
 
+        // notify followers
+        const followers = (await Follow.find({ following: user.email })).map(
+          (follow) => follow.follower
+        );
+        const followerUsers = await User.find(
+          { email: { $in: followers } },
+          profileBadgeProj
+        );
+
+        followerUsers.forEach(async (follower) => {
+          const authorName = `${post.creator.firstName} ${post.creator.lastName}`;
+
+          const notification = new Notification({
+            user: follower._id,
+            sender: user.id,
+            type: 'new_post',
+            latestUser: [user.id],
+            post: newPost._id,
+            message: `${authorName} created a new post.`,
+            createdAt: new Date().toISOString()
+          });
+
+          await notification.save();
+        });
+
         pubSub.publish(NEW_POST, {
           onNewPost: post
         });
@@ -501,7 +527,7 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate('creator');
 
         if (!post) {
           throw new UserInputError('Post not found.');
@@ -520,6 +546,38 @@ module.exports = {
             user: user.id,
             createdAt: new Date().toISOString()
           });
+
+          // notify post creator
+          let notification = await Notification.findOne({
+            user: post.creator,
+            post: postId,
+            type: 'save',
+            latestUser: { $in: [user.id] }
+          });
+
+          const currUser = await User.findById(user.id);
+
+          if (notification) {
+            notification.latestUser.push(user.id);
+            notification.message = `${currUser.firstName} ${
+              currUser.lastName
+            } and ${
+              notification.latestUser.length - 1
+            } others saved your post.`;
+            notification.createdAt = new Date().toISOString();
+          } else {
+            notification = new Notification({
+              user: post.creator,
+              sender: user.id,
+              type: 'save',
+              post: postId,
+              latestUser: [user.id],
+              message: `${currUser.firstName} ${currUser.lastName} saved your post.`,
+              createdAt: new Date().toISOString()
+            });
+          }
+
+          await notification.save();
         }
         await post.save();
         await post.populate([
