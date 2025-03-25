@@ -533,7 +533,15 @@ const PostDetails = () => {
 
                   <Group gap={6} mb="lg">
                     {postDetails.tags.map((tag: string) => (
-                      <Badge key={tag} variant="light">
+                      <Badge
+                        key={tag}
+                        variant="light"
+                        style={{
+                          cursor: 'pointer'
+                        }}
+                        component="button"
+                        onClick={() => navigate(`/tag/${tag}`)}
+                      >
                         {tag}
                       </Badge>
                     ))}

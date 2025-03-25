@@ -9,6 +9,7 @@ import {
   Stack,
   Title
 } from '@mantine/core';
+import { IconFilter } from '@tabler/icons-react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useQuery } from '@apollo/client';
 
@@ -18,7 +19,6 @@ import { TPostItem, TPostState } from '../../../../types';
 
 import PostCard from '../../../components/feed/post-card';
 import LoadingFeed from '../../../components/feed/loading-feed';
-import { IconFilter } from '@tabler/icons-react';
 import FiltersModal from '../filters-modal';
 
 const ForYou = () => {
@@ -96,7 +96,7 @@ const ForYou = () => {
                     )}
                     <Divider
                       label={
-                        <Title c="dark" order={2}>
+                        <Title c="dark" order={3}>
                           More posts for you
                         </Title>
                       }

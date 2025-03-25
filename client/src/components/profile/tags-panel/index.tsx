@@ -29,7 +29,13 @@ const TagsPanel = ({
     return (
       <Group gap={6}>
         {tags.map((item: string) => (
-          <Badge key={item} variant="light">
+          <Badge
+            variant="light"
+            component="button"
+            style={{ cursor: 'pointer' }}
+            key={item}
+            onClick={() => navigate(`/tag/${item}`)}
+          >
             {item}
           </Badge>
         ))}

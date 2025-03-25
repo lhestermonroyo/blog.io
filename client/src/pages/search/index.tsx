@@ -16,11 +16,11 @@ import { IconSearch } from '@tabler/icons-react';
 import _ from 'lodash';
 
 import { GET_SEARCH_RESULTS } from '../../graphql/mutations';
+import { TPostItem, TProfileBadge } from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
 import ProfileBadge from '../../components/profile-badge';
 import PostCard from '../../components/feed/post-card';
-import { TPostItem, TProfileBadge } from '../../../types';
 
 const Search = () => {
   const [loading, setLoading] = useState(false);
@@ -122,7 +122,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={5}>
+                            <Title c="dark" order={3}>
                               Authors ({results.users.length})
                             </Title>
                           }
@@ -140,7 +140,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={5}>
+                            <Title c="dark" order={3}>
                               Tags ({results.tags.length})
                             </Title>
                           }
@@ -160,7 +160,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={5}>
+                            <Title c="dark" order={3}>
                               Posts ({results.posts.length})
                             </Title>
                           }

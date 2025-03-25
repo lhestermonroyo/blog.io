@@ -12,6 +12,7 @@ import Compose from '../pages/compose';
 import EditPost from '../pages/edit-post';
 import EditProfile from '../pages/edit-profile';
 import Search from '../pages/search';
+import Tag from '../pages/tag';
 
 const AppRouter = () => {
   return (
@@ -26,6 +27,7 @@ const AppRouter = () => {
           <Route path="/" element={<Feed />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/tag/:tag" element={<Tag />} />
           <Route path="/post/:id" element={<PostDetails />} />
           <Route path="/compose" element={<Compose />} />
           <Route path="/edit-post/:id" element={<EditPost />} />

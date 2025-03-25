@@ -27,10 +27,17 @@ const initialState: TAuthState = {
       email: '',
       firstName: '',
       lastName: '',
-      birthdate: null as Date | null,
-      location: '',
       pronouns: '',
-      bio: ''
+      title: '',
+      location: '',
+      birthdate: null as Date | null,
+      bio: '',
+      facebook: '',
+      twitter: '',
+      instagram: '',
+      linkedin: '',
+      github: '',
+      website: ''
     },
     uploadForm: {
       avatar: null,

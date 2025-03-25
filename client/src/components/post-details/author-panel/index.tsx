@@ -175,14 +175,14 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
               <Stack gap={2}>
                 <Group gap={4} align="center">
                   <IconAt size={16} />
-                  <Text size="sm" c="dimmed">
+                  <Text size="xs" c="dimmed">
                     {creatorProfile?.email}
                   </Text>
                 </Group>
 
                 <Group gap={4} align="center">
                   <IconMapPin size={16} />
-                  <Text size="sm" c="dimmed">
+                  <Text size="xs" c="dimmed">
                     {creatorProfile?.location || 'Not set a location yet'}
                   </Text>
                 </Group>

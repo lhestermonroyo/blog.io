@@ -16,13 +16,23 @@ import {
   Text,
   Title
 } from '@mantine/core';
-import { IconAt, IconEdit, IconMapPin } from '@tabler/icons-react';
+import {
+  IconAt,
+  IconBallpen,
+  IconEdit,
+  IconMapPin,
+  IconMessage2,
+  IconUserMinus,
+  IconUserPlus
+} from '@tabler/icons-react';
 import { useMutation, useQuery } from '@apollo/client';
+import { notifications } from '@mantine/notifications';
 
 import {
   GET_PROFILE_BY_EMAIL,
   GET_STATS_BY_EMAIL
 } from '../../graphql/queries';
+import { FOLLOW_USER } from '../../graphql/mutations';
 import { TPostItem, TProfile, TProfileBadge, TStats } from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
@@ -31,8 +41,6 @@ import LoadingProfile from '../../components/profile/loading-profile';
 import ProfileButton from '../../components/profile-button';
 import TagsPanel from '../../components/profile/tags-panel';
 import SocialsPanel from '../../components/profile/socials-panel';
-import { notifications } from '@mantine/notifications';
-import { FOLLOW_USER } from '../../graphql/mutations';
 import ExpandableImage from '../../components/expandable-image';
 
 const Profile = () => {
@@ -94,6 +102,7 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!params.email) {
       setProfile(auth.profile);
     }
@@ -315,6 +324,13 @@ const Profile = () => {
                             <Button
                               flex={1}
                               variant={isFollowed ? 'light' : 'outline'}
+                              leftSection={
+                                isFollowed ? (
+                                  <IconUserMinus size={20} />
+                                ) : (
+                                  <IconUserPlus size={20} />
+                                )
+                              }
                               onClick={handleFollow}
                             >
                               {isFollowed ? 'Unfollow' : 'Follow'}
@@ -322,6 +338,7 @@ const Profile = () => {
                             <Button
                               flex={1}
                               component="a"
+                              leftSection={<IconMessage2 size={20} />}
                               href={`mailto:${profile?.email}`}
                             >
                               Get in Touch
@@ -333,11 +350,16 @@ const Profile = () => {
                             <Button
                               flex={1}
                               variant="outline"
+                              leftSection={<IconBallpen size={20} />}
                               onClick={() => navigate('/compose')}
                             >
                               Compose New Post
                             </Button>
-                            <Button flex={1} onClick={() => navigate('edit')}>
+                            <Button
+                              flex={1}
+                              leftSection={<IconEdit size={20} />}
+                              onClick={() => navigate('edit')}
+                            >
                               Edit Profile
                             </Button>
                           </Fragment>
@@ -393,9 +415,6 @@ const Profile = () => {
                               <ProfileButton
                                 key={follower.id}
                                 profile={follower}
-                                onClick={() =>
-                                  navigate(`/profile/${follower.email}`)
-                                }
                               />
                             )
                           )
@@ -410,9 +429,6 @@ const Profile = () => {
                               <ProfileButton
                                 key={following.id}
                                 profile={following}
-                                onClick={() =>
-                                  navigate(`/profile/${following.email}`)
-                                }
                               />
                             )
                           )

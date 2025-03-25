@@ -143,7 +143,7 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
 
         <Divider
           label={
-            <Title c="dark" order={2}>
+            <Title c="dark" order={3}>
               Socials
             </Title>
           }
