@@ -1,6 +1,13 @@
 const { gql } = require('graphql-tag');
 
 module.exports = gql`
+  enum NotificationType {
+    new_post
+    new_comment
+    like
+    save
+    follow
+  }
   # Users
   type Session {
     id: ID!
@@ -38,6 +45,7 @@ module.exports = gql`
     github: String
     website: String
   }
+
   # Posts
   type Posts {
     totalCount: Int!
@@ -89,6 +97,7 @@ module.exports = gql`
     user: ProfileBadge!
     createdAt: String!
   }
+
   # Stats
   type Stats {
     email: String!
@@ -109,6 +118,7 @@ module.exports = gql`
     count: Int!
     list: [ProfileBadge]!
   }
+
   # Search
   type SearchResults {
     totalCount: Int!
@@ -116,6 +126,32 @@ module.exports = gql`
     tags: [String]!
     posts: [PostItem]!
   }
+
+  # Notifications
+  type Notifications {
+    unreadCount: Int!
+    list: [NotificationDetails]!
+  }
+  type NotificationDetails {
+    id: ID!
+    type: NotificationType!
+    user: ProfileBadge!
+    sender: ProfileBadge!
+    latestUser: [ProfileBadge]!
+    post: PostBadge
+    isRead: Boolean!
+    message: String!
+    createdAt: String!
+  }
+  type NotificationResponse {
+    unreadCount: Int!
+    notification: NotificationDetails
+  }
+  type PostBadge {
+    id: ID!
+    title: String!
+  }
+
   # Status
   type Status {
     success: Boolean!
@@ -169,6 +205,8 @@ module.exports = gql`
     getTags: [String]!
     # Follows
     getStatsByEmail(email: String!): Stats!
+    # Notifications
+    getNotifications: Notifications!
   }
 
   type Mutation {
@@ -193,11 +231,14 @@ module.exports = gql`
     followUser(email: String): FollowResponse!
     # Search
     getSearchResults(query: String!): SearchResults
+    # Notifications
+    markAsRead(notificationId: ID!): NotificationResponse!
   }
 
   type Subscription {
     onNewPost: PostDetails!
     onNewComment: PostDetails!
     onLikePost: PostDetails!
+    onNewNotification: NotificationResponse!
   }
 `;

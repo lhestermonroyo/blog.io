@@ -7,18 +7,19 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const { createServer } = require('http');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const {
-  ApolloServerPluginDrainHttpServer,
+  ApolloServerPluginDrainHttpServer
 } = require('@apollo/server/plugin/drainHttpServer');
 const { WebSocketServer } = require('ws');
 const { useServer } = require('graphql-ws/lib/use/ws');
 
+const pubSub = require('./pubSub');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
 const { MONGODB_URI, PORT } = require('./config');
 
 const schema = makeExecutableSchema({
   typeDefs,
-  resolvers,
+  resolvers
 });
 const app = express();
 
@@ -26,11 +27,13 @@ const httpServer = createServer(app);
 
 const wsServer = new WebSocketServer({
   server: httpServer,
-  path: '/',
+  path: '/subscriptions'
 });
 const wsServerCleanup = useServer(
   {
     schema,
+    onConnect: () => console.log('WebSocket client connected'),
+    onDisconnect: () => console.log('WebSocket client disconnected')
   },
   wsServer
 );
@@ -44,11 +47,11 @@ const apolloServer = new ApolloServer({
         return {
           async drainServer() {
             await wsServerCleanup.dispose();
-          },
+          }
         };
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
 
 (async () => {
@@ -56,17 +59,18 @@ const apolloServer = new ApolloServer({
     await mongoose.connect(MONGODB_URI);
     await apolloServer.start();
     app.use(
-      '/',
+      '/graphql',
       cors({
         origin: 'http://localhost:5173',
-        credentials: true,
+        credentials: true
       }),
       cookieParser(),
       express.json(),
       expressMiddleware(apolloServer, {
-        context: async ctx => ({
-          ...ctx,
-        }),
+        context: async (ctx) => ({
+          pubSub,
+          ...ctx
+        })
       })
     );
   } catch (error) {
@@ -75,6 +79,6 @@ const apolloServer = new ApolloServer({
 })();
 
 httpServer.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Subscriptions ready at ws://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}/graphql`);
+  console.log(`Subscriptions ready at ws://localhost:${PORT}/subscriptions`);
 });

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Recipient
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Recipient, the user who will receive the notification
     sender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -19,11 +19,6 @@ const notificationSchema = new mongoose.Schema(
       ref: 'Post',
       required: false
     }, // If related to a post
-    comment: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Comment',
-      required: false
-    }, // If related to a comment
     isRead: { type: Boolean, default: false },
     message: { type: String, required: true },
     createdAt: String

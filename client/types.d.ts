@@ -138,5 +138,24 @@ export type TPostState = {
   postDetails: TPostDetails | null;
   creatorProfile: TProfile | null;
   creatorStats: TStats;
-  tags: string[];
+};
+
+export type TNotificationState = {
+  unreadCount: number;
+  list: TNotificationItem[];
+};
+
+export type TNotificationItem = {
+  id: string;
+  type: 'new_post' | 'new_comment' | 'like' | 'save' | 'follow';
+  user: TProfileBadge;
+  sender: TProfileBadge;
+  latestUser: [TProfileBadge];
+  post?: {
+    id: string;
+    title: string;
+  };
+  isRead: boolean;
+  message: string;
+  createdAt: string;
 };

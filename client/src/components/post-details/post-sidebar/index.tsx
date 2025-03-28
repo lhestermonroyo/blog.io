@@ -1,14 +1,4 @@
-import { Fragment, useEffect, useMemo } from 'react';
-import {
-  Avatar,
-  Button,
-  Card,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-  Title
-} from '@mantine/core';
+import { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { useRecoilState } from 'recoil';
 
@@ -23,6 +13,7 @@ import { TPostState } from '../../../../types';
 import AuthorPanel from '../author-panel';
 import AuthorPostsPanel from '../author-posts-panel';
 import SuggestionsPanel from '../suggestions-panel';
+import { Stack } from '@mantine/core';
 
 const PostSidebar = () => {
   const [post, setPost] = useRecoilState(states.post);

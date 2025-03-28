@@ -4,6 +4,7 @@ const likeResolver = require('./likes');
 const commentResolver = require('./comments');
 const statResolver = require('./stats');
 const searchResolver = require('./search');
+const notification = require('./notification');
 
 module.exports = {
   Posts: {
@@ -30,10 +31,15 @@ module.exports = {
     totalCount: (parent) =>
       parent.users.length + parent.tags.length + parent.posts.length
   },
+  Notifications: {
+    unreadCount: (parent) =>
+      parent.list.filter((notification) => !notification.isRead).length
+  },
   Query: {
     ...userResolver.Query,
     ...postResolver.Query,
-    ...statResolver.Query
+    ...statResolver.Query,
+    ...notification.Query
   },
   Mutation: {
     ...userResolver.Mutation,
@@ -41,11 +47,13 @@ module.exports = {
     ...likeResolver.Mutation,
     ...commentResolver.Mutation,
     ...statResolver.Mutation,
-    ...searchResolver.Mutation
+    ...searchResolver.Mutation,
+    ...notification.Mutation
   },
   Subscription: {
     ...postResolver.Subscription,
     ...commentResolver.Subscription,
-    ...likeResolver.Subscription
+    ...likeResolver.Subscription,
+    ...notification.Subscription
   }
 };

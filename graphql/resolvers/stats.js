@@ -1,9 +1,13 @@
 const { UserInputError } = require('apollo-server');
+const pubSub = require('../../pubSub');
 
 const User = require('../../models/User');
 const Follow = require('../../models/Follow');
 const Post = require('../../models/Post');
+const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
+
+const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
 const profileBadgeProj = '_id email firstName lastName avatar';
 
@@ -21,7 +25,7 @@ module.exports = {
           throw new UserInputError('You cannot follow yourself.');
         }
 
-        const followingUser = await User.find({ email });
+        const followingUser = await User.findOne({ email });
 
         if (!followingUser) {
           throw new UserInputError('User not found.');
@@ -32,14 +36,126 @@ module.exports = {
           following: email
         });
 
-        if (!isAlreadyFollowing) {
+        const requests = [
+          Notification.findOne({
+            user: followingUser._id,
+            type: 'follow'
+          }).populate('latestUser', profileBadgeProj),
+          User.findById(user.id)
+        ];
+        let [notification, currUser] = await Promise.all(requests);
+
+        if (isAlreadyFollowing) {
+          await Follow.deleteOne({ follower: user.email, following: email });
+
+          if (notification) {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (existing) {
+              notification.latestUser = notification.latestUser.filter(
+                (user) => user._id.toString() !== currUser._id.toString()
+              );
+            }
+
+            if (notification.latestUser.length === 0) {
+              await notification.deleteOne();
+            } else {
+              const msgUser = notification.latestUser[0];
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${msgUser.firstName} ${msgUser.lastName} followed you.`;
+              } else {
+                notification.message = `${msgUser.firstName} ${
+                  msgUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others followed you.`;
+              }
+
+              notification.createdAt = new Date().toISOString();
+              await notification.save();
+            }
+          }
+        } else {
           const newFollow = new Follow({
             follower: user.email,
             following: email
           });
           await newFollow.save();
-        } else {
-          await Follow.deleteOne({ follower: user.email, following: email });
+
+          if (!notification) {
+            notification = new Notification({
+              user: followingUser._id,
+              sender: user.id,
+              type: 'follow',
+              latestUser: [user.id],
+              message: `${currUser.firstName} ${currUser.lastName} followed you.`,
+              createdAt: new Date().toISOString()
+            });
+            await notification.save();
+          } else {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (!existing) {
+              notification.latestUser.unshift(currUser._id);
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${currUser.firstName} ${currUser.lastName} followed you.`;
+              } else {
+                notification.message = `${currUser.firstName} ${
+                  currUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others followed you.`;
+              }
+
+              notification.isRead = false;
+              notification.createdAt = new Date().toISOString();
+              await notification.save();
+            }
+          }
+        }
+
+        if (notification) {
+          const exists = await Notification.exists({ _id: notification._id });
+
+          if (exists) {
+            await notification.populate([
+              {
+                path: 'user',
+                model: 'User',
+                select: profileBadgeProj
+              },
+              {
+                path: 'sender',
+                model: 'User',
+                select: profileBadgeProj
+              },
+              {
+                path: 'latestUser',
+                model: 'User',
+                select: profileBadgeProj
+              }
+            ]);
+            const unreadCount = await Notification.countDocuments({
+              user: followingUser._id,
+              isRead: false
+            });
+
+            pubSub.publish(NEW_NOTIFICATION, {
+              onNewNotification: {
+                unreadCount,
+                notification: {
+                  id: notification._id,
+                  ...notification._doc
+                }
+              }
+            });
+          }
         }
 
         const [followers, following] = await Promise.all([
@@ -67,6 +183,7 @@ module.exports = {
           }
         };
       } catch (error) {
+        console.log('error', error);
         throw new Error(error);
       }
     }

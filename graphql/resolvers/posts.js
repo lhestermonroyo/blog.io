@@ -10,9 +10,10 @@ const { validatePostInput } = require('../../utils/validators.util');
 
 const pubSub = new PubSub();
 
-const NEW_POST = 'NEW_POST';
+const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
 const profileBadgeProj = '_id email firstName lastName avatar';
+const postBadgeProj = '_id title';
 
 module.exports = {
   Query: {
@@ -394,12 +395,21 @@ module.exports = {
             message: `${authorName} created a new post.`,
             createdAt: new Date().toISOString()
           });
-
           await notification.save();
-        });
 
-        pubSub.publish(NEW_POST, {
-          onNewPost: post
+          const unreadCount = await Notification.countDocuments({
+            user: follower._id,
+            isRead: false
+          });
+          pubSub.publish(NEW_NOTIFICATION, {
+            onNewNotification: {
+              unreadCount,
+              notification: {
+                id: notification._id,
+                ...notification._doc
+              }
+            }
+          });
         });
 
         return post;
@@ -527,7 +537,15 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const post = await Post.findById(postId).populate('creator');
+        const requests = [
+          Post.findById(postId),
+          Notification.findOne({
+            post: postId,
+            type: 'save'
+          }).populate('latestUser', profileBadgeProj),
+          User.findById(user.id)
+        ];
+        let [post, notification, currUser] = await Promise.all(requests);
 
         if (!post) {
           throw new UserInputError('Post not found.');
@@ -541,31 +559,44 @@ module.exports = {
           post.saves = post.saves.filter(
             (save) => save.user.toString() !== user.id
           );
+
+          if (notification) {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (existing) {
+              notification.latestUser = notification.latestUser.filter(
+                (user) => user._id.toString() !== currUser._id.toString()
+              );
+            }
+
+            if (notification.latestUser.length === 0) {
+              await notification.deleteOne();
+            } else {
+              const msgUser = notification.latestUser[0];
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${msgUser.firstName} ${msgUser.lastName} saved your post.`;
+              } else {
+                notification.message = `${msgUser.firstName} ${
+                  msgUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others saved your post.`;
+              }
+
+              notification.createdAt = new Date().toISOString();
+              await notification.save();
+            }
+          }
         } else {
           post.saves.push({
             user: user.id,
             createdAt: new Date().toISOString()
           });
 
-          // notify post creator
-          let notification = await Notification.findOne({
-            user: post.creator,
-            post: postId,
-            type: 'save',
-            latestUser: { $in: [user.id] }
-          });
-
-          const currUser = await User.findById(user.id);
-
-          if (notification) {
-            notification.latestUser.push(user.id);
-            notification.message = `${currUser.firstName} ${
-              currUser.lastName
-            } and ${
-              notification.latestUser.length - 1
-            } others saved your post.`;
-            notification.createdAt = new Date().toISOString();
-          } else {
+          if (!notification) {
             notification = new Notification({
               user: post.creator,
               sender: user.id,
@@ -575,9 +606,30 @@ module.exports = {
               message: `${currUser.firstName} ${currUser.lastName} saved your post.`,
               createdAt: new Date().toISOString()
             });
-          }
+            await notification.save();
+          } else {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
 
-          await notification.save();
+            if (!existing) {
+              notification.latestUser.unshift(currUser._id);
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${currUser.firstName} ${currUser.lastName} saved your post.`;
+              } else {
+                notification.message = `${currUser.firstName} ${
+                  currUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others saved your post.`;
+                notification.isRead = false;
+                notification.createdAt = new Date().toISOString();
+              }
+
+              await notification.save();
+            }
+          }
         }
         await post.save();
         await post.populate([
@@ -614,6 +666,49 @@ module.exports = {
           }
         ]);
 
+        if (notification) {
+          const exists = await Notification.exists({ _id: notification._id });
+
+          if (exists) {
+            await notification.populate([
+              {
+                path: 'user',
+                model: 'User',
+                select: profileBadgeProj
+              },
+              {
+                path: 'sender',
+                model: 'User',
+                select: profileBadgeProj
+              },
+              {
+                path: 'latestUser',
+                model: 'User',
+                select: profileBadgeProj
+              },
+              {
+                path: 'post',
+                model: 'Post',
+                select: postBadgeProj
+              }
+            ]);
+            const unreadCount = await Notification.countDocuments({
+              user: post.creator,
+              isRead: false
+            });
+
+            pubSub.publish(NEW_NOTIFICATION, {
+              onNewNotification: {
+                unreadCount,
+                notification: {
+                  id: notification._id,
+                  ...notification._doc
+                }
+              }
+            });
+          }
+        }
+
         const isLiked = post.likes.some(
           (like) => like.liker._id.toString() === user.id
         );
@@ -634,11 +729,6 @@ module.exports = {
       } catch (error) {
         throw new Error(error);
       }
-    }
-  },
-  Subscription: {
-    onNewPost: {
-      subscribe: () => pubSub.asyncIterator([NEW_POST])
     }
   }
 };

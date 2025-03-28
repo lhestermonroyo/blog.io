@@ -1,11 +1,9 @@
 import { FC, Fragment, useEffect } from 'react';
 import { Button, Group, MultiSelect, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useRecoilState } from 'recoil';
-import { useQuery } from '@apollo/client';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
-import { GET_TAGS } from '../../../graphql/queries';
 import { TAuthState } from '../../../../types';
 
 type StepThreeProps = {
@@ -15,6 +13,7 @@ type StepThreeProps = {
 
 const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
+  const tag = useRecoilValue(states.tag);
   const { onboarding, profile } = auth;
 
   const form = useForm({
@@ -33,8 +32,6 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
     form.setFieldValue('tags', onboarding.tagsForm);
   }, [onboarding.tagsForm, profile?.tags]);
 
-  const { data } = useQuery(GET_TAGS);
-
   const handleSubmit = (values: typeof form.values) => {
     setAuth((prev: TAuthState) => ({
       ...prev,
@@ -46,10 +43,7 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
     onNextStep();
   };
 
-  if (data) {
-    const key = Object.keys(data)[0];
-    const tags = data[key];
-
+  if (tag) {
     return (
       <Fragment>
         <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -61,7 +55,7 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
             <MultiSelect
               label="Select Topics/tags"
               placeholder="Select minumum of 3 topics/tags"
-              data={tags}
+              data={tag.list}
               searchable
               clearable
               checkIconPosition="right"

@@ -29,6 +29,46 @@ export const GET_PROFILE = gql`
   }
 `;
 
+export const GET_NOTIFICATIONS = gql`
+  query GetNotifications {
+    getNotifications {
+      unreadCount
+      list {
+        id
+        type
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        sender {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        latestUser {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        post {
+          id
+          title
+        }
+        isRead
+        message
+        createdAt
+      }
+    }
+  }
+`;
+
 export const GET_PROFILE_BY_EMAIL = gql`
   query GetProfileByEmail($email: String!) {
     getProfileByEmail(email: $email) {

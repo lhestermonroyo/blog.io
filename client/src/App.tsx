@@ -8,10 +8,10 @@ import { createTheme, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { useQuery } from '@apollo/client';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
 
 import states from './states';
-import { GET_PROFILE } from './graphql/queries';
+import { GET_PROFILE, GET_TAGS } from './graphql/queries';
 import { TAuthState } from '../types';
 
 import AppRouter from './routes';
@@ -41,23 +41,43 @@ const theme = createTheme({
 
 function App() {
   const [auth, setAuth] = useRecoilState(states.auth);
+  const setTag = useSetRecoilState(states.tag);
 
-  const { data, loading, error, refetch } = useQuery(GET_PROFILE);
+  const resetPost = useResetRecoilState(states.post);
+  const resetNotification = useResetRecoilState(states.notification);
+
+  const {
+    data: profileResponse,
+    loading: profileLoading,
+    error,
+    refetch: refetchProfile
+  } = useQuery(GET_PROFILE);
+  const { data: tagResponse, loading: tagLoading } = useQuery(GET_TAGS);
 
   useEffect(() => {
-    refetch();
+    refetchProfile();
   }, []);
 
   useEffect(() => {
     if (auth.isAuth) {
-      refetch();
+      refetchProfile();
     }
-  }, [auth]);
+  }, [auth.isAuth]);
 
   useEffect(() => {
-    if (data) {
-      const key = Object.keys(data)[0];
-      const profile = data[key];
+    if (tagResponse) {
+      const key = Object.keys(tagResponse)[0];
+      const tags = tagResponse[key];
+      setTag({
+        list: tags
+      });
+    }
+  }, [tagResponse]);
+
+  useEffect(() => {
+    if (profileResponse) {
+      const key = Object.keys(profileResponse)[0];
+      const profile = profileResponse[key];
 
       setAuth((prev: TAuthState) => ({
         ...prev,
@@ -65,7 +85,7 @@ function App() {
         profile
       }));
     }
-  }, [data]);
+  }, [profileResponse]);
 
   useEffect(() => {
     if (error) {
@@ -74,13 +94,15 @@ function App() {
         isAuth: false,
         profile: null
       }));
+      resetPost();
+      resetNotification();
     }
   }, [error]);
 
   return (
     <MantineProvider defaultColorScheme="light" theme={theme}>
       <Notifications />
-      <LoadingPage loading={loading}>
+      <LoadingPage loading={profileLoading || tagLoading}>
         <ModalsProvider>
           <AppRouter />
         </ModalsProvider>

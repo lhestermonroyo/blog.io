@@ -1,15 +1,16 @@
-const { PubSub } = require('graphql-subscriptions');
 const { UserInputError } = require('apollo-server');
+const pubSub = require('../../pubSub');
 
 const Post = require('../../models/Post');
+const User = require('../../models/User');
+const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
 const { validateCommentInput } = require('../../utils/validators.util');
 
-const pubSub = new PubSub();
-
-const NEW_COMMENT = 'NEW_COMMENT';
+const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
 const profileBadgeProj = '_id email firstName lastName avatar';
+const postBadgeProj = '_id title';
 
 module.exports = {
   Mutation: {
@@ -27,7 +28,15 @@ module.exports = {
           throw new UserInputError('Validation Error', { errors });
         }
 
-        const post = await Post.findById(postId);
+        const requests = [
+          Post.findById(postId),
+          Notification.findOne({
+            post: postId,
+            type: 'new_comment'
+          }).populate('latestUser', profileBadgeProj),
+          User.findById(user.id)
+        ];
+        let [post, notification, currUser] = await Promise.all(requests);
 
         if (!post) {
           throw new Error('Post not found');
@@ -40,6 +49,85 @@ module.exports = {
           createdAt: new Date().toISOString()
         });
         await post.save();
+
+        if (notification) {
+          const existing = notification.latestUser.some(
+            (user) => user._id.toString() === currUser._id.toString()
+          );
+
+          if (!existing) {
+            notification.latestUser.unshift(currUser);
+
+            const msgUser = notification.latestUser[0];
+
+            if (notification.latestUser.length === 1) {
+              notification.message = `${msgUser.firstName} ${msgUser.lastName} commented your post.`;
+            } else {
+              notification.message = `${msgUser.firstName} ${
+                msgUser.lastName
+              } and ${
+                notification.latestUser.length - 1
+              } others commented your post.`;
+            }
+
+            notification.isRead = false;
+            notification.createdAt = new Date().toISOString();
+            await notification.save();
+          }
+        } else {
+          notification = new Notification({
+            user: post.creator,
+            sender: user.id,
+            post: postId,
+            type: 'new_comment',
+            message: `${currUser.firstName} ${currUser.lastName} commented on your post.`,
+            latestUser: [currUser.id],
+            createdAt: new Date().toISOString()
+          });
+          await notification.save();
+        }
+
+        const exists = await Notification.exists({ _id: notification._id });
+
+        if (exists) {
+          await notification.populate([
+            {
+              path: 'user',
+              model: 'User',
+              select: profileBadgeProj
+            },
+            {
+              path: 'sender',
+              model: 'User',
+              select: profileBadgeProj
+            },
+            {
+              path: 'latestUser',
+              model: 'User',
+              select: profileBadgeProj
+            },
+            {
+              path: 'post',
+              model: 'Post',
+              select: postBadgeProj
+            }
+          ]);
+          const unreadCount = await Notification.countDocuments({
+            user: post.creator,
+            isRead: false
+          });
+
+          pubSub.publish(NEW_NOTIFICATION, {
+            onNewNotification: {
+              unreadCount,
+              notification: {
+                id: notification._id,
+                ...notification._doc
+              }
+            }
+          });
+        }
+
         await post.populate([
           {
             path: 'creator',
@@ -75,13 +163,6 @@ module.exports = {
           }
         ]);
 
-        pubSub.publish(NEW_COMMENT, {
-          onNewComment: {
-            id: post._id,
-            ...post._doc
-          }
-        });
-
         const isLiked = post.likes.some(
           (like) => like.liker._id.toString() === user.id
         );
@@ -100,6 +181,7 @@ module.exports = {
           isSaved
         };
       } catch (error) {
+        console.log('error', error);
         throw new Error(error);
       }
     },
@@ -269,11 +351,6 @@ module.exports = {
       } catch (error) {
         throw new Error(error);
       }
-    }
-  },
-  Subscription: {
-    onNewComment: {
-      subscribe: (_, __, { pubSub }) => pubSub.asyncIterator('NEW_COMMENT')
     }
   }
 };

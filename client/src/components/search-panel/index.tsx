@@ -21,7 +21,7 @@ import { TPostItem, TProfileBadge } from '../../../types';
 import classes from './style.module.css';
 import { useNavigate } from 'react-router';
 
-const SearchField = () => {
+const SearchPanel = () => {
   const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<any>([]);
   const [resultsData, setResultsData] = useState<any>([]);
@@ -54,6 +54,7 @@ const SearchField = () => {
       const key = Object.keys(response.data)[0];
       const data = response.data[key];
 
+      // check duplicate in postItems
       const postItems = [...data.posts].map((post: TPostItem) => post?.title);
       const authorItems = [...data.users].map(
         (user: TProfileBadge) => `${user.firstName} ${user.lastName}`
@@ -111,7 +112,7 @@ const SearchField = () => {
           `${item.firstName} ${item.lastName}` === option.value
       );
     const isPost =
-      resultsData[0] &&
+      resultsData[1] &&
       resultsData[1].items.some(
         (item: TPostItem) => item.title === option.value
       );
@@ -192,4 +193,4 @@ const SearchField = () => {
   );
 };
 
-export default SearchField;
+export default SearchPanel;

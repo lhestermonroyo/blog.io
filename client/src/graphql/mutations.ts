@@ -550,3 +550,43 @@ export const GET_SEARCH_RESULTS = gql`
     }
   }
 `;
+
+export const MARK_AS_READ = gql`
+  mutation MarkAsRead($notificationId: ID!) {
+    markAsRead(notificationId: $notificationId) {
+      unreadCount
+      notification {
+        id
+        type
+        user {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        sender {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        latestUser {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        post {
+          id
+          title
+        }
+        isRead
+        message
+        createdAt
+      }
+    }
+  }
+`;

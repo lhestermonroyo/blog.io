@@ -2,18 +2,17 @@ import { useEffect, useState } from 'react';
 import { Button, Group, MultiSelect, Stack, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
-import { useMutation, useQuery } from '@apollo/client';
-import { useRecoilState } from 'recoil';
+import { useMutation } from '@apollo/client';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
 import { UPDATE_PROFILE } from '../../../graphql/mutations';
-import { GET_TAGS } from '../../../graphql/queries';
 
 const TagsForm = () => {
   const [submitting, setSubmitting] = useState(false);
 
-  const [post, setPost] = useRecoilState(states.post);
   const [auth, setAuth] = useRecoilState(states.auth);
+  const tag = useRecoilValue(states.tag);
   const { profile } = auth;
 
   const form = useForm({
@@ -28,9 +27,6 @@ const TagsForm = () => {
     validateInputOnBlur: true
   });
 
-  const { data: tagsResponse } = useQuery(GET_TAGS, {
-    skip: !post?.tags
-  });
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
   useEffect(() => {
@@ -38,18 +34,6 @@ const TagsForm = () => {
       tags: profile?.tags || []
     });
   }, []);
-
-  useEffect(() => {
-    if (tagsResponse) {
-      const key = Object.keys(tagsResponse)[0];
-      const data = tagsResponse[key];
-
-      setPost((prev) => ({
-        ...prev,
-        tags: data
-      }));
-    }
-  }, [tagsResponse]);
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
@@ -111,7 +95,7 @@ const TagsForm = () => {
           <MultiSelect
             label="Select Topics/tags"
             placeholder="Select minumum of 3 topics/tags"
-            data={post?.tags}
+            data={tag?.list}
             searchable
             clearable
             checkIconPosition="right"

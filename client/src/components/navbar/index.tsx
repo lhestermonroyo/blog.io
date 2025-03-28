@@ -22,7 +22,7 @@ import {
 } from '@tabler/icons-react';
 import cx from 'clsx';
 import { useNavigate } from 'react-router';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useResetRecoilState } from 'recoil';
 import { useMutation } from '@apollo/client';
 
 import states from '../../states';
@@ -30,15 +30,17 @@ import { LOGOUT } from '../../graphql/mutations';
 import { TAuthState } from '../../../types';
 
 import Logo from '../logo';
-import SearchField from '../search-field';
+import SearchPanel from '../search-panel';
 
 import classes from './style.module.css';
+import NotificationPanel from '../notification-panel';
 
 const Navbar = () => {
   const [userMenuOpened, setUserMenuOpened] = useState(false);
 
   const [auth, setAuth] = useRecoilState(states.auth);
-  const [post, setPost] = useRecoilState(states.post);
+  const resetPost = useResetRecoilState(states.post);
+  const resetNotification = useResetRecoilState(states.notification);
   const { isAuth, profile } = auth;
 
   const [logout] = useMutation(LOGOUT);
@@ -99,6 +101,8 @@ const Navbar = () => {
             tagsForm: []
           }
         }));
+        resetPost();
+        resetNotification();
         navigate('/login');
       }
     } catch (error) {
@@ -120,7 +124,7 @@ const Navbar = () => {
             <Anchor onClick={() => navigate('/')}>
               <Logo />
             </Anchor>
-            <SearchField />
+            <SearchPanel />
           </Group>
 
           {isAuth && profile ? (
@@ -132,15 +136,7 @@ const Navbar = () => {
               >
                 Compose
               </Button>
-              <ActionIcon
-                style={{
-                  borderWidth: 0
-                }}
-                variant="transparent"
-                radius="xl"
-              >
-                <IconBell size={24} />
-              </ActionIcon>
+              <NotificationPanel />
               <Menu
                 width={200}
                 position="bottom-end"

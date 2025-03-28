@@ -36,8 +36,7 @@ const initialState: TPostState = {
       count: 0,
       list: []
     }
-  },
-  tags: []
+  }
 };
 
 export const POST_STATE = atom({
