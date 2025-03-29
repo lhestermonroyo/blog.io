@@ -5,9 +5,11 @@ require('dotenv').config({
 const mongodbUri = process.env.MONGODB_URI;
 const secretKey = process.env.SECRET_KEY;
 const port = process.env.PORT || 4000;
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:5714';
 
 module.exports = {
   MONGODB_URI: mongodbUri,
   SECRET_KEY: secretKey,
-  PORT: port
+  PORT: port,
+  CLIENT_URL: clientUrl
 };

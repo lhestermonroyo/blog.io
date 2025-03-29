@@ -16,7 +16,7 @@ const { useServer } = require('graphql-ws/lib/use/ws');
 const pubSub = require('./pubSub');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
-const { MONGODB_URI, PORT } = require('./config');
+const { MONGODB_URI, CLIENT_URL, PORT } = require('./config');
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -65,7 +65,7 @@ const apolloServer = new ApolloServer({
       .use(
         '/graphql',
         cors({
-          origin: 'http://localhost:4173',
+          origin: CLIENT_URL,
           credentials: true
         }),
         cookieParser(),
