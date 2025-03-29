@@ -225,15 +225,17 @@ const Profile = () => {
                           }}
                         />
                       </ExpandableImage>
-                      <ActionIcon
-                        radius="xl"
-                        pos="absolute"
-                        top={12}
-                        right={12}
-                        onClick={() => navigate('edit?tab=4')}
-                      >
-                        <IconEdit size={16} />
-                      </ActionIcon>
+                      {ownProfile && (
+                        <ActionIcon
+                          radius="xl"
+                          pos="absolute"
+                          top={12}
+                          right={12}
+                          onClick={() => navigate('edit?tab=4')}
+                        >
+                          <IconEdit size={16} />
+                        </ActionIcon>
+                      )}
                     </Card.Section>
                     <Stack>
                       <Group mt={-40} justify="space-between" align="flex-end">
@@ -249,15 +251,17 @@ const Profile = () => {
                               className="profile-avatar"
                             />
                           </ExpandableImage>
-                          <ActionIcon
-                            radius="xl"
-                            pos="absolute"
-                            right={-10}
-                            bottom={-10}
-                            onClick={() => navigate('edit?tab=4')}
-                          >
-                            <IconEdit size={16} />
-                          </ActionIcon>
+                          {ownProfile && (
+                            <ActionIcon
+                              radius="xl"
+                              pos="absolute"
+                              right={-10}
+                              bottom={-10}
+                              onClick={() => navigate('edit?tab=4')}
+                            >
+                              <IconEdit size={16} />
+                            </ActionIcon>
+                          )}
                         </Box>
                       </Group>
 
