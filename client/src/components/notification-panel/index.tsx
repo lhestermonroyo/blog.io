@@ -23,7 +23,7 @@ import {
 } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { format } from 'date-fns';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 
 import states from '../../states';
@@ -33,8 +33,10 @@ import { MARK_AS_READ } from '../../graphql/mutations';
 import { TNotificationItem, TNotificationState } from '../../../types';
 
 const NotificationPanel = () => {
+  const auth = useRecoilValue(states.auth);
   const [notification, setNotification] = useRecoilState(states.notification);
   const { unreadCount, list } = notification;
+  const { profile } = auth;
 
   const {
     data: notifResponse,
@@ -46,42 +48,46 @@ const NotificationPanel = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   fetchNotifications();
-  // }, []);
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   useEffect(() => {
     if (newNotifResponse) {
       const key = Object.keys(newNotifResponse)[0];
       const data = newNotifResponse[key];
 
-      setNotification((prev: TNotificationState) => {
-        let currList = prev.list;
-        const isExist = currList.find(
-          (item: TNotificationItem) => item.id === data.notification.id
-        );
+      const ownNotification = data.notification.user.id === profile?.id;
 
-        if (isExist) {
-          currList = currList.map((item: TNotificationItem) => {
-            if (item.id === data.notification.id) {
-              return data.notification;
-            }
-            return item;
-          });
-        } else {
-          currList = [data.notification, ...currList];
-        }
+      if (ownNotification) {
+        setNotification((prev: TNotificationState) => {
+          let currList = prev.list;
+          const isExist = currList.find(
+            (item: TNotificationItem) => item.id === data.notification.id
+          );
 
-        return {
-          ...prev,
-          unreadCount: data.unreadCount,
-          list: currList.sort((a, b) => {
-            const dateA = new Date(a.createdAt);
-            const dateB = new Date(b.createdAt);
-            return dateB.getTime() - dateA.getTime();
-          })
-        };
-      });
+          if (isExist) {
+            currList = currList.map((item: TNotificationItem) => {
+              if (item.id === data.notification.id) {
+                return data.notification;
+              }
+              return item;
+            });
+          } else {
+            currList = [data.notification, ...currList];
+          }
+
+          return {
+            ...prev,
+            unreadCount: data.unreadCount,
+            list: currList.sort((a, b) => {
+              const dateA = new Date(a.createdAt);
+              const dateB = new Date(b.createdAt);
+              return dateB.getTime() - dateA.getTime();
+            })
+          };
+        });
+      }
     }
   }, [newNotifResponse]);
 

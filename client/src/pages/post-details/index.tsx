@@ -89,8 +89,6 @@ const PostDetails = () => {
     }
   });
 
-  console.log(postDetails);
-
   const [deletePost] = useMutation(DELETE_POST);
   const [likePost] = useMutation(LIKE_POST);
   const [savePost] = useMutation(SAVE_POST);
@@ -289,10 +287,14 @@ const PostDetails = () => {
       const data = response.data[key];
 
       if (data) {
-        setPost({
-          ...post,
-          postDetails: data
-        });
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            saveCount: data.saveCount,
+            saves: data.saves
+          }
+        }));
       }
     } catch (error) {
       console.log('Error:', error);

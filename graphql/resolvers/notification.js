@@ -44,9 +44,6 @@ module.exports = {
         throw new Error('Notification not found');
       }
 
-      console.log(notification);
-      console.log('user', user.id);
-
       if (notification.user.toString() !== user.id.toString()) {
         throw new Error('Unauthorized action');
       }

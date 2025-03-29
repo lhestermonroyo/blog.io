@@ -128,7 +128,9 @@ module.exports = {
         ]);
 
         if (notification) {
-          const exists = await Notification.exists({ _id: notification._id });
+          const exists = await Notification.exists({
+            _id: notification._id
+          });
 
           if (exists) {
             await notification.populate([
@@ -153,8 +155,7 @@ module.exports = {
                 select: postBadgeProj
               }
             ]);
-            console.log(post.creator);
-            console.log(notification._id);
+
             const unreadCount = await Notification.countDocuments({
               user: post.creator,
               isRead: false
