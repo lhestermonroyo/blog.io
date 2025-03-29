@@ -52,10 +52,14 @@ function App() {
     error,
     refetch: refetchProfile
   } = useQuery(GET_PROFILE);
-  const { data: tagResponse, loading: tagLoading } = useQuery(GET_TAGS);
+  const {
+    data: tagResponse,
+    loading: tagLoading,
+    refetch: fetchTags
+  } = useQuery(GET_TAGS);
 
   useEffect(() => {
-    refetchProfile();
+    init();
   }, []);
 
   useEffect(() => {
@@ -98,6 +102,15 @@ function App() {
       resetNotification();
     }
   }, [error]);
+
+  const init = async () => {
+    try {
+      const requests = [fetchTags(), refetchProfile()];
+      await Promise.all(requests);
+    } catch (error) {
+      console.error('Error fetching initial data:', error);
+    }
+  };
 
   return (
     <MantineProvider defaultColorScheme="light" theme={theme}>

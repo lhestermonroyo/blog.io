@@ -43,7 +43,9 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
         <Grid>
           <Grid.Col span={thumbnail ? 8 : 12}>
             <Stack>
-              <ProfileBadge avatarSize="sm" profile={item.creator} />
+              <Group>
+                <ProfileBadge avatarSize="sm" profile={item.creator} />
+              </Group>
               <Stack gap={0}>
                 <Title order={4} lineClamp={2}>
                   {item.title}
