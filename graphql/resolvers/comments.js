@@ -49,6 +49,17 @@ module.exports = {
           createdAt: new Date().toISOString()
         });
         await post.save();
+        await post.populate([
+          {
+            path: 'comments',
+            model: 'Comment',
+            populate: {
+              path: 'commentor',
+              model: 'User',
+              select: profileBadgeProj
+            }
+          }
+        ]);
 
         if (notification) {
           const existing = notification.latestUser.some(
@@ -128,57 +139,8 @@ module.exports = {
           });
         }
 
-        await post.populate([
-          {
-            path: 'creator',
-            model: 'User',
-            select: profileBadgeProj
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          }
-        ]);
-
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
-          id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          comments: post.comments
         };
       } catch (error) {
         console.log('error', error);
@@ -218,11 +180,6 @@ module.exports = {
         await post.save();
         await post.populate([
           {
-            path: 'creator',
-            model: 'User',
-            select: profileBadgeProj
-          },
-          {
             path: 'comments',
             model: 'Comment',
             populate: {
@@ -230,43 +187,11 @@ module.exports = {
               model: 'User',
               select: profileBadgeProj
             }
-          },
-          {
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            }
           }
         ]);
 
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
-          id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          comments: post.comments
         };
       } catch (error) {
         throw new Error(error);
@@ -298,11 +223,6 @@ module.exports = {
         await post.save();
         await post.populate([
           {
-            path: 'creator',
-            model: 'User',
-            select: profileBadgeProj
-          },
-          {
             path: 'comments',
             model: 'Comment',
             populate: {
@@ -310,43 +230,11 @@ module.exports = {
               model: 'User',
               select: profileBadgeProj
             }
-          },
-          {
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            }
           }
         ]);
 
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
-          id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          comments: post.comments
         };
       } catch (error) {
         throw new Error(error);

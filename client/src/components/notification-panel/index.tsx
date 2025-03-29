@@ -26,10 +26,10 @@ import { format } from 'date-fns';
 import { useRecoilState } from 'recoil';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 
+import states from '../../states';
 import { GET_NOTIFICATIONS } from '../../graphql/queries';
 import { ON_NEW_NOTIFICATION } from '../../graphql/subscriptions';
 import { MARK_AS_READ } from '../../graphql/mutations';
-import states from '../../states';
 import { TNotificationItem, TNotificationState } from '../../../types';
 
 const NotificationPanel = () => {
@@ -46,9 +46,9 @@ const NotificationPanel = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
+  // useEffect(() => {
+  //   fetchNotifications();
+  // }, []);
 
   useEffect(() => {
     if (newNotifResponse) {
@@ -90,10 +90,7 @@ const NotificationPanel = () => {
       const key = Object.keys(notifResponse)[0];
       const data = notifResponse[key];
 
-      if (JSON.stringify(data) !== JSON.stringify(notification)) {
-        console.log('new data detected');
-        setNotification(data);
-      }
+      setNotification(data);
     }
   }, [notifResponse]);
 
@@ -122,15 +119,21 @@ const NotificationPanel = () => {
       const key = Object.keys(response.data)[0];
       const data = response.data[key];
 
-      setNotification((prev) => ({
+      setNotification((prev: TNotificationState) => ({
         ...prev,
         unreadCount: data.unreadCount,
-        list: prev.list.map((item: TNotificationItem) => {
-          if (item.id === data.id) {
-            return data.notification;
-          }
-          return item;
-        })
+        list: prev.list
+          .map((item: TNotificationItem) => {
+            if (item.id === data.notification.id) {
+              return data.notification;
+            }
+            return item;
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            return dateB.getTime() - dateA.getTime();
+          })
       }));
     } catch (error) {
       console.error(error);

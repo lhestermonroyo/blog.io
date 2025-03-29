@@ -45,7 +45,12 @@ import {
 
 import states from '../../states';
 import { deleteBlogFiles } from '../../utils/upload.util';
-import { TCommentItem, TLikeItem, TPostState } from '../../../types';
+import {
+  TCommentItem,
+  TLikeItem,
+  TPostDetails,
+  TPostState
+} from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
 import LoadingPost from '../../components/post-details/loading-post';
@@ -78,11 +83,13 @@ const PostDetails = () => {
   const params = useParams();
   const navigate = useNavigate();
 
-  const { data, loading, error } = useQuery(GET_POST_BY_ID, {
+  const { data, loading, error, refetch } = useQuery(GET_POST_BY_ID, {
     variables: {
       postId: params.id
     }
   });
+
+  console.log(postDetails);
 
   const [deletePost] = useMutation(DELETE_POST);
   const [likePost] = useMutation(LIKE_POST);
@@ -100,6 +107,7 @@ const PostDetails = () => {
   });
 
   useEffect(() => {
+    refetch();
     window.scrollTo(0, 0);
   }, []);
 
@@ -185,7 +193,11 @@ const PostDetails = () => {
       if (data) {
         setPost((prev: TPostState) => ({
           ...prev,
-          postDetails: data
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            likes: data.likes,
+            likeCount: data.likeCount
+          }
         }));
       }
     } catch (error) {
@@ -213,10 +225,14 @@ const PostDetails = () => {
       const data = response.data[key];
 
       if (data) {
-        setPost({
-          ...post,
-          postDetails: data
-        });
+        setPost((prev) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments,
+            commentCount: data.commentCount
+          }
+        }));
         form.reset();
         commentRef.current?.blur();
         notifications.show({

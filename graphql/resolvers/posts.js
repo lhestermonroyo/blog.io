@@ -1,5 +1,5 @@
 const { UserInputError } = require('apollo-server');
-const { PubSub } = require('graphql-subscriptions');
+const pubSub = require('../../pubSub');
 
 const Post = require('../../models/Post');
 const User = require('../../models/User');
@@ -7,8 +7,6 @@ const Follow = require('../../models/Follow');
 const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
 const { validatePostInput } = require('../../utils/validators.util');
-
-const pubSub = new PubSub();
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
@@ -255,22 +253,9 @@ module.exports = {
           throw new Error('Post not found');
         }
 
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
           id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          ...post._doc
         };
       } catch (error) {
         throw new Error(error);
@@ -356,24 +341,6 @@ module.exports = {
           }
         ]);
 
-        const isLiked = newPost.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = newPost.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = newPost.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
-        const post = {
-          id: newPost._id,
-          ...newPost._doc,
-          isLiked,
-          isCommented,
-          isSaved
-        };
-
         // notify followers
         const followers = (await Follow.find({ following: user.email })).map(
           (follow) => follow.follower
@@ -384,7 +351,7 @@ module.exports = {
         );
 
         followerUsers.forEach(async (follower) => {
-          const authorName = `${post.creator.firstName} ${post.creator.lastName}`;
+          const authorName = `${newPost.creator?.firstName} ${newPost.creator?.lastName}`;
 
           const notification = new Notification({
             user: follower._id,
@@ -412,7 +379,10 @@ module.exports = {
           });
         });
 
-        return post;
+        return {
+          id: newPost._id,
+          ...newPost._doc
+        };
       } catch (error) {
         throw new Error(error);
       }
@@ -482,22 +452,9 @@ module.exports = {
           }
         ]);
 
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
           id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          ...post._doc
         };
       } catch (error) {
         throw new Error(error);
@@ -634,28 +591,6 @@ module.exports = {
         await post.save();
         await post.populate([
           {
-            path: 'creator',
-            model: 'User'
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
             path: 'saves',
             model: 'Save',
             populate: {
@@ -709,22 +644,8 @@ module.exports = {
           }
         }
 
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
-          id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          saves: post.saves
         };
       } catch (error) {
         throw new Error(error);

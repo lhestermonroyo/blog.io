@@ -12,7 +12,6 @@ import {
 import { useForm } from '@mantine/form';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useNavigate } from 'react-router';
 import {
   IconClock,
   IconDotsVertical,
@@ -21,8 +20,11 @@ import {
 } from '@tabler/icons-react';
 import { format } from 'date-fns';
 
+import { TCommentItem, TPostDetails, TPostState } from '../../../../types';
+
 import ProfileBadge from '../../profile-badge';
-import { TCommentItem } from '../../../../types';
+import { useSetRecoilState } from 'recoil';
+import states from '../../../states';
 
 type CommentCardProps = {
   comment: TCommentItem;
@@ -39,6 +41,8 @@ const CommentCard: FC<CommentCardProps> = ({
   updateComment,
   deleteComment
 }) => {
+  const setPost = useSetRecoilState(states.post);
+
   const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -53,8 +57,6 @@ const CommentCard: FC<CommentCardProps> = ({
     validateInputOnBlur: true
   });
 
-  const navigate = useNavigate();
-
   const handleSubmitUpdate = async (values: typeof form.values) => {
     try {
       setSubmitting(true);
@@ -62,6 +64,15 @@ const CommentCard: FC<CommentCardProps> = ({
       const data = await updateComment(comment.id, values);
 
       if (data) {
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments,
+            commentCount: data.comments
+          }
+        }));
+
         notifications.show({
           title: 'Success',
           message: 'Your comment has been updated successfully.',
@@ -87,6 +98,17 @@ const CommentCard: FC<CommentCardProps> = ({
       const data = await deleteComment(comment.id);
 
       if (data) {
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments.filter(
+              (c: TCommentItem) => c.id !== comment.id
+            ),
+            commentCount: (prev.postDetails?.commentCount || 0) - 1
+          }
+        }));
+
         notifications.show({
           title: 'Success',
           message: 'Your comment has been deleted successfully.',

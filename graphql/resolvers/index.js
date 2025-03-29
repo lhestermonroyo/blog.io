@@ -15,6 +15,15 @@ module.exports = {
     commentCount: (parent) => parent.comments.length,
     saveCount: (parent) => parent.saves.length
   },
+  LikeResponse: {
+    likeCount: (parent) => parent.likes.length
+  },
+  CommentResponse: {
+    commentCount: (parent) => parent.comments.length
+  },
+  SaveResponse: {
+    saveCount: (parent) => parent.saves.length
+  },
   Profile: {
     age: (parent) => {
       if (!parent.birthdate) {

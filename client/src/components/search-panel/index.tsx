@@ -54,25 +54,21 @@ const SearchPanel = () => {
       const key = Object.keys(response.data)[0];
       const data = response.data[key];
 
-      // check duplicate in postItems
       const postItems = [...data.posts].map((post: TPostItem) => post?.title);
       const authorItems = [...data.users].map(
         (user: TProfileBadge) => `${user.firstName} ${user.lastName}`
       );
+      const resultsData: any = [];
 
-      if (authorItems.length) {
-        resultsData.push({
-          group: 'Authors',
-          items: [...data.users]
-        });
-      }
+      resultsData.push({
+        group: 'Authors',
+        items: [...data.users]
+      });
 
-      if (postItems.length) {
-        resultsData.push({
-          group: 'Posts',
-          items: [...data.posts]
-        });
-      }
+      resultsData.push({
+        group: 'Posts',
+        items: [...data.posts]
+      });
 
       setResults([
         {

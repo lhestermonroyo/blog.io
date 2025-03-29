@@ -75,9 +75,6 @@ module.exports = gql`
     likeCount: Int!
     commentCount: Int!
     saveCount: Int!
-    isLiked: Boolean!
-    isCommented: Boolean!
-    isSaved: Boolean!
     createdAt: String!
   }
   type Comment {
@@ -96,6 +93,18 @@ module.exports = gql`
     id: ID!
     user: ProfileBadge!
     createdAt: String!
+  }
+  type LikeResponse {
+    likeCount: Int!
+    likes: [Like]!
+  }
+  type CommentResponse {
+    commentCount: Int!
+    comments: [Comment]!
+  }
+  type SaveResponse {
+    saveCount: Int!
+    saves: [Save]!
   }
 
   # Stats
@@ -220,13 +229,13 @@ module.exports = gql`
     createPost(postInput: PostInput): PostDetails!
     updatePost(postId: ID!, postInput: PostInput): PostDetails!
     deletePost(postId: ID!): Status!
-    savePost(postId: ID!): PostDetails!
+    savePost(postId: ID!): SaveResponse!
     # Comments
-    createComment(postId: ID!, body: String!): PostDetails!
-    updateComment(postId: ID!, commentId: ID!, body: String!): PostDetails!
-    deleteComment(postId: ID!, commentId: ID!): PostDetails!
+    createComment(postId: ID!, body: String!): CommentResponse!
+    updateComment(postId: ID!, commentId: ID!, body: String!): CommentResponse!
+    deleteComment(postId: ID!, commentId: ID!): CommentResponse!
     # Likes
-    likePost(postId: ID!): PostDetails!
+    likePost(postId: ID!): LikeResponse!
     # Stats
     followUser(email: String): FollowResponse!
     # Search

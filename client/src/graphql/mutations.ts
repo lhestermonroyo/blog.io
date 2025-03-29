@@ -90,66 +90,6 @@ export const FOLLOW_USER = gql`
   }
 `;
 
-export const SAVE_POST = gql`
-  mutation SavePost($postId: ID!) {
-    savePost(postId: $postId) {
-      id
-      title
-      content
-      tags
-      creator {
-        id
-        email
-        firstName
-        lastName
-        avatar
-      }
-      comments {
-        id
-        body
-        commentor {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        isEdited
-        createdAt
-      }
-      likes {
-        id
-        liker {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      saves {
-        id
-        user {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      commentCount
-      likeCount
-      saveCount
-      isLiked
-      isCommented
-      isSaved
-      createdAt
-    }
-  }
-`;
-
 export const CREATE_POST = gql`
   mutation CreatePost($postInput: PostInput) {
     createPost(postInput: $postInput) {
@@ -202,9 +142,6 @@ export const CREATE_POST = gql`
       commentCount
       likeCount
       saveCount
-      isLiked
-      isCommented
-      isSaved
       createdAt
     }
   }
@@ -262,9 +199,6 @@ export const UPDATE_POST = gql`
       commentCount
       likeCount
       saveCount
-      isLiked
-      isCommented
-      isSaved
       createdAt
     }
   }
@@ -281,30 +215,7 @@ export const DELETE_POST = gql`
 export const LIKE_POST = gql`
   mutation LikePost($postId: ID!) {
     likePost(postId: $postId) {
-      id
-      title
-      content
-      tags
-      creator {
-        id
-        email
-        firstName
-        lastName
-        avatar
-      }
-      comments {
-        id
-        body
-        commentor {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        isEdited
-        createdAt
-      }
+      likeCount
       likes {
         id
         liker {
@@ -316,24 +227,6 @@ export const LIKE_POST = gql`
         }
         createdAt
       }
-      saves {
-        id
-        user {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      commentCount
-      likeCount
-      saveCount
-      isLiked
-      isCommented
-      isSaved
-      createdAt
     }
   }
 `;
@@ -341,17 +234,7 @@ export const LIKE_POST = gql`
 export const CREATE_COMMENT = gql`
   mutation CreateComment($postId: ID!, $body: String!) {
     createComment(postId: $postId, body: $body) {
-      id
-      title
-      content
-      tags
-      creator {
-        id
-        email
-        firstName
-        lastName
-        avatar
-      }
+      commentCount
       comments {
         id
         body
@@ -365,35 +248,6 @@ export const CREATE_COMMENT = gql`
         isEdited
         createdAt
       }
-      likes {
-        id
-        liker {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      saves {
-        id
-        user {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      commentCount
-      likeCount
-      saveCount
-      isLiked
-      isCommented
-      isSaved
-      createdAt
     }
   }
 `;
@@ -401,17 +255,7 @@ export const CREATE_COMMENT = gql`
 export const UPDATE_COMMENT = gql`
   mutation updateComment($postId: ID!, $commentId: ID!, $body: String!) {
     updateComment(postId: $postId, commentId: $commentId, body: $body) {
-      id
-      title
-      content
-      tags
-      creator {
-        id
-        email
-        firstName
-        lastName
-        avatar
-      }
+      commentCount
       comments {
         id
         body
@@ -425,35 +269,6 @@ export const UPDATE_COMMENT = gql`
         isEdited
         createdAt
       }
-      likes {
-        id
-        liker {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      saves {
-        id
-        user {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
-      commentCount
-      likeCount
-      saveCount
-      isLiked
-      isCommented
-      isSaved
-      createdAt
     }
   }
 `;
@@ -461,17 +276,7 @@ export const UPDATE_COMMENT = gql`
 export const DELETE_COMMENT = gql`
   mutation deleteComment($postId: ID!, $commentId: ID!) {
     deleteComment(postId: $postId, commentId: $commentId) {
-      id
-      title
-      content
-      tags
-      creator {
-        id
-        email
-        firstName
-        lastName
-        avatar
-      }
+      commentCount
       comments {
         id
         body
@@ -485,17 +290,14 @@ export const DELETE_COMMENT = gql`
         isEdited
         createdAt
       }
-      likes {
-        id
-        liker {
-          id
-          email
-          firstName
-          lastName
-          avatar
-        }
-        createdAt
-      }
+    }
+  }
+`;
+
+export const SAVE_POST = gql`
+  mutation SavePost($postId: ID!) {
+    savePost(postId: $postId) {
+      saveCount
       saves {
         id
         user {
@@ -507,13 +309,6 @@ export const DELETE_COMMENT = gql`
         }
         createdAt
       }
-      commentCount
-      likeCount
-      saveCount
-      isLiked
-      isCommented
-      isSaved
-      createdAt
     }
   }
 `;

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { ActionIcon, Group, Text } from '@mantine/core';
 import {
   IconBookmark,
@@ -8,6 +8,9 @@ import {
   IconMessage,
   IconMessageFilled
 } from '@tabler/icons-react';
+import { useRecoilValue } from 'recoil';
+
+import states from '../../../states';
 import { TPostDetails } from '../../../../types';
 
 type PostReactionProps = {
@@ -23,21 +26,37 @@ const PostReaction: FC<PostReactionProps> = ({
   onComment,
   onSave
 }) => {
+  const auth = useRecoilValue(states.auth);
+
+  const isLiked = useMemo(
+    () =>
+      post.likes.some((like) => like.liker?.id.toString() === auth.profile?.id),
+    [post]
+  );
+  const isCommented = useMemo(
+    () =>
+      post.comments.some(
+        (comment) => comment.commentor?.id.toString() === auth.profile?.id
+      ),
+    [post]
+  );
+  const isSaved = useMemo(
+    () =>
+      post.saves.some((save) => save.user?.id.toString() === auth.profile?.id),
+    [post]
+  );
+
   return (
     <Group gap="lg">
       <Group justify="center" align="center" gap={4}>
         <ActionIcon variant="transparent" onClick={onLike}>
-          {post?.isLiked ? (
-            <IconHeartFilled size={24} />
-          ) : (
-            <IconHeart size={24} />
-          )}
+          {isLiked ? <IconHeartFilled size={24} /> : <IconHeart size={24} />}
         </ActionIcon>
         <Text c="dimmed">{post.likeCount}</Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
         <ActionIcon variant="transparent" onClick={onComment}>
-          {post?.isCommented ? (
+          {isCommented ? (
             <IconMessageFilled size={24} />
           ) : (
             <IconMessage size={24} />
@@ -47,7 +66,7 @@ const PostReaction: FC<PostReactionProps> = ({
       </Group>
       <Group justify="center" align="center" gap={4}>
         <ActionIcon variant="transparent" onClick={onSave}>
-          {post?.isSaved ? (
+          {isSaved ? (
             <IconBookmarkFilled size={24} />
           ) : (
             <IconBookmark size={24} />

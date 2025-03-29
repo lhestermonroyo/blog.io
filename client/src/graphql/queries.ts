@@ -322,9 +322,6 @@ export const GET_POST_BY_ID = gql`
       commentCount
       likeCount
       saveCount
-      isLiked
-      isCommented
-      isSaved
       createdAt
     }
   }

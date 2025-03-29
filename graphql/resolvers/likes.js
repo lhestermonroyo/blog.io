@@ -117,33 +117,10 @@ module.exports = {
         await post.save();
         await post.populate([
           {
-            path: 'creator',
-            model: 'User',
-            select: profileBadgeProj
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
             path: 'likes',
             model: 'Like',
             populate: {
               path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
               model: 'User',
               select: profileBadgeProj
             }
@@ -176,6 +153,8 @@ module.exports = {
                 select: postBadgeProj
               }
             ]);
+            console.log(post.creator);
+            console.log(notification._id);
             const unreadCount = await Notification.countDocuments({
               user: post.creator,
               isRead: false
@@ -193,22 +172,8 @@ module.exports = {
           }
         }
 
-        const isLiked = post.likes.some(
-          (like) => like.liker._id.toString() === user.id
-        );
-        const isCommented = post.comments.some(
-          (comment) => comment.commentor._id.toString() === user.id
-        );
-        const isSaved = post.saves.some(
-          (save) => save.user._id.toString() === user.id
-        );
-
         return {
-          id: post._id,
-          ...post._doc,
-          isLiked,
-          isCommented,
-          isSaved
+          likes: post.likes
         };
       } catch (error) {
         throw new Error(error);
