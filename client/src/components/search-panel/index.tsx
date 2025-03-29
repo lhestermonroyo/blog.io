@@ -87,6 +87,7 @@ const SearchPanel = () => {
   };
 
   const optionsFilter: OptionsFilter = ({ options, search }) => {
+    console.log('search', search);
     options = options.map((option: any) => {
       if (option.group === 'Authors') {
         option.items = option.items.slice(0, 5);

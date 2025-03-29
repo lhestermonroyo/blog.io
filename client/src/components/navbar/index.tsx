@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  ActionIcon,
   Anchor,
   Avatar,
   Button,
@@ -14,7 +13,6 @@ import {
 import { notifications } from '@mantine/notifications';
 import {
   IconBallpen,
-  IconBell,
   IconChevronDown,
   IconLogout,
   IconSettings,

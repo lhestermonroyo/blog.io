@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Tabs, Text, Title } from '@mantine/core';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
 import states from '../../states';

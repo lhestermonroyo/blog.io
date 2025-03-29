@@ -13,8 +13,8 @@ import LoadingFeed from '../../components/feed/loading-feed';
 import PostCard from '../../components/feed/post-card';
 
 const Tag = () => {
-  const post = useRecoilValue(states.post);
-  const { tags } = post;
+  const tag = useRecoilValue(states.tag);
+  const { list } = tag;
 
   const param = useParams();
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const Tag = () => {
 
   const key = Object.keys(response || {})[0];
   const data = response ? response[key] : {};
-  const list = data?.posts || [];
+  const posts = data.posts || [];
 
   return (
     <ProtectedLayout>
@@ -51,12 +51,12 @@ const Tag = () => {
           <Stack>
             <Title order={3}>
               <Title order={3} component="span" c="green">
-                {list?.length}
+                {posts?.length}
               </Title>{' '}
-              {list?.length === 1 ? 'post' : 'posts'} found
+              {posts?.length === 1 ? 'post' : 'posts'} found
             </Title>
-            <SimpleGrid cols={list?.length === 1 ? 1 : 2} spacing={24}>
-              {list.map((post: TPostItem) => (
+            <SimpleGrid cols={posts?.length === 1 ? 1 : 2} spacing={24}>
+              {posts.map((post: TPostItem) => (
                 <PostCard key={post.id} item={post} />
               ))}
             </SimpleGrid>
@@ -71,7 +71,7 @@ const Tag = () => {
           }
         />
         <Group gap={6}>
-          {tags.map((item: string) => {
+          {list.map((item: string) => {
             if (item === param.tag) return null;
 
             return (

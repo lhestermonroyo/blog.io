@@ -45,12 +45,7 @@ import {
 
 import states from '../../states';
 import { deleteBlogFiles } from '../../utils/upload.util';
-import {
-  TCommentItem,
-  TLikeItem,
-  TPostDetails,
-  TPostState
-} from '../../../types';
+import { TCommentItem, TPostDetails, TPostState } from '../../../types';
 
 import ProtectedLayout from '../../layouts/protected';
 import LoadingPost from '../../components/post-details/loading-post';

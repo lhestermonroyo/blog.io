@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -55,24 +56,31 @@ const apolloServer = new ApolloServer({
 });
 
 (async () => {
+  const __dirname = path.resolve();
+
   try {
     await mongoose.connect(MONGODB_URI);
     await apolloServer.start();
-    app.use(
-      '/graphql',
-      cors({
-        origin: 'http://localhost:5173',
-        credentials: true
-      }),
-      cookieParser(),
-      express.json(),
-      expressMiddleware(apolloServer, {
-        context: async (ctx) => ({
-          pubSub,
-          ...ctx
+    app
+      .use(
+        '/graphql',
+        cors({
+          origin: 'http://localhost:5173',
+          credentials: true
+        }),
+        cookieParser(),
+        express.json(),
+        expressMiddleware(apolloServer, {
+          context: async (ctx) => ({
+            pubSub,
+            ...ctx
+          })
         })
-      })
-    );
+      )
+      .use(express.static(path.join(__dirname, '/client/dist')))
+      .get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+      });
   } catch (error) {
     console.log('Error:', error);
   }
