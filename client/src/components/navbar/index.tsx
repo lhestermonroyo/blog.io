@@ -133,9 +133,9 @@ const Navbar = () => {
           {isAuth && profile ? (
             <Group gap={!isMd ? 'lg' : 'md'} justify="center">
               <Button
-                onClick={() => navigate('/compose')}
                 variant="filled"
                 leftSection={<IconBallpen size={20} />}
+                onClick={() => navigate('/compose')}
                 visibleFrom="md"
               >
                 Compose
@@ -144,6 +144,7 @@ const Navbar = () => {
                 variant="filled"
                 size="lg"
                 radius="md"
+                onClick={() => navigate('/compose')}
                 hiddenFrom="md"
               >
                 <IconBallpen size={24} />
