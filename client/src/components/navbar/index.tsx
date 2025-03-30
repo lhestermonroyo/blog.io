@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  ActionIcon,
   Anchor,
   Avatar,
   Button,
@@ -15,11 +16,13 @@ import {
   IconBallpen,
   IconChevronDown,
   IconLogout,
+  IconSearch,
   IconSettings,
   IconUserCircle
 } from '@tabler/icons-react';
 import cx from 'clsx';
 import { useNavigate } from 'react-router';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState, useResetRecoilState } from 'recoil';
 import { useMutation } from '@apollo/client';
 
@@ -40,6 +43,8 @@ const Navbar = () => {
   const resetPost = useResetRecoilState(states.post);
   const resetNotification = useResetRecoilState(states.notification);
   const { isAuth, profile } = auth;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [logout] = useMutation(LOGOUT);
 
@@ -118,7 +123,7 @@ const Navbar = () => {
     <header className={classes.header}>
       <Container size="lg" h="100%">
         <Group justify="space-between" h="100%">
-          <Group>
+          <Group justify="flex-start">
             <Anchor onClick={() => navigate('/')}>
               <Logo />
             </Anchor>
@@ -126,14 +131,37 @@ const Navbar = () => {
           </Group>
 
           {isAuth && profile ? (
-            <Group gap="lg" justify="center">
+            <Group gap={!isMd ? 'lg' : 'md'} justify="center">
               <Button
                 onClick={() => navigate('/compose')}
                 variant="filled"
                 leftSection={<IconBallpen size={20} />}
+                visibleFrom="md"
               >
                 Compose
               </Button>
+              <ActionIcon
+                variant="filled"
+                size="lg"
+                radius="md"
+                hiddenFrom="md"
+              >
+                <IconBallpen size={24} />
+              </ActionIcon>
+              <ActionIcon
+                style={{
+                  borderWidth: 0
+                }}
+                size="lg"
+                variant="default"
+                c="dimmed"
+                radius="xl"
+                onClick={() => navigate('/search')}
+                hiddenFrom="sm"
+              >
+                <IconSearch size={24} />
+              </ActionIcon>
+
               <NotificationPanel />
               <Menu
                 width={200}
@@ -158,7 +186,7 @@ const Navbar = () => {
                         color="initials"
                         size="md"
                       />
-                      <Text fw={500} size="sm" mx={2}>
+                      <Text fw={500} size="sm" mx={2} visibleFrom="sm">
                         {`${profile?.firstName} ${profile?.lastName}`}
                       </Text>
                       <IconChevronDown size={12} stroke={1.5} />
@@ -207,7 +235,20 @@ const Navbar = () => {
               </Menu>
             </Group>
           ) : (
-            <Group gap="lg">
+            <Group gap={!isMd ? 'lg' : 'md'}>
+              <ActionIcon
+                style={{
+                  borderWidth: 0
+                }}
+                size="lg"
+                variant="default"
+                c="dimmed"
+                radius="xl"
+                onClick={() => navigate('/search')}
+                hiddenFrom="sm"
+              >
+                <IconSearch size={24} />
+              </ActionIcon>
               <Button
                 px={0}
                 variant="transparent"
@@ -215,7 +256,7 @@ const Navbar = () => {
               >
                 Login
               </Button>
-              <Button variant="outline" onClick={() => navigate('/sign-up')}>
+              <Button variant="filled" onClick={() => navigate('/sign-up')}>
                 Create Account
               </Button>
             </Group>

@@ -11,6 +11,7 @@ import {
   Title
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
+import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
 import { useMutation } from '@apollo/client';
@@ -23,6 +24,8 @@ import { UPDATE_PROFILE } from '../../../graphql/mutations';
 const UserInfoForm = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile } = auth;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
@@ -78,8 +81,8 @@ const UserInfoForm = () => {
   };
 
   return (
-    <Stack gap="lg" px="xl">
-      <Title order={2}>User Information</Title>
+    <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
+      <Title order={!isMd ? 3 : 4}>User Information</Title>
       <EditItem
         label="Firstname"
         name="firstName"
@@ -154,6 +157,8 @@ const EditItem = ({
       }
     }
   });
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     if (edit) {
@@ -235,11 +240,11 @@ const EditItem = ({
 
   return (
     <Group justify="space-between" gap={6}>
-      <Stack gap={0} maw={520}>
-        <Text size="sm" c="dimmed">
+      <Stack gap={0} flex={1}>
+        <Text size={!isMd ? 'sm' : 'xs'} c="dimmed">
           {label}
         </Text>
-        <Text>{value || 'Not set yet'}</Text>
+        <Text size={!isMd ? 'md' : 'sm'}>{value || 'Not set yet'}</Text>
       </Stack>
       <Button variant="white" onClick={() => setEdit(true)}>
         Edit

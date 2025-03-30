@@ -49,9 +49,9 @@
     );
   }
 
-  @media (max-width: $mantine-breakpoint-xs) {
+  /* @media (max-width: $mantine-breakpoint-xs) {
     display: none;
-  }
+  } */
 }
 
 .userActive {

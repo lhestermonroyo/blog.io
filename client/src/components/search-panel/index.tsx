@@ -174,7 +174,7 @@ const SearchPanel = () => {
   return (
     <Fragment>
       <Autocomplete
-        miw={380}
+        miw={300}
         variant="filled"
         placeholder="Search"
         clearable
@@ -186,6 +186,7 @@ const SearchPanel = () => {
         classNames={{
           dropdown: classes.dropdown
         }}
+        visibleFrom="sm"
       />
     </Fragment>
   );

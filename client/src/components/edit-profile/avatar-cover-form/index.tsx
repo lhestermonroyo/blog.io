@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
-import { Button, Group, Stack, Text } from '@mantine/core';
+import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState } from 'recoil';
 import { useMutation } from '@apollo/client';
 
@@ -20,6 +21,8 @@ const AvatarCoverForm = () => {
 
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile } = auth;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
@@ -133,9 +136,10 @@ const AvatarCoverForm = () => {
 
   return (
     <Fragment>
-      <Stack gap="xl" px="xl">
+      <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
+        <Title order={!isMd ? 3 : 4}>Avatar & Cover Photo</Title>
         <Stack gap={6}>
-          <Text>Upload Avatar</Text>
+          <Text size={!isMd ? 'md' : 'sm'}>Upload Avatar</Text>
           <Group>
             <UploadAvatar
               avatarUri={avatar || (profile?.avatar as string)}
@@ -159,7 +163,7 @@ const AvatarCoverForm = () => {
         </Stack>
 
         <Stack gap={6}>
-          <Text>Upload Cover Photo</Text>
+          <Text size={!isMd ? 'md' : 'sm'}>Upload Cover Photo</Text>
           <Stack>
             <UploadCover
               coverUri={coverPhoto || (profile?.coverPhoto as string)}

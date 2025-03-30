@@ -100,7 +100,6 @@ const PostSidebar = () => {
     if (postsResponse) {
       const key = Object.keys(postsResponse)[0];
       const data = postsResponse[key];
-      console.log('data', data);
 
       setPost((prev: TPostState) => ({
         ...prev,

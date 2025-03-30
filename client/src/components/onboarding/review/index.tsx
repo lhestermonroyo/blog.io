@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { useRecoilValue } from 'recoil';
-import states from '../../../states';
 import {
   Avatar,
   Badge,
@@ -13,7 +12,10 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { format } from 'date-fns';
+
+import states from '../../../states';
 
 type ReviewProps = {
   submitting: boolean;
@@ -31,14 +33,18 @@ const Review: FC<ReviewProps> = ({
   const auth = useRecoilValue(states.auth);
   const { onboarding } = auth;
 
+  const isMd = useMediaQuery('(max-width: 768px)');
+
   return (
     <Stack mt="xl">
-      <Title order={4}>Review your profile details before proceeding.</Title>
+      <Title order={!isMd ? 4 : 5}>
+        Review your profile details before proceeding.
+      </Title>
 
       <Card withBorder>
         <Stack gap="lg">
           <Group justify="space-between">
-            <Title order={4}>Profile Info</Title>
+            <Title order={!isMd ? 4 : 5}>Profile Info</Title>
             <Button
               variant="subtle"
               disabled={submitting}
@@ -77,7 +83,7 @@ const Review: FC<ReviewProps> = ({
 
           <Divider
             label={
-              <Title c="dark" order={3}>
+              <Title c="dark" order={!isMd ? 4 : 5}>
                 Socials
               </Title>
             }
@@ -131,7 +137,7 @@ const Review: FC<ReviewProps> = ({
       <Card withBorder>
         <Stack gap="lg">
           <Group justify="space-between">
-            <Title order={4}>Avatar & Cover Photo</Title>
+            <Title order={!isMd ? 4 : 5}>Avatar & Cover Photo</Title>
             <Button
               variant="subtle"
               disabled={submitting}
@@ -177,7 +183,7 @@ const Review: FC<ReviewProps> = ({
       <Card withBorder>
         <Stack gap="lg">
           <Group justify="space-between">
-            <Title order={4}>Tags & Interests</Title>
+            <Title order={!isMd ? 4 : 5}>Tags & Interests</Title>
             <Button
               variant="subtle"
               disabled={submitting}
@@ -209,12 +215,14 @@ const Review: FC<ReviewProps> = ({
 };
 
 const ReviewItem = ({ label, value }: { label: string; value: string }) => {
+  const isMd = useMediaQuery('(max-width: 768px)');
+
   return (
     <Stack gap={0}>
-      <Text size="sm" c="dimmed">
+      <Text size={!isMd ? 'sm' : 'xs'} c="dimmed">
         {label}
       </Text>
-      <Text>{value}</Text>
+      <Text size={!isMd ? 'md' : 'sm'}>{value}</Text>
     </Stack>
   );
 };

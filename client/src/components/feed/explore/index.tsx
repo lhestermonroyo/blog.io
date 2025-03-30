@@ -52,7 +52,7 @@ const Explore = () => {
   return (
     <Box mt="lg">
       <LoadingFeed loading={loading} error={error} refetch={fetchPosts}>
-        <SimpleGrid cols={2} spacing={24}>
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing={24}>
           {list &&
             list.map((post: TPostItem) => (
               <PostCard key={post.id} item={post} />

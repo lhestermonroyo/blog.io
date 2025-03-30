@@ -27,7 +27,7 @@ const LoadingFeed: FC<LoadingFeedProps> = ({
 }) => {
   if (loading) {
     return (
-      <SimpleGrid cols={2}>
+      <SimpleGrid cols={{ base: 1, md: 2 }}>
         {[...new Array(4)].map((_, index) => (
           <Card key={index}>
             <Grid>

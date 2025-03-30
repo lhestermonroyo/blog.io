@@ -35,7 +35,7 @@ const ExpandableImage: FC<ExpandableImageProps> = ({ src, children }) => {
           right={0}
         />
         <Group p={0} justify="center">
-          <Image src={src} alt="Image" w="auto" fit="cover" mah={700} />
+          <Image src={src} alt="Image" w="100%" fit="cover" />
         </Group>
       </Modal>
       <UnstyledButton component="span" onClick={open}>

@@ -17,6 +17,7 @@ import {
   IconHeart,
   IconMessage
 } from '@tabler/icons-react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 
@@ -35,19 +36,20 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
     (block: any) => block.type === 'paragraph'
   );
 
+  const isMd = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
 
   return (
     <UnstyledButton key={item.id} onClick={() => navigate(`/post/${item.id}`)}>
       <Card p={0}>
         <Grid>
-          <Grid.Col span={thumbnail ? 8 : 12}>
+          <Grid.Col span={thumbnail ? (!isMd ? 8 : 7) : 12}>
             <Stack>
               <Group>
                 <ProfileBadge avatarSize="sm" profile={item.creator} />
               </Group>
               <Stack gap={0}>
-                <Title order={4} lineClamp={2}>
+                <Title order={!isMd ? 4 : 5} lineClamp={2}>
                   {item.title}
                 </Title>
                 <Group gap={4} align="center">
@@ -58,6 +60,7 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
                 </Group>
               </Stack>
               <Text
+                size={!isMd ? 'md' : 'sm'}
                 lineClamp={2}
                 dangerouslySetInnerHTML={{
                   __html: paragraph?.data.text
@@ -73,7 +76,7 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
             </Stack>
           </Grid.Col>
           {thumbnail && (
-            <Grid.Col flex={1} display="flex" span={4}>
+            <Grid.Col flex={1} display="flex" span={!isMd ? 4 : 5}>
               <Image
                 radius="sm"
                 src={thumbnail?.data.file.url}
@@ -90,21 +93,27 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
         <Group mt="md" gap="lg">
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              <IconHeart size={24} />
+              <IconHeart size={!isMd ? 24 : 20} />
             </ActionIcon>
-            <Text c="dimmed">{item.likeCount}</Text>
+            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+              {item.likeCount}
+            </Text>
           </Group>
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              <IconMessage size={24} />
+              <IconMessage size={!isMd ? 24 : 20} />
             </ActionIcon>
-            <Text c="dimmed">{item.commentCount}</Text>
+            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+              {item.commentCount}
+            </Text>
           </Group>
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              <IconBookmark size={24} />
+              <IconBookmark size={!isMd ? 24 : 20} />
             </ActionIcon>
-            <Text c="dimmed">{item.saveCount}</Text>
+            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+              {item.saveCount}
+            </Text>
           </Group>
         </Group>
       </Card>

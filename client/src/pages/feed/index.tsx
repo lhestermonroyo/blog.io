@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Tabs, Text, Title } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
@@ -21,6 +22,8 @@ import Following from '../../components/feed/following';
 const Feed = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile, isAuth } = auth;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const { data: statsResponse, refetch: fetchStats } = useQuery(
     GET_STATS_BY_EMAIL,
@@ -77,13 +80,13 @@ const Feed = () => {
       <MainLayout>
         {profile && (
           <Stack gap={0} mb="sm">
-            <Title order={1}>
+            <Title order={!isMd ? 1 : 3}>
               {greetUser()},{' '}
               <Text span c="green" inherit>
                 {profile?.firstName} 👋
               </Text>
             </Title>
-            <Text c="dimmed">
+            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
               Here are some posts that you might be interested in. Enjoy!
             </Text>
           </Stack>
@@ -111,8 +114,8 @@ const Feed = () => {
   return (
     <MainLayout>
       <Stack gap={0} mb="sm">
-        <Title order={1}>Explore Feed</Title>
-        <Text c="dimmed">
+        <Title order={!isMd ? 1 : 3}>Explore Feed</Title>
+        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
           Here are some posts that you might be interested in. Enjoy!
         </Text>
       </Stack>

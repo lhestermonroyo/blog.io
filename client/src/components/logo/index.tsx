@@ -8,7 +8,7 @@ type LogoProps = {
 };
 
 const Logo: FC<LogoProps> = ({ height = 20 }) => {
-  return <Image height={height} src={logoLight} alt="logo" />;
+  return <Image h={height} w="auto" src={logoLight} alt="logo" />;
 };
 
 export default Logo;

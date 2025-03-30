@@ -10,6 +10,7 @@ import {
   Title
 } from '@mantine/core';
 import { IconFilter } from '@tabler/icons-react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useQuery } from '@apollo/client';
 
@@ -32,6 +33,8 @@ const ForYou = () => {
       forYou: { filters, list }
     }
   } = post;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const {
     data: response,
@@ -97,7 +100,7 @@ const ForYou = () => {
                     )}
                     <Divider
                       label={
-                        <Title c="dark" order={3}>
+                        <Title c="dark" order={!isMd ? 3 : 4}>
                           More posts for you
                         </Title>
                       }
@@ -106,7 +109,7 @@ const ForYou = () => {
                   </Fragment>
                 )}
 
-                <SimpleGrid cols={2} spacing={24}>
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing={24}>
                   {list.slice(filters.length ? 0 : 1).map((post: TPostItem) => (
                     <PostCard key={post.id} item={post} />
                   ))}

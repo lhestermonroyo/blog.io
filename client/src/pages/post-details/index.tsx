@@ -23,6 +23,7 @@ import {
 import { modals } from '@mantine/modals';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   IconArrowLeft,
   IconClock,
@@ -73,6 +74,9 @@ const PostDetails = () => {
     },
     mode: 'uncontrolled'
   });
+
+  const isMd = useMediaQuery('(max-width: 768px)');
+  const isLg = useMediaQuery('(max-width: 1200px)');
 
   const theme = useMantineTheme();
   const params = useParams();
@@ -329,7 +333,7 @@ const PostDetails = () => {
   return (
     <MainLayout>
       <Grid gutter="xl">
-        <Grid.Col span={8}>
+        <Grid.Col span={!isLg ? 8 : 12}>
           <Stack gap="lg">
             <Group justify="space-between" align="center">
               <Button
@@ -381,7 +385,7 @@ const PostDetails = () => {
               {postDetails && (
                 <Fragment>
                   <Stack gap={4}>
-                    <Title order={1}>{postDetails?.title}</Title>
+                    <Title order={!isMd ? 1 : 3}>{postDetails?.title}</Title>
                     <Group gap={4} align="center">
                       <IconClock size={14} />
                       <Text fz="xs" c="dimmed">
@@ -408,12 +412,13 @@ const PostDetails = () => {
                     <Divider />
                   </Stack>
 
-                  <Stack>
+                  <Stack flex={1} w="100%">
                     {content.blocks.map((block: any) => {
                       switch (block.type) {
                         case 'paragraph':
                           return (
                             <Text
+                              size={!isMd ? 'md' : 'sm'}
                               key={block.id}
                               dangerouslySetInnerHTML={{
                                 __html: block.data.text
@@ -424,7 +429,7 @@ const PostDetails = () => {
                           return (
                             <Title
                               key={block.id}
-                              order={block.data.level + 1}
+                              order={block.data.level + (isMd ? 1 : 0)}
                               dangerouslySetInnerHTML={{
                                 __html: block.data.text
                               }}
@@ -433,6 +438,8 @@ const PostDetails = () => {
                         case 'list':
                           return (
                             <List
+                              size={!isMd ? 'md' : 'sm'}
+                              w="100%"
                               withPadding
                               key={block.id}
                               type={block.data.style}
@@ -454,6 +461,7 @@ const PostDetails = () => {
                           return (
                             <Blockquote
                               color="green"
+                              fz={!isMd ? 'md' : 'sm'}
                               key={block.id}
                               cite={block.data.caption}
                               mt="xl"
@@ -573,7 +581,7 @@ const PostDetails = () => {
 
                   {auth.isAuth && auth.profile ? (
                     <Fragment>
-                      <Title order={2}>
+                      <Title order={!isMd ? 2 : 3}>
                         Comments ({postDetails.commentCount})
                       </Title>
 
@@ -630,7 +638,9 @@ const PostDetails = () => {
             </LoadingPost>
           </Stack>
         </Grid.Col>
-        <Grid.Col span={4}>{postDetails && <PostSidebar />}</Grid.Col>
+        <Grid.Col span={!isLg ? 4 : 12}>
+          {postDetails && <PostSidebar />}
+        </Grid.Col>
       </Grid>
     </MainLayout>
   );

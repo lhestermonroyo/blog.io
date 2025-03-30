@@ -7,10 +7,13 @@ import { useRecoilState } from 'recoil';
 
 import states from '../../../states';
 import { UPDATE_PROFILE } from '../../../graphql/mutations';
+import { useMediaQuery } from '@mantine/hooks';
 
 const SocialsForm = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile } = auth;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
@@ -63,8 +66,8 @@ const SocialsForm = () => {
   };
 
   return (
-    <Stack gap="lg" px="xl">
-      <Title order={2}>Socials</Title>
+    <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
+      <Title order={!isMd ? 3 : 4}>Socials</Title>
       <EditItem
         label="Facebook"
         name="facebook"
@@ -132,6 +135,8 @@ const EditItem = ({
     }
   });
 
+  const isMd = useMediaQuery('(max-width: 768px)');
+
   useEffect(() => {
     if (edit) {
       form.setValues({
@@ -182,11 +187,11 @@ const EditItem = ({
 
   return (
     <Group justify="space-between">
-      <Stack gap={0}>
-        <Text size="sm" c="dimmed">
+      <Stack gap={0} flex={1}>
+        <Text size={!isMd ? 'sm' : 'xs'} c="dimmed">
           {label}
         </Text>
-        <Text>{value || 'Not set yet'}</Text>
+        <Text size={!isMd ? 'md' : 'sm'}>{value || 'Not set yet'}</Text>
       </Stack>
       <Button variant="white" onClick={() => setEdit(true)}>
         Edit

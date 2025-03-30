@@ -25,6 +25,10 @@ button[data-disabled='true'] {
   background: #fff !important;
 }
 
+li > .mantine-List-itemWrapper {
+  white-space: break-spaces !important;
+}
+
 .profile-avatar {
   border: 2px solid #fff;
 }

@@ -166,7 +166,8 @@ const NotificationPanel = () => {
           >
             <ActionIcon
               style={{
-                borderWidth: 0
+                borderWidth: 0,
+                marginTop: 4
               }}
               variant="default"
               c="dimmed"

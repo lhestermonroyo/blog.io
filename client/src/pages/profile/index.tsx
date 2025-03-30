@@ -25,6 +25,7 @@ import {
   IconUserMinus,
   IconUserPlus
 } from '@tabler/icons-react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useMutation, useQuery } from '@apollo/client';
 import { notifications } from '@mantine/notifications';
 
@@ -66,6 +67,8 @@ const Profile = () => {
 
   const auth = useRecoilValue(states.auth);
 
+  const isMd = useMediaQuery('(max-width: 768px)');
+  const isLg = useMediaQuery('(max-width: 1200px)');
   const params = useParams();
   const navigate = useNavigate();
 
@@ -205,9 +208,9 @@ const Profile = () => {
     return (
       <MainLayout>
         <Stack gap="lg">
-          <Title order={1}>Profile</Title>
-          <Grid>
-            <Grid.Col span={8}>
+          <Title order={!isMd ? 1 : 3}>Profile</Title>
+          <Grid gutter="xl">
+            <Grid.Col span={!isLg ? 8 : 12}>
               <LoadingProfile
                 loading={profileLoading || statsLoading}
                 error={null}
@@ -300,7 +303,7 @@ const Profile = () => {
                             </Group>
                           </Stack>
                         </Stack>
-                        <Group flex={1}>
+                        <Group flex={1} visibleFrom="sm">
                           <Stack gap={4} flex={1}>
                             <Text size="sm" color="dimmed">
                               Post Written
@@ -320,6 +323,27 @@ const Profile = () => {
                             <Text size="lg">{stats.following.count}</Text>
                           </Stack>
                         </Group>
+                      </Group>
+
+                      <Group flex={1} hiddenFrom="sm">
+                        <Stack gap={4} flex={1}>
+                          <Text size="sm" color="dimmed">
+                            Post Written
+                          </Text>
+                          <Text size="lg">{stats.posts.count}</Text>
+                        </Stack>
+                        <Stack gap={4} flex={1}>
+                          <Text size="sm" color="dimmed">
+                            Followers
+                          </Text>
+                          <Text size="lg">{stats.followers.count}</Text>
+                        </Stack>
+                        <Stack gap={4} flex={1}>
+                          <Text size="sm" color="dimmed">
+                            Following
+                          </Text>
+                          <Text size="lg">{stats.following.count}</Text>
+                        </Stack>
                       </Group>
 
                       <Text mt="lg">{profile?.bio}</Text>
@@ -467,7 +491,7 @@ const Profile = () => {
                 </Stack>
               </LoadingProfile>
             </Grid.Col>
-            <Grid.Col span={4}>
+            <Grid.Col span={!isLg ? 4 : 12}>
               <Stack gap="lg" className="sidebar-container">
                 <SocialsPanel
                   loading={profileLoading || statsLoading}

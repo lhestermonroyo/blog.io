@@ -11,6 +11,7 @@ import {
   TextInput,
   Title
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconSearch } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import _ from 'lodash';
@@ -32,6 +33,7 @@ const Search = () => {
     posts: []
   });
 
+  const isMd = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
 
   const searchFieldRef = useRef<HTMLInputElement>(null);
@@ -89,23 +91,23 @@ const Search = () => {
   return (
     <MainLayout size="sm">
       <Stack gap="lg">
-        <Title order={1} ta="center">
+        <Title order={!isMd ? 1 : 2} ta="center">
           Find something in mind
         </Title>
         <TextInput
           ref={searchFieldRef}
-          size="xl"
+          size={!isMd ? 'xl' : 'lg'}
           radius="xl"
-          placeholder="Search posts, authors, topics/tags..."
+          placeholder="Search posts, authors and topics/tags..."
           leftSection={<IconSearch size={24} />}
           onChange={(e) => setQuery(e.target.value)}
         />
 
         {query.length > 2 && (
           <Stack gap="xl">
-            <Title order={2}>
+            <Title order={!isMd ? 2 : 3}>
               Results for{' '}
-              <Title component="span" order={2} c="green">
+              <Title component="span" order={!isMd ? 2 : 3} c="green">
                 {query}
               </Title>
             </Title>
@@ -124,7 +126,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={3}>
+                            <Title c="dark" order={!isMd ? 3 : 4}>
                               Authors ({results.users.length})
                             </Title>
                           }
@@ -142,7 +144,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={3}>
+                            <Title c="dark" order={!isMd ? 3 : 4}>
                               Tags ({results.tags.length})
                             </Title>
                           }
@@ -168,7 +170,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={3}>
+                            <Title c="dark" order={!isMd ? 3 : 4}>
                               Posts ({results.posts.length})
                             </Title>
                           }

@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router';
 import { Button, Group, Stack, Tabs, Title } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconArrowLeft } from '@tabler/icons-react';
 
 import MainLayout from '../../layouts/main';
@@ -10,6 +11,8 @@ import AvatarCoverForm from '../../components/edit-profile/avatar-cover-form';
 import AccountSettingsForm from '../../components/edit-profile/account-settings-form';
 
 const EditProfile = () => {
+  const isMd = useMediaQuery('(max-width: 768px)');
+
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -27,8 +30,12 @@ const EditProfile = () => {
             Back
           </Button>
         </Group>
-        <Title order={1}>Edit Profile</Title>
-        <Tabs defaultValue={tab || '1'} orientation="vertical" mih={500}>
+        <Title order={!isMd ? 1 : 3}>Edit Profile</Title>
+        <Tabs
+          defaultValue={tab || '1'}
+          orientation={!isMd ? 'vertical' : 'horizontal'}
+          mih={500}
+        >
           <Tabs.List>
             <Tabs.Tab value="1">User Information</Tabs.Tab>
             <Tabs.Tab value="2">Socials</Tabs.Tab>

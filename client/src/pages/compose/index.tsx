@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from '@mantine/hooks';
 import cx from 'clsx';
 import EditorJS from '@editorjs/editorjs';
 import Header from '@editorjs/header';
@@ -45,6 +46,8 @@ const Compose = () => {
     mode: 'uncontrolled',
     validateInputOnBlur: true
   });
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const ejInstance = useRef<EditorJS | null>(null);
   const editorRef = useRef(null);
@@ -184,7 +187,7 @@ const Compose = () => {
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack display="flex" justify="stretch" gap="lg">
           <Group justify="space-between" align="center">
-            <Title order={1}>Compose Blog</Title>
+            <Title order={!isMd ? 1 : 3}>Compose Blog</Title>
             <Button loading={submitting} type="submit">
               Publish
             </Button>

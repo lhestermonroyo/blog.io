@@ -10,6 +10,7 @@ import {
   Title
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { useNavigate } from 'react-router';
 import { useSetRecoilState } from 'recoil';
@@ -39,6 +40,7 @@ const Login = () => {
 
   const [login] = useMutation(LOGIN);
 
+  const isMd = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
 
   const handleSubmit = async (values: typeof form.values) => {
@@ -77,8 +79,8 @@ const Login = () => {
 
   return (
     <AuthLayout>
-      <Title order={1}>Hello there!</Title>
-      <Text c="dimmed" mb="xl">
+      <Title order={!isMd ? 1 : 2}>Hello there!</Title>
+      <Text c="dimmed" mb="xl" size={!isMd ? 'md' : 'sm'}>
         Login and continue sharing your ideas to the world
       </Text>
       <form onSubmit={form.onSubmit(handleSubmit)}>

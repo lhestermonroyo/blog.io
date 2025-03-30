@@ -55,13 +55,14 @@ const StepOne: FC<StepOneProps> = ({ onNextStep }) => {
         email: formData?.email || profile?.email,
         firstName: formData?.firstName || profile?.firstName,
         lastName: formData?.lastName || profile?.lastName,
+        pronouns: formData?.pronouns || profile?.pronouns,
+        title: formData?.title || profile?.title,
+        location: formData?.location || profile?.location,
         birthdate: formData?.birthdate
           ? new Date(formData.birthdate)
           : profile?.birthdate
           ? new Date(profile.birthdate)
           : null,
-        location: formData?.location || profile?.location,
-        pronouns: formData?.pronouns || profile?.pronouns,
         bio: formData?.bio || profile?.bio,
         facebook: formData?.facebook || profile?.socials.facebook,
         twitter: formData?.twitter || profile?.socials.twitter,

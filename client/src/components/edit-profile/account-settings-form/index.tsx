@@ -17,6 +17,7 @@ import states from '../../../states';
 import { CHANGE_PASSWORD } from '../../../graphql/mutations';
 
 import { TAuthState } from '../../../../types';
+import { useMediaQuery } from '@mantine/hooks';
 
 const AccountSettingsForm = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +43,8 @@ const AccountSettingsForm = () => {
     mode: 'uncontrolled',
     validateInputOnBlur: true
   });
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [changePassword] = useMutation(CHANGE_PASSWORD);
   const navigate = useNavigate();
@@ -140,8 +143,8 @@ const AccountSettingsForm = () => {
   };
 
   return (
-    <Stack gap="lg" px="xl">
-      <Title order={2}>Account Settings</Title>
+    <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
+      <Title order={!isMd ? 3 : 4}>Account Settings</Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <TextInput

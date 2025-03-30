@@ -1,6 +1,7 @@
 import { FC, Fragment, useEffect } from 'react';
 import { Button, Group, MultiSelect, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
@@ -28,6 +29,8 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
     validateInputOnBlur: true
   });
 
+  const isMd = useMediaQuery('(max-width: 768px)');
+
   useEffect(() => {
     form.setFieldValue('tags', onboarding.tagsForm);
   }, [onboarding.tagsForm, profile?.tags]);
@@ -48,7 +51,7 @@ const StepThree: FC<StepThreeProps> = ({ onNextStep, onPrevStep }) => {
       <Fragment>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="lg" mt="xl">
-            <Title order={4}>
+            <Title order={!isMd ? 4 : 5}>
               Where do your interests lie? Select your preferred topics first to
               personalize your feed.
             </Title>

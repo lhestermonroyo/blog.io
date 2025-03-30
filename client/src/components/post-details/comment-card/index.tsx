@@ -12,6 +12,7 @@ import {
 import { useForm } from '@mantine/form';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   IconClock,
   IconDotsVertical,
@@ -45,6 +46,8 @@ const CommentCard: FC<CommentCardProps> = ({
 
   const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const form = useForm({
     initialValues: {
@@ -229,7 +232,7 @@ const CommentCard: FC<CommentCardProps> = ({
             )}
           </Group>
         </Stack>
-        <Text>{comment.body}</Text>
+        <Text size={!isMd ? 'md' : 'sm'}>{comment.body}</Text>
       </Stack>
       {!isLastComment && <Divider />}
     </Fragment>

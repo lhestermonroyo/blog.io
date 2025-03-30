@@ -8,6 +8,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router';
 
@@ -31,6 +32,8 @@ const Onboarding = () => {
 
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile, onboarding } = auth;
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const navigate = useNavigate();
 
@@ -146,8 +149,10 @@ const Onboarding = () => {
           <Logo />
         </Group>
         <Box>
-          <Title order={1}>Profile Setup</Title>
-          <Text c="dimmed">We would like to know you first.</Text>
+          <Title order={!isMd ? 1 : 2}>Profile Setup</Title>
+          <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+            We would like to know you first.
+          </Text>
         </Box>
         <Stepper active={active}>
           <Stepper.Step label="First step" description="Profile Info">

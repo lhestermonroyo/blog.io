@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Group, MultiSelect, Stack, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
+import { useMediaQuery } from '@mantine/hooks';
 import { useMutation } from '@apollo/client';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -26,6 +27,8 @@ const TagsForm = () => {
     mode: 'uncontrolled',
     validateInputOnBlur: true
   });
+
+  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
@@ -88,8 +91,8 @@ const TagsForm = () => {
   };
 
   return (
-    <Stack gap="lg" px="xl">
-      <Title order={2}>Topics/Tags</Title>
+    <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
+      <Title order={!isMd ? 3 : 4}>Topics/Tags</Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <MultiSelect

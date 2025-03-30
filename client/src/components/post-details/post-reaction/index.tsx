@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import { ActionIcon, Group, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   IconBookmark,
   IconBookmarkFilled,
@@ -28,6 +29,8 @@ const PostReaction: FC<PostReactionProps> = ({
 }) => {
   const auth = useRecoilValue(states.auth);
 
+  const isMd = useMediaQuery('(max-width: 768px)');
+
   const isLiked = useMemo(
     () =>
       post.likes.some((like) => like.liker?.id.toString() === auth.profile?.id),
@@ -54,9 +57,15 @@ const PostReaction: FC<PostReactionProps> = ({
           disabled={!auth.isAuth && !auth.profile}
           onClick={onLike}
         >
-          {isLiked ? <IconHeartFilled size={24} /> : <IconHeart size={24} />}
+          {isLiked ? (
+            <IconHeartFilled size={!isMd ? 24 : 20} />
+          ) : (
+            <IconHeart size={!isMd ? 24 : 20} />
+          )}
         </ActionIcon>
-        <Text c="dimmed">{post.likeCount}</Text>
+        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+          {post.likeCount}
+        </Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
         <ActionIcon
@@ -65,12 +74,14 @@ const PostReaction: FC<PostReactionProps> = ({
           onClick={onComment}
         >
           {isCommented ? (
-            <IconMessageFilled size={24} />
+            <IconMessageFilled size={!isMd ? 24 : 20} />
           ) : (
-            <IconMessage size={24} />
+            <IconMessage size={!isMd ? 24 : 20} />
           )}
         </ActionIcon>
-        <Text c="dimmed">{post.commentCount}</Text>
+        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+          {post.commentCount}
+        </Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
         <ActionIcon
@@ -79,12 +90,14 @@ const PostReaction: FC<PostReactionProps> = ({
           onClick={onSave}
         >
           {isSaved ? (
-            <IconBookmarkFilled size={24} />
+            <IconBookmarkFilled size={!isMd ? 24 : 20} />
           ) : (
-            <IconBookmark size={24} />
+            <IconBookmark size={!isMd ? 24 : 20} />
           )}
         </ActionIcon>
-        <Text c="dimmed">{post.saveCount}</Text>
+        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+          {post.saveCount}
+        </Text>
       </Group>
     </Group>
   );
