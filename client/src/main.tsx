@@ -12,14 +12,17 @@ import {
 } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 
+const HTTP_LINK = import.meta.env.VITE_HTTP_LINK;
+const WS_LINK = import.meta.env.VITE_WS_LINK;
+
 const httpLink = new HttpLink({
-  uri: 'http://localhost:8080/graphql',
+  uri: HTTP_LINK,
   credentials: 'include'
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: 'ws://localhost:8080/subscriptions' // backend link, check backend console for link
+    url: WS_LINK // backend link, check backend console for link
   })
 );
 
