@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Box, SimpleGrid } from '@mantine/core';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
 import states from '../../../states';

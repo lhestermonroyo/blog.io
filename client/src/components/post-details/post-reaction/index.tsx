@@ -46,11 +46,6 @@ const PostReaction: FC<PostReactionProps> = ({
     [post]
   );
 
-  const buttonProps = {
-    variant: !auth.isAuth && !auth.profile ? 'transparent' : 'subtle',
-    disabled: !auth.isAuth && !auth.profile
-  }
-
   return (
     <Group gap="lg">
       <Group justify="center" align="center" gap={4}>

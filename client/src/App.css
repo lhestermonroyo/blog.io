@@ -21,6 +21,10 @@ div {
   line-height: 1.5;
 }
 
+button[data-disabled='true'] {
+  background: #fff !important;
+}
+
 .profile-avatar {
   border: 2px solid #fff;
 }
