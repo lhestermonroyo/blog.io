@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes } from 'react-router';
+import { HashRouter, Navigate, Route, Routes } from 'react-router';
 
 import AuthRoute from './AuthRoute';
 import ProtectedRoute from './ProtectedRoute';
@@ -34,6 +34,7 @@ const AppRouter = () => {
           <Route path="/edit-post/:id" element={<EditPost />} />
           <Route path="/profile/edit" element={<EditProfile />} />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
   );
