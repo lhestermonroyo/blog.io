@@ -244,14 +244,8 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getProfileByEmail(_, { email }, context) {
+    async getProfileByEmail(_, { email }, __) {
       try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated.');
-        }
-
         const response = await User.findOne({ email });
 
         if (!response) {

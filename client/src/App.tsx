@@ -51,15 +51,19 @@ function App() {
     loading: profileLoading,
     error,
     refetch: refetchProfile
-  } = useQuery(GET_PROFILE);
+  } = useQuery(GET_PROFILE, {
+    fetchPolicy: 'network-only'
+  });
   const {
     data: tagResponse,
     loading: tagLoading,
     refetch: fetchTags
-  } = useQuery(GET_TAGS);
+  } = useQuery(GET_TAGS, {
+    fetchPolicy: 'network-only'
+  });
 
   useEffect(() => {
-    init();
+    fetchTags();
   }, []);
 
   useEffect(() => {
@@ -102,15 +106,6 @@ function App() {
       resetNotification();
     }
   }, [error]);
-
-  const init = async () => {
-    try {
-      const requests = [fetchTags(), refetchProfile()];
-      await Promise.all(requests);
-    } catch (error) {
-      console.error('Error fetching initial data:', error);
-    }
-  };
 
   return (
     <MantineProvider defaultColorScheme="light" theme={theme}>

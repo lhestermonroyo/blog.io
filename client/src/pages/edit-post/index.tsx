@@ -12,6 +12,7 @@ import {
   useMantineColorScheme
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import cx from 'clsx';
 import EditorJS from '@editorjs/editorjs';
@@ -25,11 +26,10 @@ import { useMutation, useQuery } from '@apollo/client';
 
 import { UPDATE_POST } from '../../graphql/mutations';
 import { isBase64, uploadBlogFiles } from '../../utils/upload.util';
-
-import ProtectedLayout from '../../layouts/protected';
-import classes from './style.module.css';
 import { GET_POST_BY_ID } from '../../graphql/queries';
-import { IconArrowLeft } from '@tabler/icons-react';
+
+import MainLayout from '../../layouts/main';
+import classes from './style.module.css';
 
 const EditPost = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -207,7 +207,7 @@ const EditPost = () => {
   if (loading) return null;
 
   return (
-    <ProtectedLayout>
+    <MainLayout>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack display="flex" justify="stretch" gap="lg">
           <Group>
@@ -259,7 +259,7 @@ const EditPost = () => {
           </Stack>
         </Stack>
       </form>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

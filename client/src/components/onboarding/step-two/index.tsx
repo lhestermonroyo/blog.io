@@ -1,6 +1,5 @@
 import { FC, Fragment, useEffect } from 'react';
 import { Button, Group, Stack, Text } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import { useRecoilState } from 'recoil';
 
 import states from '../../../states';
@@ -26,8 +25,9 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
           ...prev.onboarding,
           uploadForm: {
             ...prev.onboarding.uploadForm,
-            avatar: profile.avatar,
-            coverPhoto: profile.coverPhoto
+            avatar: prev.onboarding.uploadForm.avatar || profile.avatar,
+            coverPhoto:
+              prev.onboarding.uploadForm.coverPhoto || profile.coverPhoto
           }
         }
       }));
@@ -60,20 +60,6 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
     }));
   };
 
-  const handleSubmit = async () => {
-    if (!onboarding.uploadForm.avatar || !onboarding.uploadForm.coverPhoto) {
-      notifications.show({
-        title: 'Validation Error',
-        message: 'Please upload avatar and cover photo first.',
-        color: 'red',
-        position: 'top-center'
-      });
-      return;
-    }
-
-    onNextStep();
-  };
-
   return (
     <Fragment>
       <Stack gap="xl" mt="xl">
@@ -97,7 +83,7 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
         <Button variant="default" onClick={onPrevStep}>
           Back
         </Button>
-        <Button onClick={handleSubmit}>Next</Button>
+        <Button onClick={onNextStep}>Next</Button>
       </Group>
     </Fragment>
   );

@@ -11,9 +11,7 @@ import PostCard from '../post-card';
 import LoadingFeed from '../loading-feed';
 
 const Explore = () => {
-  const auth = useRecoilValue(states.auth);
   const [post, setPost] = useRecoilState(states.post);
-  const { profile } = auth;
   const {
     feed: {
       explore: { list }
@@ -26,7 +24,7 @@ const Explore = () => {
     error,
     refetch: fetchPosts
   } = useQuery(GET_POSTS, {
-    skip: !profile
+    fetchPolicy: 'network-only'
   });
 
   useEffect(() => {

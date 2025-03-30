@@ -189,14 +189,8 @@ module.exports = {
     }
   },
   Query: {
-    async getStatsByEmail(_, { email }, context) {
+    async getStatsByEmail(_, { email }, __) {
       try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
         const statUser = await User.findOne({ email });
 
         if (!statUser) {

@@ -26,7 +26,7 @@ import { useMutation } from '@apollo/client';
 import { CREATE_POST } from '../../graphql/mutations';
 import { uploadBlogFiles } from '../../utils/upload.util';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 import classes from './style.module.css';
 
 const Compose = () => {
@@ -180,7 +180,7 @@ const Compose = () => {
   };
 
   return (
-    <ProtectedLayout>
+    <MainLayout>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack display="flex" justify="stretch" gap="lg">
           <Group justify="space-between" align="center">
@@ -224,7 +224,7 @@ const Compose = () => {
           </Stack>
         </Stack>
       </form>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

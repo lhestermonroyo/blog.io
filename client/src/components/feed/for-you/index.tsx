@@ -40,7 +40,8 @@ const ForYou = () => {
     refetch: fetchPostsByTags
   } = useQuery(GET_POSTS_BY_TAGS, {
     variables: { tags: filters.length ? filters : profile?.tags },
-    skip: !profile
+    skip: !profile,
+    fetchPolicy: 'network-only'
   });
 
   useEffect(() => {
@@ -88,7 +89,7 @@ const ForYou = () => {
                 </Group>
                 {!filters.length && (
                   <Fragment>
-                    {list.length && (
+                    {list.length > 0 && (
                       <Stack gap="xs">
                         <Badge color="green">Newest</Badge>
                         <PostCard item={list[0]} />

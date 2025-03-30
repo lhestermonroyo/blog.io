@@ -46,16 +46,29 @@ const PostReaction: FC<PostReactionProps> = ({
     [post]
   );
 
+  const buttonProps = {
+    variant: !auth.isAuth && !auth.profile ? 'transparent' : 'subtle',
+    disabled: !auth.isAuth && !auth.profile
+  }
+
   return (
     <Group gap="lg">
       <Group justify="center" align="center" gap={4}>
-        <ActionIcon variant="transparent" onClick={onLike}>
+        <ActionIcon
+          variant="transparent"
+          disabled={!auth.isAuth && !auth.profile}
+          onClick={onLike}
+        >
           {isLiked ? <IconHeartFilled size={24} /> : <IconHeart size={24} />}
         </ActionIcon>
         <Text c="dimmed">{post.likeCount}</Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
-        <ActionIcon variant="transparent" onClick={onComment}>
+        <ActionIcon
+          variant="transparent"
+          disabled={!auth.isAuth && !auth.profile}
+          onClick={onComment}
+        >
           {isCommented ? (
             <IconMessageFilled size={24} />
           ) : (
@@ -65,7 +78,11 @@ const PostReaction: FC<PostReactionProps> = ({
         <Text c="dimmed">{post.commentCount}</Text>
       </Group>
       <Group justify="center" align="center" gap={4}>
-        <ActionIcon variant="transparent" onClick={onSave}>
+        <ActionIcon
+          variant="transparent"
+          disabled={!auth.isAuth && !auth.profile}
+          onClick={onSave}
+        >
           {isSaved ? (
             <IconBookmarkFilled size={24} />
           ) : (

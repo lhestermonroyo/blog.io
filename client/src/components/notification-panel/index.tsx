@@ -38,19 +38,16 @@ const NotificationPanel = () => {
   const { unreadCount, list } = notification;
   const { profile } = auth;
 
-  const {
-    data: notifResponse,
-    loading: loadingNotif,
-    refetch: fetchNotifications
-  } = useQuery(GET_NOTIFICATIONS);
+  const { data: notifResponse, loading: loadingNotif } = useQuery(
+    GET_NOTIFICATIONS,
+    {
+      fetchPolicy: 'network-only'
+    }
+  );
   const { data: newNotifResponse } = useSubscription(ON_NEW_NOTIFICATION);
   const [markAsRead] = useMutation(MARK_AS_READ);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
 
   useEffect(() => {
     if (newNotifResponse) {

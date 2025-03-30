@@ -2,15 +2,12 @@ import { FC, Fragment, ReactNode } from 'react';
 import { Container, MantineSize } from '@mantine/core';
 import Navbar from '../../components/navbar';
 
-type ProtectedLayoutProps = {
+type MainLayoutProps = {
   children: ReactNode;
   size?: number | MantineSize | (string & {}) | undefined;
 };
 
-const ProtectedLayout: FC<ProtectedLayoutProps> = ({
-  children,
-  size = 'lg'
-}) => {
+const MainLayout: FC<MainLayoutProps> = ({ children, size = 'lg' }) => {
   return (
     <Fragment>
       <Navbar />
@@ -21,4 +18,4 @@ const ProtectedLayout: FC<ProtectedLayoutProps> = ({
   );
 };
 
-export default ProtectedLayout;
+export default MainLayout;

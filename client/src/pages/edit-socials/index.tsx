@@ -10,7 +10,7 @@ import { useRecoilState } from 'recoil';
 
 import { UPDATE_PROFILE } from '../../graphql/mutations';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 
 const EditSocials = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
@@ -69,7 +69,7 @@ const EditSocials = () => {
   };
 
   return (
-    <ProtectedLayout size="sm">
+    <MainLayout size="sm">
       <Stack gap="lg">
         <Group>
           <Button
@@ -118,7 +118,7 @@ const EditSocials = () => {
           onSave={handleSubmit}
         />
       </Stack>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

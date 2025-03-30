@@ -15,14 +15,8 @@ const postBadgeProj = '_id title';
 
 module.exports = {
   Query: {
-    async getPosts(_, { limit }, context) {
+    async getPosts(_, { limit }, __) {
       try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
         const query = Post.find()
           .sort({ createdAt: -1 })
           .populate('creator', profileBadgeProj);
@@ -33,6 +27,88 @@ module.exports = {
 
         const posts = await query;
         const totalCount = await Post.countDocuments();
+
+        return {
+          totalCount,
+          posts: posts.map(async (post) => {
+            const likeCount = post._doc.likes.length ?? 0;
+            const commentCount = post._doc.comments.length ?? 0;
+            const saveCount = post._doc.saves.length ?? 0;
+
+            delete post._doc.likes;
+            delete post._doc.comments;
+            delete post._doc.saves;
+
+            return {
+              id: post._id,
+              ...post._doc,
+              likeCount,
+              commentCount,
+              saveCount
+            };
+          })
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async getPostsByTags(_, { tags, limit }, __) {
+      try {
+        const query = Post.find({
+          tags: {
+            $in: [...tags]
+          }
+        })
+          .sort({ createdAt: -1 })
+          .populate('creator', profileBadgeProj);
+
+        if (limit) {
+          query.limit(limit);
+        }
+
+        const posts = await query;
+        const totalCount = await Post.countDocuments({
+          tags: {
+            $in: [...tags]
+          }
+        });
+
+        return {
+          totalCount,
+          posts: posts.map(async (post) => {
+            const likeCount = post._doc.likes.length ?? 0;
+            const commentCount = post._doc.comments.length ?? 0;
+            const saveCount = post._doc.saves.length ?? 0;
+
+            delete post._doc.likes;
+            delete post._doc.comments;
+            delete post._doc.saves;
+
+            return {
+              id: post._id,
+              ...post._doc,
+              likeCount,
+              commentCount,
+              saveCount
+            };
+          })
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async getPostsByCreator(_, { creator, limit }, __) {
+      try {
+        const query = Post.find({ creator })
+          .sort({ createdAt: -1 })
+          .populate('creator', profileBadgeProj);
+
+        if (limit) {
+          query.limit(limit);
+        }
+
+        const posts = await query;
+        const totalCount = await Post.countDocuments({ creator });
 
         return {
           totalCount,
@@ -117,108 +193,8 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getPostsByTags(_, { tags, limit }, context) {
+    async getPostById(_, { postId }, __) {
       try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
-        const query = Post.find({
-          tags: {
-            $in: [...tags]
-          }
-        })
-          .sort({ createdAt: -1 })
-          .populate('creator', profileBadgeProj);
-
-        if (limit) {
-          query.limit(limit);
-        }
-
-        const posts = await query;
-        const totalCount = await Post.countDocuments({
-          tags: {
-            $in: [...tags]
-          }
-        });
-
-        return {
-          totalCount,
-          posts: posts.map(async (post) => {
-            const likeCount = post._doc.likes.length ?? 0;
-            const commentCount = post._doc.comments.length ?? 0;
-            const saveCount = post._doc.saves.length ?? 0;
-
-            delete post._doc.likes;
-            delete post._doc.comments;
-            delete post._doc.saves;
-
-            return {
-              id: post._id,
-              ...post._doc,
-              likeCount,
-              commentCount,
-              saveCount
-            };
-          })
-        };
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-    async getPostsByCreator(_, { creator, limit }, context) {
-      try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
-        const query = Post.find({ creator })
-          .sort({ createdAt: -1 })
-          .populate('creator', profileBadgeProj);
-
-        if (limit) {
-          query.limit(limit);
-        }
-
-        const posts = await query;
-        const totalCount = await Post.countDocuments({ creator });
-
-        return {
-          totalCount,
-          posts: posts.map(async (post) => {
-            const likeCount = post._doc.likes.length ?? 0;
-            const commentCount = post._doc.comments.length ?? 0;
-            const saveCount = post._doc.saves.length ?? 0;
-
-            delete post._doc.likes;
-            delete post._doc.comments;
-            delete post._doc.saves;
-
-            return {
-              id: post._id,
-              ...post._doc,
-              likeCount,
-              commentCount,
-              saveCount
-            };
-          })
-        };
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-    async getPostById(_, { postId }, context) {
-      try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
         const post = await Post.findById(postId)
           .populate('creator')
           .populate({
@@ -261,14 +237,8 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getTags(_, __, context) {
+    async getTags() {
       try {
-        const user = checkAuth(context);
-
-        if (!user) {
-          throw new Error('User not authenticated');
-        }
-
         const tags = await Post.aggregate([
           { $unwind: '$tags' },
           { $group: { _id: null, allTags: { $addToSet: '$tags' } } }

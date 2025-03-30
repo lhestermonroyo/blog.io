@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { useRecoilState } from 'recoil';
+import { Stack } from '@mantine/core';
 
 import {
   GET_STATS_BY_EMAIL,
@@ -10,10 +11,10 @@ import {
 } from '../../../graphql/queries';
 import states from '../../../states';
 import { TPostState } from '../../../../types';
+
 import AuthorPanel from '../author-panel';
 import AuthorPostsPanel from '../author-posts-panel';
 import SuggestionsPanel from '../suggestions-panel';
-import { Stack } from '@mantine/core';
 
 const PostSidebar = () => {
   const [post, setPost] = useRecoilState(states.post);
@@ -28,7 +29,8 @@ const PostSidebar = () => {
     refetch: fetchProfileByEmail
   } = useQuery(GET_PROFILE_BY_EMAIL, {
     variables: { email: creatorEmail },
-    skip: !creatorEmail
+    skip: !creatorEmail,
+    fetchPolicy: 'network-only'
   });
   const {
     data: statsResponse,
@@ -36,7 +38,8 @@ const PostSidebar = () => {
     refetch: fetchStatsByEmail
   } = useQuery(GET_STATS_BY_EMAIL, {
     variables: { email: creatorEmail },
-    skip: !creatorEmail
+    skip: !creatorEmail,
+    fetchPolicy: 'network-only'
   });
   const {
     data: postsResponse,
@@ -44,7 +47,8 @@ const PostSidebar = () => {
     refetch: fetchPostsByCreator
   } = useQuery(GET_POSTS_BY_CREATOR, {
     variables: { creator: creatorId, limit: 5 },
-    skip: !creatorId
+    skip: !creatorId,
+    fetchPolicy: 'network-only'
   });
   const {
     data: tagPostsResponse,
@@ -52,7 +56,8 @@ const PostSidebar = () => {
     refetch: fetchPostsByTags
   } = useQuery(GET_POSTS_BY_TAGS, {
     variables: { tags: postDetails?.tags, limit: 5 },
-    skip: !postDetails?.tags
+    skip: !postDetails?.tags,
+    fetchPolicy: 'network-only'
   });
 
   useEffect(() => {
@@ -95,6 +100,7 @@ const PostSidebar = () => {
     if (postsResponse) {
       const key = Object.keys(postsResponse)[0];
       const data = postsResponse[key];
+      console.log('data', data);
 
       setPost((prev: TPostState) => ({
         ...prev,

@@ -7,12 +7,6 @@ const profileBadgeProj = '_id email firstName lastName avatar';
 module.exports = {
   Mutation: {
     getSearchResults: async (_, { query }, context) => {
-      const user = checkAuth(context);
-
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
       const users = await User.find(
         {
           $or: [

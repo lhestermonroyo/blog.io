@@ -47,7 +47,7 @@ import states from '../../states';
 import { deleteBlogFiles } from '../../utils/upload.util';
 import { TCommentItem, TPostDetails, TPostState } from '../../../types';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 import LoadingPost from '../../components/post-details/loading-post';
 import ProfileBadge from '../../components/profile-badge';
 import PostReaction from '../../components/post-details/post-reaction';
@@ -81,7 +81,8 @@ const PostDetails = () => {
   const { data, loading, error, refetch } = useQuery(GET_POST_BY_ID, {
     variables: {
       postId: params.id
-    }
+    },
+    fetchPolicy: 'network-only'
   });
 
   const [deletePost] = useMutation(DELETE_POST);
@@ -326,7 +327,7 @@ const PostDetails = () => {
   const content = postDetails && JSON.parse(postDetails?.content);
 
   return (
-    <ProtectedLayout>
+    <MainLayout>
       <Grid gutter="xl">
         <Grid.Col span={8}>
           <Stack gap="lg">
@@ -570,48 +571,58 @@ const PostDetails = () => {
                     />
                   </Stack>
 
-                  <Title order={2}>Comments ({postDetails.commentCount})</Title>
+                  {auth.isAuth && auth.profile ? (
+                    <Fragment>
+                      <Title order={2}>
+                        Comments ({postDetails.commentCount})
+                      </Title>
 
-                  <form onSubmit={form.onSubmit(handleSubmitComment)}>
-                    <Stack>
-                      <Textarea
-                        ref={commentRef}
-                        label="Comment"
-                        placeholder="Enter your comment"
-                        name="comment"
-                        key={form.key('comment')}
-                        {...form.getInputProps('comment')}
-                      />
-                      <Group>
-                        <Button type="submit" loading={submitting}>
-                          Submit
-                        </Button>
-                      </Group>
-                    </Stack>
-                  </form>
-
-                  {postDetails.comments.length > 0 ? (
-                    <Stack gap="lg" my="xl">
-                      {postDetails.comments.map(
-                        (comment: TCommentItem, index: number) => (
-                          <CommentCard
-                            key={comment.id}
-                            comment={comment}
-                            isLastComment={
-                              postDetails.comments.length === index + 1
-                            }
-                            isOwnComment={
-                              comment.commentor.email === profileEmail
-                            }
-                            updateComment={handleUpdateComment}
-                            deleteComment={handleDeleteComment}
+                      <form onSubmit={form.onSubmit(handleSubmitComment)}>
+                        <Stack>
+                          <Textarea
+                            ref={commentRef}
+                            label="Comment"
+                            placeholder="Enter your comment"
+                            name="comment"
+                            key={form.key('comment')}
+                            {...form.getInputProps('comment')}
                           />
-                        )
+                          <Group>
+                            <Button type="submit" loading={submitting}>
+                              Submit
+                            </Button>
+                          </Group>
+                        </Stack>
+                      </form>
+
+                      {postDetails.comments.length > 0 ? (
+                        <Stack gap="lg" my="xl">
+                          {postDetails.comments.map(
+                            (comment: TCommentItem, index: number) => (
+                              <CommentCard
+                                key={comment.id}
+                                comment={comment}
+                                isLastComment={
+                                  postDetails.comments.length === index + 1
+                                }
+                                isOwnComment={
+                                  comment.commentor.email === profileEmail
+                                }
+                                updateComment={handleUpdateComment}
+                                deleteComment={handleDeleteComment}
+                              />
+                            )
+                          )}
+                        </Stack>
+                      ) : (
+                        <Text size="sm" c="dimmed">
+                          No comments yet.
+                        </Text>
                       )}
-                    </Stack>
+                    </Fragment>
                   ) : (
                     <Text size="sm" c="dimmed">
-                      No comments yet.
+                      You must be logged in to comment on this post.
                     </Text>
                   )}
                 </Fragment>
@@ -621,7 +632,7 @@ const PostDetails = () => {
         </Grid.Col>
         <Grid.Col span={4}>{postDetails && <PostSidebar />}</Grid.Col>
       </Grid>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

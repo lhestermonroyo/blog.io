@@ -9,16 +9,16 @@ import {
   Skeleton,
   Stack,
   TextInput,
-  Title,
-  UnstyledButton
+  Title
 } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
 import _ from 'lodash';
 
 import { GET_SEARCH_RESULTS } from '../../graphql/mutations';
 import { TPostItem, TProfileBadge } from '../../../types';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 import ProfileBadge from '../../components/profile-badge';
 import PostCard from '../../components/feed/post-card';
 
@@ -31,6 +31,8 @@ const Search = () => {
     tags: [],
     posts: []
   });
+
+  const navigate = useNavigate();
 
   const searchFieldRef = useRef<HTMLInputElement>(null);
 
@@ -85,7 +87,7 @@ const Search = () => {
   };
 
   return (
-    <ProtectedLayout size="sm">
+    <MainLayout size="sm">
       <Stack gap="lg">
         <Title order={1} ta="center">
           Find something in mind
@@ -148,9 +150,15 @@ const Search = () => {
 
                         <Group gap="lg">
                           {results.tags.map((tag: string) => (
-                            <UnstyledButton key={tag}>
-                              <Badge variant="light">{tag}</Badge>
-                            </UnstyledButton>
+                            <Badge
+                              variant="light"
+                              component="button"
+                              style={{ cursor: 'pointer' }}
+                              key={tag}
+                              onClick={() => navigate(`/tag/${tag}`)}
+                            >
+                              {tag}
+                            </Badge>
                           ))}
                         </Group>
                       </Stack>
@@ -180,7 +188,7 @@ const Search = () => {
           </Stack>
         )}
       </Stack>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

@@ -177,6 +177,7 @@ const SearchPanel = () => {
         miw={380}
         variant="filled"
         placeholder="Search"
+        clearable
         leftSection={<IconSearch size={16} stroke={1.5} />}
         onChange={(value) => setQuery(value)}
         filter={optionsFilter}

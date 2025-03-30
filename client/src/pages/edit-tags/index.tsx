@@ -10,7 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { UPDATE_PROFILE } from '../../graphql/mutations';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 
 const EditTags = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -94,7 +94,7 @@ const EditTags = () => {
   };
 
   return (
-    <ProtectedLayout size="sm">
+    <MainLayout size="sm">
       <Stack gap="lg">
         <Group>
           <Button
@@ -127,7 +127,7 @@ const EditTags = () => {
           </Stack>
         </form>
       </Stack>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

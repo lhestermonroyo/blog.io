@@ -214,7 +214,7 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
           </Group>
 
           <Group gap={6}>
-            {!isOwnProfile && (
+            {!isOwnProfile && auth.isAuth && auth.profile && (
               <Button
                 flex={1}
                 variant={isFollowed ? 'light' : 'outline'}

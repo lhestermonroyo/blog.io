@@ -8,7 +8,7 @@ import states from '../../states';
 import { GET_POSTS_BY_TAGS } from '../../graphql/queries';
 import { TPostItem } from '../../../types';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 import LoadingFeed from '../../components/feed/loading-feed';
 import PostCard from '../../components/feed/post-card';
 
@@ -42,7 +42,7 @@ const Tag = () => {
   const posts = data.posts || [];
 
   return (
-    <ProtectedLayout>
+    <MainLayout>
       <Stack gap="lg">
         <Title order={1} tt="capitalize">
           {param.tag}
@@ -90,7 +90,7 @@ const Tag = () => {
           })}
         </Group>
       </Stack>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

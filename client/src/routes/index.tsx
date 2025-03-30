@@ -1,6 +1,6 @@
 import { HashRouter, Route, Routes } from 'react-router';
 
-import PublicRoute from './PublicRoute';
+import AuthRoute from './AuthRoute';
 import ProtectedRoute from './ProtectedRoute';
 import Login from '../pages/login';
 import SignUp from '../pages/sign-up';
@@ -18,20 +18,20 @@ const AppRouter = () => {
   return (
     <HashRouter>
       <Routes>
-        <Route element={<PublicRoute />}>
+        <Route path="/" element={<Feed />} />
+        <Route path="/post/:id" element={<PostDetails />} />
+        <Route path="/profile/:email?" element={<Profile />} />
+        <Route path="/tag/:tag" element={<Tag />} />
+        <Route path="/search" element={<Search />} />
+        <Route element={<AuthRoute />}>
           <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<SignUp />} />
         </Route>
         {/*  */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Feed />} />
           <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/tag/:tag" element={<Tag />} />
-          <Route path="/post/:id" element={<PostDetails />} />
           <Route path="/compose" element={<Compose />} />
           <Route path="/edit-post/:id" element={<EditPost />} />
-          <Route path="/profile/:email?" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
         </Route>
       </Routes>

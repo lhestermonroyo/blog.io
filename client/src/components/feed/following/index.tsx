@@ -26,7 +26,8 @@ const Following = () => {
     error,
     refetch: fetchPostsByFollowing
   } = useQuery(GET_POSTS_BY_FOLLOWING, {
-    skip: !profile
+    skip: !profile,
+    fetchPolicy: 'network-only'
   });
 
   useEffect(() => {

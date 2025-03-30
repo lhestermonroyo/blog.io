@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router';
 import { Button, Group, Stack, Tabs, Title } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 import UserInfoForm from '../../components/edit-profile/user-info-form';
 import SocialsForm from '../../components/edit-profile/socials-form';
 import TagsForm from '../../components/edit-profile/tags-form';
@@ -16,7 +16,7 @@ const EditProfile = () => {
   const tab = searchParams.get('tab');
 
   return (
-    <ProtectedLayout size="lg">
+    <MainLayout size="lg">
       <Stack gap="lg">
         <Group>
           <Button
@@ -55,7 +55,7 @@ const EditProfile = () => {
           </Tabs.Panel>
         </Tabs>
       </Stack>
-    </ProtectedLayout>
+    </MainLayout>
   );
 };
 

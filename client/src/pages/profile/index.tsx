@@ -35,7 +35,7 @@ import {
 import { FOLLOW_USER } from '../../graphql/mutations';
 import { TPostItem, TProfile, TProfileBadge, TStats } from '../../../types';
 
-import ProtectedLayout from '../../layouts/protected';
+import MainLayout from '../../layouts/main';
 import PostCard from '../../components/feed/post-card';
 import LoadingProfile from '../../components/profile/loading-profile';
 import ProfileButton from '../../components/profile-button';
@@ -75,7 +75,8 @@ const Profile = () => {
       variables: {
         email: params.email
       },
-      skip: !params.email
+      skip: !params.email,
+      fetchPolicy: 'network-only'
     }
   );
   const {
@@ -84,7 +85,8 @@ const Profile = () => {
     refetch: fetchStatsByEmail
   } = useQuery(GET_STATS_BY_EMAIL, {
     variables: { email: profile?.email },
-    skip: !profile?.email
+    skip: !profile?.email,
+    fetchPolicy: 'network-only'
   });
   const [followUser] = useMutation(FOLLOW_USER);
 
@@ -201,7 +203,7 @@ const Profile = () => {
 
   if (profile && stats) {
     return (
-      <ProtectedLayout>
+      <MainLayout>
         <Stack gap="lg">
           <Title order={1}>Profile</Title>
           <Grid>
@@ -325,20 +327,23 @@ const Profile = () => {
                       <Group gap={6} mt="lg" flex={1}>
                         {!ownProfile && (
                           <Fragment>
-                            <Button
-                              flex={1}
-                              variant={isFollowed ? 'light' : 'outline'}
-                              leftSection={
-                                isFollowed ? (
-                                  <IconUserMinus size={20} />
-                                ) : (
-                                  <IconUserPlus size={20} />
-                                )
-                              }
-                              onClick={handleFollow}
-                            >
-                              {isFollowed ? 'Unfollow' : 'Follow'}
-                            </Button>
+                            {auth.isAuth && auth.profile && (
+                              <Button
+                                flex={1}
+                                variant={isFollowed ? 'light' : 'outline'}
+                                leftSection={
+                                  isFollowed ? (
+                                    <IconUserMinus size={20} />
+                                  ) : (
+                                    <IconUserPlus size={20} />
+                                  )
+                                }
+                                onClick={handleFollow}
+                              >
+                                {isFollowed ? 'Unfollow' : 'Follow'}
+                              </Button>
+                            )}
+
                             <Button
                               flex={1}
                               component="a"
@@ -372,76 +377,93 @@ const Profile = () => {
                     </Stack>
                   </Card>
 
-                  <Card withBorder p={0}>
-                    <Tabs defaultValue="1">
-                      <Tabs.List justify="center">
-                        <Tabs.Tab value="1">Posts</Tabs.Tab>
-                        {/* {ownProfile && ( */}
-                        <Tabs.Tab value="2">Saved Posts</Tabs.Tab>
-                        {/* )} */}
-                        <Tabs.Tab value="3">Followers</Tabs.Tab>
-                        <Tabs.Tab value="4">Following</Tabs.Tab>
-                      </Tabs.List>
-                      <Tabs.Panel
-                        value="1"
-                        p={stats.posts.list.length ? 'lg' : 0}
-                      >
-                        <Stack gap="xl">
-                          {stats.posts.list.length ? (
+                  {auth.isAuth && auth.profile ? (
+                    <Card withBorder p={0}>
+                      <Tabs defaultValue="1">
+                        <Tabs.List justify="center">
+                          <Tabs.Tab value="1">Posts</Tabs.Tab>
+                          <Tabs.Tab value="2">Saved Posts</Tabs.Tab>
+                          <Tabs.Tab value="3">Followers</Tabs.Tab>
+                          <Tabs.Tab value="4">Following</Tabs.Tab>
+                        </Tabs.List>
+                        <Tabs.Panel
+                          value="1"
+                          p={stats.posts.list.length ? 'lg' : 0}
+                        >
+                          <Stack gap="xl">
+                            {stats.posts.list.length ? (
+                              <Stack gap="xl">
+                                {stats.posts.list.map((post: TPostItem) => (
+                                  <PostCard key={post.id} item={post} />
+                                ))}
+                              </Stack>
+                            ) : (
+                              <Empty text="No created post yet." />
+                            )}
+                          </Stack>
+                        </Tabs.Panel>
+                        <Tabs.Panel
+                          value="2"
+                          p={stats.savedPosts.list.length ? 'lg' : 0}
+                        >
+                          {stats.savedPosts.list.length ? (
                             <Stack gap="xl">
-                              {stats.posts.list.map((post: TPostItem) => (
+                              {stats.savedPosts.list.map((post: TPostItem) => (
                                 <PostCard key={post.id} item={post} />
                               ))}
                             </Stack>
                           ) : (
-                            <Empty text="No created post yet." />
+                            <Empty text="No saved posts yet." />
                           )}
-                        </Stack>
-                      </Tabs.Panel>
-                      <Tabs.Panel
-                        value="2"
-                        p={stats.savedPosts.list.length ? 'lg' : 0}
-                      >
-                        {stats.savedPosts.list.length ? (
+                        </Tabs.Panel>
+                        <Tabs.Panel value="3">
+                          {stats.followers.list.length ? (
+                            stats.followers.list.map(
+                              (follower: TProfileBadge) => (
+                                <ProfileButton
+                                  key={follower.id}
+                                  profile={follower}
+                                />
+                              )
+                            )
+                          ) : (
+                            <Empty text="No followers yet." />
+                          )}
+                        </Tabs.Panel>
+                        <Tabs.Panel value="4">
+                          {stats.following.list.length ? (
+                            stats.following.list.map(
+                              (following: TProfileBadge) => (
+                                <ProfileButton
+                                  key={following.id}
+                                  profile={following}
+                                />
+                              )
+                            )
+                          ) : (
+                            <Empty text="Not following anyone yet." />
+                          )}
+                        </Tabs.Panel>
+                      </Tabs>
+                    </Card>
+                  ) : (
+                    <Card withBorder>
+                      <Title order={3} mb="md">
+                        Posts
+                      </Title>
+                      <Stack gap="xl">
+                        {stats.posts.list.length ? (
                           <Stack gap="xl">
-                            {stats.savedPosts.list.map((post: TPostItem) => (
+                            {stats.posts.list.map((post: TPostItem) => (
                               <PostCard key={post.id} item={post} />
                             ))}
                           </Stack>
                         ) : (
-                          <Empty text="No saved posts yet." />
+                          <Empty text="No created post yet." />
                         )}
-                      </Tabs.Panel>
-                      <Tabs.Panel value="3">
-                        {stats.followers.list.length ? (
-                          stats.followers.list.map(
-                            (follower: TProfileBadge) => (
-                              <ProfileButton
-                                key={follower.id}
-                                profile={follower}
-                              />
-                            )
-                          )
-                        ) : (
-                          <Empty text="No followers yet." />
-                        )}
-                      </Tabs.Panel>
-                      <Tabs.Panel value="4">
-                        {stats.following.list.length ? (
-                          stats.following.list.map(
-                            (following: TProfileBadge) => (
-                              <ProfileButton
-                                key={following.id}
-                                profile={following}
-                              />
-                            )
-                          )
-                        ) : (
-                          <Empty text="Not following anyone yet." />
-                        )}
-                      </Tabs.Panel>
-                    </Tabs>
-                  </Card>
+                      </Stack>
+                    </Card>
+                  )}
                 </Stack>
               </LoadingProfile>
             </Grid.Col>
@@ -461,7 +483,7 @@ const Profile = () => {
             </Grid.Col>
           </Grid>
         </Stack>
-      </ProtectedLayout>
+      </MainLayout>
     );
   }
 };
