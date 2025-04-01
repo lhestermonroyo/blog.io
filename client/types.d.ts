@@ -61,6 +61,17 @@ export type TCommentItem = {
   id: string;
   body: string;
   commentor: TProfileBadge;
+  replies: TReplyItem[];
+  likes: TLikeItem[];
+  isEdited: boolean;
+  createdAt: string;
+};
+
+export type TReplyItem = {
+  id: string;
+  body: string;
+  replier: TProfileBadge;
+  likes: TLikeItem[];
   isEdited: boolean;
   createdAt: string;
 };

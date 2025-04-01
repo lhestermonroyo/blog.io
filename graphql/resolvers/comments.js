@@ -6,11 +6,13 @@ const User = require('../../models/User');
 const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
 const { validateCommentInput } = require('../../utils/validators.util');
+const {
+  profileBadgeProj,
+  populateComment,
+  populateNotification
+} = require('../../utils/populate.util');
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
-
-const profileBadgeProj = '_id email firstName lastName avatar';
-const postBadgeProj = '_id title';
 
 module.exports = {
   Mutation: {
@@ -49,17 +51,7 @@ module.exports = {
           createdAt: new Date().toISOString()
         });
         await post.save();
-        await post.populate([
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          }
-        ]);
+        await post.populate(populateComment);
 
         if (notification) {
           const existing = notification.latestUser.some(
@@ -101,28 +93,7 @@ module.exports = {
         const exists = await Notification.exists({ _id: notification._id });
 
         if (exists) {
-          await notification.populate([
-            {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            },
-            {
-              path: 'sender',
-              model: 'User',
-              select: profileBadgeProj
-            },
-            {
-              path: 'latestUser',
-              model: 'User',
-              select: profileBadgeProj
-            },
-            {
-              path: 'post',
-              model: 'Post',
-              select: postBadgeProj
-            }
-          ]);
+          await notification.populate(populateNotification);
           const unreadCount = await Notification.countDocuments({
             user: post.creator,
             isRead: false
@@ -144,6 +115,52 @@ module.exports = {
         };
       } catch (error) {
         console.log('error', error);
+        throw new Error(error);
+      }
+    },
+    async likeComment(_, { postId, commentId }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const post = await Post.findById(postId);
+        if (!post) {
+          throw new Error('Post not found');
+        }
+
+        const commentIndex = post.comments.findIndex(
+          (comment) => comment.id === commentId
+        );
+        const comment = post.comments[commentIndex];
+
+        if (!comment) {
+          throw new Error('Comment not found');
+        }
+
+        const alreadyLiked = comment.likes.find(
+          (like) => like.liker.toString() === user.id
+        );
+
+        if (alreadyLiked) {
+          comment.likes = comment.likes.filter(
+            (like) => like.liker.toString() !== user.id
+          );
+        } else {
+          comment.likes.push({
+            liker: user.id,
+            createdAt: new Date().toISOString()
+          });
+        }
+        await post.save();
+        await post.populate(populateComment);
+
+        return {
+          comments: post.comments
+        };
+      } catch (error) {
         throw new Error(error);
       }
     },
@@ -178,17 +195,7 @@ module.exports = {
         post.comments[commentIndex].body = body;
         post.comments[commentIndex].isEdited = true;
         await post.save();
-        await post.populate([
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          }
-        ]);
+        await post.populate(populateComment);
 
         return {
           comments: post.comments
@@ -221,17 +228,210 @@ module.exports = {
 
         post.comments.splice(commentIndex, 1);
         await post.save();
-        await post.populate([
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          }
-        ]);
+        await post.populate(populateComment);
+
+        return {
+          comments: post.comments
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async createReply(_, { postId, commentId, body }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const { valid, errors } = validateCommentInput(body);
+
+        if (!valid) {
+          throw new UserInputError('Validation Error', { errors });
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+          throw new Error('Post not found');
+        }
+
+        const commentIndex = post.comments.findIndex(
+          (comment) => comment.id === commentId
+        );
+        const comment = post.comments[commentIndex];
+
+        if (!comment) {
+          throw new Error('Comment not found');
+        }
+
+        comment.replies.unshift({
+          body,
+          replier: user.id,
+          likes: [],
+          isEdited: false,
+          createdAt: new Date().toISOString()
+        });
+        await post.save();
+        await post.populate(populateComment);
+
+        return {
+          comments: post.comments
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async likeReply(_, { postId, commentId, replyId }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+          throw new Error('Post not found');
+        }
+
+        const commentIndex = post.comments.findIndex(
+          (comment) => comment.id === commentId
+        );
+        const comment = post.comments[commentIndex];
+
+        if (!comment) {
+          throw new Error('Comment not found');
+        }
+
+        const replyIndex = comment.replies.findIndex(
+          (reply) => reply.id === replyId
+        );
+        const reply = comment.replies[replyIndex];
+
+        if (!reply) {
+          throw new Error('Reply not found');
+        }
+
+        const alreadyLiked = reply.likes.find(
+          (like) => like.liker.toString() === user.id
+        );
+
+        if (alreadyLiked) {
+          reply.likes = reply.likes.filter(
+            (like) => like.liker.toString() !== user.id
+          );
+        } else {
+          reply.likes.push({
+            liker: user.id,
+            createdAt: new Date().toISOString()
+          });
+        }
+        await post.save();
+        await post.populate(populateComment);
+
+        return {
+          comments: post.comments
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async updateReply(_, { postId, commentId, replyId, body }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const { valid, errors } = validateCommentInput(body);
+
+        if (!valid) {
+          throw new UserInputError('Validation Error', { errors });
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+          throw new Error('Post not found');
+        }
+
+        const commentIndex = post.comments.findIndex(
+          (comment) => comment.id === commentId
+        );
+        const comment = post.comments[commentIndex];
+
+        if (!comment) {
+          throw new Error('Comment not found');
+        }
+
+        const replyIndex = comment.replies.findIndex(
+          (reply) => reply.id === replyId
+        );
+        const reply = comment.replies[replyIndex];
+
+        if (!reply) {
+          throw new Error('Reply not found');
+        }
+
+        if (reply.replier.toString() !== user.id) {
+          throw new Error('User not allowed to update reply');
+        }
+
+        reply.body = body;
+        reply.isEdited = true;
+        await post.save();
+        await post.populate(populateComment);
+
+        return {
+          comments: post.comments
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async deleteReply(_, { postId, commentId, replyId }, context) {
+      try {
+        const user = checkAuth(context);
+
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+          throw new Error('Post not found');
+        }
+
+        const commentIndex = post.comments.findIndex(
+          (comment) => comment.id === commentId
+        );
+        const comment = post.comments[commentIndex];
+
+        if (!comment) {
+          throw new Error('Comment not found');
+        }
+
+        const replyIndex = comment.replies.findIndex(
+          (reply) => reply.id === replyId
+        );
+        const reply = comment.replies[replyIndex];
+
+        if (!reply) {
+          throw new Error('Reply not found');
+        }
+
+        if (reply.replier.toString() !== user.id) {
+          throw new Error('User not allowed to delete reply');
+        }
+
+        comment.replies.splice(replyIndex, 1);
+        await post.save();
+        await post.populate(populateComment);
 
         return {
           comments: post.comments

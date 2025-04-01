@@ -1,9 +1,7 @@
 const pubSub = require('../../pubSub');
 const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
-
-const profileBadgeProj = '_id email firstName lastName avatar';
-const postBadgeProj = '_id title';
+const { populateNotification } = require('../../utils/populate.util');
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
@@ -20,10 +18,7 @@ module.exports = {
         user: user.id
       })
         .sort({ createdAt: -1 })
-        .populate('user', profileBadgeProj)
-        .populate('sender', profileBadgeProj)
-        .populate('latestUser', profileBadgeProj)
-        .populate('post', postBadgeProj);
+        .populate(populateNotification);
 
       return {
         list: notifications
@@ -50,28 +45,7 @@ module.exports = {
 
       notification.isRead = true;
       await notification.save();
-      await notification.populate([
-        {
-          path: 'user',
-          model: 'User',
-          select: profileBadgeProj
-        },
-        {
-          path: 'sender',
-          model: 'User',
-          select: profileBadgeProj
-        },
-        {
-          path: 'latestUser',
-          model: 'User',
-          select: profileBadgeProj
-        },
-        {
-          path: 'post',
-          model: 'Post',
-          select: postBadgeProj
-        }
-      ]);
+      await notification.populate(populateNotification);
 
       const unreadCount = await Notification.countDocuments({
         user: user.id,

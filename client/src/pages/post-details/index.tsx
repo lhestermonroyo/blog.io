@@ -548,7 +548,14 @@ const PostDetails = () => {
                             </ExpandableImage>
                           );
                         default:
-                          return null;
+                          return (
+                            <Text
+                              key={block.id}
+                              dangerouslySetInnerHTML={{
+                                __html: block.data
+                              }}
+                            />
+                          );
                       }
                     })}
                   </Stack>

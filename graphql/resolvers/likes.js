@@ -3,11 +3,12 @@ const Post = require('../../models/Post');
 const User = require('../../models/User');
 const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
+const {
+  profileBadgeProj,
+  populateNotification
+} = require('../../utils/populate.util');
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
-
-const profileBadgeProj = '_id email firstName lastName avatar';
-const postBadgeProj = '_id title';
 
 module.exports = {
   Mutation: {
@@ -133,28 +134,7 @@ module.exports = {
           });
 
           if (exists) {
-            await notification.populate([
-              {
-                path: 'user',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'sender',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'latestUser',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'post',
-                model: 'Post',
-                select: postBadgeProj
-              }
-            ]);
+            await notification.populate(populateNotification);
 
             const unreadCount = await Notification.countDocuments({
               user: post.creator,

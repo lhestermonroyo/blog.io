@@ -114,6 +114,41 @@ export const CREATE_POST = gql`
           lastName
           avatar
         }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
         isEdited
         createdAt
       }
@@ -170,6 +205,41 @@ export const UPDATE_POST = gql`
           firstName
           lastName
           avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
         }
         isEdited
         createdAt
@@ -245,6 +315,97 @@ export const CREATE_COMMENT = gql`
           lastName
           avatar
         }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
+        isEdited
+        createdAt
+      }
+    }
+  }
+`;
+
+export const LIKE_COMMENT = gql`
+  mutation LikeComment($postId: ID!, $commentId: ID!) {
+    likeComment(postId: $postId, commentId: $commentId) {
+      commentCount
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
         isEdited
         createdAt
       }
@@ -266,6 +427,41 @@ export const UPDATE_COMMENT = gql`
           lastName
           avatar
         }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
         isEdited
         createdAt
       }
@@ -286,6 +482,97 @@ export const DELETE_COMMENT = gql`
           firstName
           lastName
           avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
+        isEdited
+        createdAt
+      }
+    }
+  }
+`;
+
+export const CREATE_REPLY = gql`
+  mutation CreateReply($postId: ID!, $commentId: ID!, $body: String!) {
+    createReply(postId: $postId, commentId: $commentId, body: $body) {
+      commentCount
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
         }
         isEdited
         createdAt

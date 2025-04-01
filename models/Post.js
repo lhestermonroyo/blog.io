@@ -15,6 +15,37 @@ const postSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
       },
+      replies: [
+        {
+          body: String,
+          replier: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+          },
+          likes: [
+            {
+              liker: {
+                type: Schema.Types.ObjectId,
+                ref: 'User'
+              },
+              createdAt: String
+            }
+          ],
+
+          isEdited: Boolean,
+          createdAt: String
+        }
+      ],
+      likes: [
+        {
+          liker: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+          },
+          createdAt: String
+        }
+      ],
+      isEdited: Boolean,
       createdAt: String
     }
   ],

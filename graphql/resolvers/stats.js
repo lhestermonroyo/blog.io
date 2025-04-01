@@ -6,10 +6,12 @@ const Follow = require('../../models/Follow');
 const Post = require('../../models/Post');
 const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
+const {
+  profileBadgeProj,
+  populateNotification
+} = require('../../utils/populate.util');
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
-
-const profileBadgeProj = '_id email firstName lastName avatar';
 
 module.exports = {
   Mutation: {
@@ -124,23 +126,8 @@ module.exports = {
           const exists = await Notification.exists({ _id: notification._id });
 
           if (exists) {
-            await notification.populate([
-              {
-                path: 'user',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'sender',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'latestUser',
-                model: 'User',
-                select: profileBadgeProj
-              }
-            ]);
+            // remove last item at populateNotification
+            await notification.populate(populateNotification);
             const unreadCount = await Notification.countDocuments({
               user: followingUser._id,
               isRead: false

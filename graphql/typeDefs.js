@@ -68,7 +68,7 @@ module.exports = gql`
     tags: [String]!
     title: String!
     content: String!
-    creator: Profile!
+    creator: ProfileBadge!
     likes: [Like]!
     comments: [Comment]!
     saves: [Save]!
@@ -81,6 +81,16 @@ module.exports = gql`
     id: ID!
     body: String!
     commentor: ProfileBadge!
+    replies: [Reply]!
+    likes: [Like]!
+    isEdited: Boolean
+    createdAt: String!
+  }
+  type Reply {
+    id: ID!
+    body: String!
+    replier: ProfileBadge!
+    likes: [Like]!
     isEdited: Boolean
     createdAt: String!
   }
@@ -232,8 +242,18 @@ module.exports = gql`
     savePost(postId: ID!): SaveResponse!
     # Comments
     createComment(postId: ID!, body: String!): CommentResponse!
+    likeComment(postId: ID!, commentId: ID!): LikeResponse!
     updateComment(postId: ID!, commentId: ID!, body: String!): CommentResponse!
     deleteComment(postId: ID!, commentId: ID!): CommentResponse!
+    createReply(postId: ID!, commentId: ID!, body: String!): CommentResponse!
+    likeReply(postId: ID!, commentId: ID!, replyId: ID!): LikeResponse!
+    updateReply(
+      postId: ID!
+      commentId: ID!
+      replyId: ID!
+      body: String!
+    ): CommentResponse!
+    deleteReply(postId: ID!, commentId: ID!, replyId: ID!): CommentResponse!
     # Likes
     likePost(postId: ID!): LikeResponse!
     # Stats

@@ -294,6 +294,41 @@ export const GET_POST_BY_ID = gql`
           lastName
           avatar
         }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
         isEdited
         createdAt
       }

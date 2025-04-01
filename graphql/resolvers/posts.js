@@ -7,11 +7,13 @@ const Follow = require('../../models/Follow');
 const Notification = require('../../models/Notification');
 const { checkAuth } = require('../../utils/auth.util');
 const { validatePostInput } = require('../../utils/validators.util');
+const {
+  profileBadgeProj,
+  populatePost,
+  populateNotification
+} = require('../../utils/populate.util');
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
-
-const profileBadgeProj = '_id email firstName lastName avatar';
-const postBadgeProj = '_id title';
 
 module.exports = {
   Query: {
@@ -195,35 +197,9 @@ module.exports = {
     },
     async getPostById(_, { postId }, __) {
       try {
-        const post = await Post.findById(postId)
-          .populate('creator')
-          .populate({
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          })
-          .populate({
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          })
-          .populate({
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          });
+        const post = await Post.findById(postId).populate(populatePost);
+
+        console.log('post', post);
 
         if (!post) {
           throw new Error('Post not found');
@@ -277,39 +253,7 @@ module.exports = {
           createdAt: new Date().toISOString()
         });
         await newPost.save();
-        await newPost.populate([
-          {
-            path: 'creator',
-            model: 'User'
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          }
-        ]);
+        await newPost.populate(populatePost);
 
         // notify followers
         const followers = (await Follow.find({ following: user.email })).map(
@@ -388,39 +332,7 @@ module.exports = {
         post.tags = tags;
 
         await post.save();
-        await post.populate([
-          {
-            path: 'creator',
-            model: 'User'
-          },
-          {
-            path: 'comments',
-            model: 'Comment',
-            populate: {
-              path: 'commentor',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'likes',
-            model: 'Like',
-            populate: {
-              path: 'liker',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          },
-          {
-            path: 'saves',
-            model: 'Save',
-            populate: {
-              path: 'user',
-              model: 'User',
-              select: profileBadgeProj
-            }
-          }
-        ]);
+        await post.populate(populatePost);
 
         return {
           id: post._id,
@@ -575,28 +487,7 @@ module.exports = {
           const exists = await Notification.exists({ _id: notification._id });
 
           if (exists) {
-            await notification.populate([
-              {
-                path: 'user',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'sender',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'latestUser',
-                model: 'User',
-                select: profileBadgeProj
-              },
-              {
-                path: 'post',
-                model: 'Post',
-                select: postBadgeProj
-              }
-            ]);
+            await notification.populate(populateNotification);
             const unreadCount = await Notification.countDocuments({
               user: post.creator,
               isRead: false

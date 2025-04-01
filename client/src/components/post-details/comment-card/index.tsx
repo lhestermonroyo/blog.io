@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from 'react';
+import { FC, Fragment, useMemo, useState } from 'react';
 import {
   ActionIcon,
   Button,
@@ -17,15 +17,25 @@ import {
   IconClock,
   IconDotsVertical,
   IconEdit,
+  IconHeart,
+  IconHeartFilled,
+  IconMessage,
   IconTrash
 } from '@tabler/icons-react';
 import { format } from 'date-fns';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { TCommentItem, TPostDetails, TPostState } from '../../../../types';
+import states from '../../../states';
+import {
+  TCommentItem,
+  TPostDetails,
+  TPostState,
+  TReplyItem
+} from '../../../../types';
 
 import ProfileBadge from '../../profile-badge';
-import { useSetRecoilState } from 'recoil';
-import states from '../../../states';
+import ReplyForm from '../reply-form';
+import ReplyCard from '../reply-card';
 
 type CommentCardProps = {
   comment: TCommentItem;
@@ -42,10 +52,13 @@ const CommentCard: FC<CommentCardProps> = ({
   updateComment,
   deleteComment
 }) => {
+  const auth = useRecoilValue(states.auth);
   const setPost = useSetRecoilState(states.post);
 
   const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
 
   const isMd = useMediaQuery('(max-width: 768px)');
 
@@ -183,6 +196,21 @@ const CommentCard: FC<CommentCardProps> = ({
     );
   }
 
+  const profileEmail = auth?.profile?.email as string;
+
+  const isLiked = useMemo(
+    () =>
+      Array.isArray(comment?.likes) &&
+      comment?.likes.some((like) => like.liker?.email === profileEmail),
+    [comment]
+  );
+  const likeCount = useMemo(() => comment?.likes?.length || 0, [comment]);
+  const replyCount = useMemo(() => comment?.replies?.length || 0, [comment]);
+  const replies = useMemo(
+    () => (Array.isArray(comment?.replies) && comment?.replies) || [],
+    [comment]
+  );
+
   return (
     <Fragment>
       <Stack key={comment.id} gap="lg">
@@ -232,7 +260,83 @@ const CommentCard: FC<CommentCardProps> = ({
             )}
           </Group>
         </Stack>
+
         <Text size={!isMd ? 'md' : 'sm'}>{comment.body}</Text>
+      </Stack>
+
+      <Stack gap={0}>
+        <Group mb="md">
+          <Group gap={6}>
+            <ActionIcon
+              variant="transparent"
+              // disabled={!auth.isAuth && !auth.profile}
+              // onClick={onLike}
+            >
+              {isLiked ? (
+                <IconHeartFilled size={!isMd ? 24 : 20} />
+              ) : (
+                <IconHeart size={!isMd ? 24 : 20} />
+              )}
+            </ActionIcon>
+            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+              {likeCount}
+            </Text>
+          </Group>
+
+          {replyCount && (
+            <Button
+              px={0}
+              variant="transparent"
+              leftSection={<IconMessage size={!isMd ? 24 : 20} />}
+              // disabled={!auth.isAuth && !auth.profile}
+              onClick={() => setShowReplies(!showReplies)}
+            >
+              <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+                {replyCount} replies
+              </Text>
+            </Button>
+          )}
+
+          <Divider
+            style={{
+              alignSelf: 'center'
+            }}
+            orientation="vertical"
+            h={16}
+          />
+
+          <Button
+            variant="transparent"
+            px={0}
+            onClick={() => setShowReplyForm(!showReplyForm)}
+          >
+            Reply
+          </Button>
+        </Group>
+
+        <Group>
+          <Divider mx="sm" orientation="vertical" size="lg" />
+          <Stack flex={1}>
+            {showReplyForm && (
+              <ReplyForm
+                comment={comment}
+                onHide={() => setShowReplyForm(false)}
+              />
+            )}
+            {showReplies && (
+              <Stack>
+                {replies.map((reply: TReplyItem, index: number) => (
+                  <ReplyCard
+                    key={index}
+                    reply={reply}
+                    isLastReply={replies.length === index + 1}
+                    isOwnReply={reply.replier.email === profileEmail}
+                  />
+                ))}
+              </Stack>
+            )}
+          </Stack>
+        </Group>
       </Stack>
       {!isLastComment && <Divider />}
     </Fragment>
