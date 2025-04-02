@@ -16,6 +16,7 @@ import { IconArrowLeft } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import cx from 'clsx';
 import EditorJS from '@editorjs/editorjs';
+import Embed from '@editorjs/embed';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
@@ -114,6 +115,7 @@ const EditPost = () => {
         table: Table,
         code: CodeTool,
         quote: Quote,
+        embed: Embed,
         image: {
           class: ImageTool,
           config: {

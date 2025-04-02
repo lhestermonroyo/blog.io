@@ -1,4 +1,13 @@
 declare module 'lodash';
+declare module 'editorjs-text-alignment-blocktune' {
+  const TextAlignTune: any;
+  export default TextAlignTune;
+}
+declare module '@editorjs/embed' {
+  import { ToolConstructable } from '@editorjs/editorjs';
+  const Embed: ToolConstructable;
+  export default Embed;
+}
 
 export type TProfile = TProfileBadge & {
   pronouns: string;
