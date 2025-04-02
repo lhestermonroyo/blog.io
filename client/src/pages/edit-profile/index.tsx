@@ -30,7 +30,7 @@ const EditProfile = () => {
             Back
           </Button>
         </Group>
-        <Title order={!isMd ? 1 : 3}>Edit Profile</Title>
+        <Title order={1}>Edit Profile</Title>
         <Tabs
           defaultValue={tab || '1'}
           orientation={!isMd ? 'vertical' : 'horizontal'}

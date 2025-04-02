@@ -9,7 +9,6 @@ import {
   Text,
   Title
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
 import { IconAt, IconMapPin } from '@tabler/icons-react';
 import { useMutation } from '@apollo/client';
@@ -31,8 +30,6 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
       posts: { count: creatorPostCount }
     }
   } = post;
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   const [followUser] = useMutation(FOLLOW_USER);
 
@@ -99,7 +96,7 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
     return (
       <Card withBorder>
         <Stack gap="lg">
-          <Title order={!isMd ? 3 : 4}>About the Author</Title>
+          <Title order={3}>About the Author</Title>
           <Group gap="md">
             <Skeleton radius="lg" width={84} height={84} />
             <Stack flex={1} gap={6}>
@@ -148,7 +145,7 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
     return (
       <Card withBorder>
         <Stack gap="lg">
-          <Title order={!isMd ? 3 : 4}>About the Author</Title>
+          <Title order={3}>About the Author</Title>
           <Group gap="md">
             <Avatar
               src={creatorProfile?.avatar}

@@ -10,7 +10,6 @@ import {
   Title
 } from '@mantine/core';
 import { IconFilter } from '@tabler/icons-react';
-import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useQuery } from '@apollo/client';
 
@@ -33,8 +32,6 @@ const ForYou = () => {
       forYou: { filters, list }
     }
   } = post;
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   const {
     data: response,
@@ -100,7 +97,7 @@ const ForYou = () => {
                     )}
                     <Divider
                       label={
-                        <Title c="dark" order={!isMd ? 3 : 4}>
+                        <Title c="dark" order={3}>
                           More posts for you
                         </Title>
                       }

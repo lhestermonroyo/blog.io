@@ -91,7 +91,7 @@ const Search = () => {
   return (
     <MainLayout size="sm">
       <Stack gap="lg">
-        <Title order={!isMd ? 1 : 2} ta="center">
+        <Title order={1} ta="center">
           Find something in mind
         </Title>
         <TextInput
@@ -105,9 +105,9 @@ const Search = () => {
 
         {query.length > 2 && (
           <Stack gap="xl">
-            <Title order={!isMd ? 2 : 3}>
+            <Title order={2}>
               Results for{' '}
-              <Title component="span" order={!isMd ? 2 : 3} c="green">
+              <Title component="span" order={2} c="green">
                 {query}
               </Title>
             </Title>
@@ -126,7 +126,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={!isMd ? 3 : 4}>
+                            <Title c="dark" order={3}>
                               Authors ({results.users.length})
                             </Title>
                           }
@@ -144,7 +144,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={!isMd ? 3 : 4}>
+                            <Title c="dark" order={3}>
                               Tags ({results.tags.length})
                             </Title>
                           }
@@ -170,7 +170,7 @@ const Search = () => {
                         <Divider
                           labelPosition="left"
                           label={
-                            <Title c="dark" order={!isMd ? 3 : 4}>
+                            <Title c="dark" order={3}>
                               Posts ({results.posts.length})
                             </Title>
                           }

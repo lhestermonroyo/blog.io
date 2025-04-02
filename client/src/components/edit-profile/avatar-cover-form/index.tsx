@@ -137,9 +137,9 @@ const AvatarCoverForm = () => {
   return (
     <Fragment>
       <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
-        <Title order={!isMd ? 3 : 4}>Avatar & Cover Photo</Title>
+        <Title order={3}>Avatar & Cover Photo</Title>
         <Stack gap={6}>
-          <Text size={!isMd ? 'md' : 'sm'}>Upload Avatar</Text>
+          <Text>Upload Avatar</Text>
           <Group>
             <UploadAvatar
               avatarUri={avatar || (profile?.avatar as string)}
@@ -163,7 +163,7 @@ const AvatarCoverForm = () => {
         </Stack>
 
         <Stack gap={6}>
-          <Text size={!isMd ? 'md' : 'sm'}>Upload Cover Photo</Text>
+          <Text>Upload Cover Photo</Text>
           <Stack>
             <UploadCover
               coverUri={coverPhoto || (profile?.coverPhoto as string)}

@@ -12,7 +12,6 @@ import {
   useMantineColorScheme
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useMediaQuery } from '@mantine/hooks';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import cx from 'clsx';
@@ -52,7 +51,6 @@ const EditPost = () => {
   const ejInstance = useRef<EditorJS | null>(null);
   const editorRef = useRef(null);
 
-  const isMd = useMediaQuery('(max-width: 768px)');
   const colorScheme = useMantineColorScheme();
   const isDark = colorScheme.colorScheme === 'dark';
 
@@ -222,7 +220,7 @@ const EditPost = () => {
             </Button>
           </Group>
           <Group justify="space-between" align="center">
-            <Title order={!isMd ? 1 : 3}>Edit Post</Title>
+            <Title order={1}>Edit Post</Title>
             <Button loading={submitting} type="submit">
               Save Changes
             </Button>

@@ -82,7 +82,7 @@ const UserInfoForm = () => {
 
   return (
     <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
-      <Title order={!isMd ? 3 : 4}>User Information</Title>
+      <Title order={3}>User Information</Title>
       <EditItem
         label="Firstname"
         name="firstName"
@@ -157,8 +157,6 @@ const EditItem = ({
       }
     }
   });
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     if (edit) {
@@ -241,10 +239,10 @@ const EditItem = ({
   return (
     <Group justify="space-between" gap={6}>
       <Stack gap={0} flex={1}>
-        <Text size={!isMd ? 'sm' : 'xs'} c="dimmed">
+        <Text size="sm" c="dimmed">
           {label}
         </Text>
-        <Text size={!isMd ? 'md' : 'sm'}>{value || 'Not set yet'}</Text>
+        <Text>{value || 'Not set yet'}</Text>
       </Stack>
       <Button variant="white" onClick={() => setEdit(true)}>
         Edit

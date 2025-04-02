@@ -12,7 +12,6 @@ import {
 import { useForm } from '@mantine/form';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useMediaQuery } from '@mantine/hooks';
 import {
   IconClock,
   IconDotsVertical,
@@ -22,18 +21,18 @@ import {
   IconTrash
 } from '@tabler/icons-react';
 import { format } from 'date-fns';
+import { useMutation } from '@apollo/client';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
-import { TPostDetails, TPostState, TReplyItem } from '../../../../types';
-
-import ProfileBadge from '../../profile-badge';
-import { useMutation } from '@apollo/client';
 import {
   DELETE_REPLY,
   LIKE_REPLY,
   UPDATE_REPLY
 } from '../../../graphql/mutations';
+import { TPostDetails, TPostState, TReplyItem } from '../../../../types';
+
+import ProfileBadge from '../../profile-badge';
 
 type ReplyCardProps = {
   commentId?: string;
@@ -54,8 +53,6 @@ const ReplyCard: FC<ReplyCardProps> = ({
 
   const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   const form = useForm({
     initialValues: {
@@ -304,20 +301,14 @@ const ReplyCard: FC<ReplyCardProps> = ({
           </Group>
         </Stack>
 
-        <Text size={!isMd ? 'md' : 'sm'}>{reply.body}</Text>
+        <Text>{reply.body}</Text>
       </Stack>
 
-      <Group gap={6}>
+      <Group gap={6} align="center">
         <ActionIcon variant="transparent" onClick={handleLike}>
-          {isLiked ? (
-            <IconHeartFilled size={!isMd ? 24 : 20} />
-          ) : (
-            <IconHeart size={!isMd ? 24 : 20} />
-          )}
+          {isLiked ? <IconHeartFilled size={24} /> : <IconHeart size={24} />}
         </ActionIcon>
-        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-          {likeCount}
-        </Text>
+        <Text c="dimmed">{likeCount}</Text>
       </Group>
       {!isLastReply && <Divider />}
     </Fragment>

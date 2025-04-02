@@ -92,7 +92,7 @@ const TagsForm = () => {
 
   return (
     <Stack gap="lg" px={!isMd ? 'xl' : 'sm'} mt={!isMd ? 0 : 'md'}>
-      <Title order={!isMd ? 3 : 4}>Topics/Tags</Title>
+      <Title order={3}>Topics/Tags</Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <MultiSelect

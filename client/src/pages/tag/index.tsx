@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Badge, Divider, Group, SimpleGrid, Stack, Title } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { useQuery } from '@apollo/client';
 import { useRecoilValue } from 'recoil';
 
@@ -16,8 +15,6 @@ import PostCard from '../../components/feed/post-card';
 const Tag = () => {
   const tag = useRecoilValue(states.tag);
   const { list } = tag;
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   const param = useParams();
   const navigate = useNavigate();
@@ -47,13 +44,13 @@ const Tag = () => {
   return (
     <MainLayout>
       <Stack gap="lg">
-        <Title order={!isMd ? 1 : 2} tt="capitalize">
+        <Title order={1} tt="capitalize">
           {param.tag}
         </Title>
         <LoadingFeed loading={loading} error={error} refetch={fetchPostsByTags}>
           <Stack>
-            <Title order={!isMd ? 3 : 4}>
-              <Title order={!isMd ? 3 : 4} component="span" c="green">
+            <Title order={3}>
+              <Title order={3} component="span" c="green">
                 {posts?.length}
               </Title>{' '}
               {posts?.length === 1 ? 'post' : 'posts'} found
@@ -74,7 +71,7 @@ const Tag = () => {
         <Divider
           labelPosition="left"
           label={
-            <Title c="dark" order={!isMd ? 3 : 4}>
+            <Title c="dark" order={3}>
               Explore other topics/tags
             </Title>
           }

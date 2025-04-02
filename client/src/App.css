@@ -74,3 +74,47 @@ li > .mantine-List-itemWrapper {
   align-items: center;
   background: #e5e5e5;
 }
+
+@media (max-width: $mantine-breakpoint-md) {
+  h1.mantine-Title-root {
+    font-size: var(--mantine-h2-font-size) !important;
+  }
+
+  h2.mantine-Title-root {
+    font-size: var(--mantine-h3-font-size) !important;
+  }
+
+  h3.mantine-Title-root {
+    font-size: var(--mantine-h4-font-size) !important;
+  }
+
+  h4.mantine-Title-root {
+    font-size: var(--mantine-h5-font-size) !important;
+  }
+
+  h5.mantine-Title-root {
+    font-size: var(--mantine-h6-font-size) !important;
+  }
+  h6.mantine-Title-root {
+    font-size: var(--mantine-h6-font-size) !important;
+  }
+
+  p.mantine-Text-root,
+  .mantine-List-root,
+  .mantine-Blockquote-root {
+    font-size: var(--mantine-font-size-sm) !important;
+  }
+
+  p[data-size='md'] {
+    font-size: var(--mantine-font-size-sm) !important;
+  }
+
+  p[data-size='sm'] {
+    font-size: var(--mantine-font-size-xs) !important;
+  }
+
+  .mantine-ActionIcon-icon svg {
+    height: 20px !important;
+    width: 20px !important;
+  }
+}

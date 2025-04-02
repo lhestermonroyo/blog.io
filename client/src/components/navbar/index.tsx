@@ -258,7 +258,7 @@ const Navbar = () => {
                 Login
               </Button>
               <Button variant="filled" onClick={() => navigate('/sign-up')}>
-                Create Account
+                Sign Up
               </Button>
             </Group>
           )}

@@ -67,7 +67,6 @@ const Profile = () => {
 
   const auth = useRecoilValue(states.auth);
 
-  const isMd = useMediaQuery('(max-width: 768px)');
   const isLg = useMediaQuery('(max-width: 1200px)');
   const params = useParams();
   const navigate = useNavigate();
@@ -208,7 +207,7 @@ const Profile = () => {
     return (
       <MainLayout>
         <Stack gap="lg">
-          <Title order={!isMd ? 1 : 3}>Profile</Title>
+          <Title order={1}>Profile</Title>
           <Grid gutter="xl">
             <Grid.Col span={!isLg ? 8 : 12}>
               <LoadingProfile

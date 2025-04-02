@@ -73,7 +73,6 @@ const PostDetails = () => {
     mode: 'uncontrolled'
   });
 
-  const isMd = useMediaQuery('(max-width: 768px)');
   const isLg = useMediaQuery('(max-width: 1200px)');
 
   const theme = useMantineTheme();
@@ -358,7 +357,7 @@ const PostDetails = () => {
               {postDetails && (
                 <Fragment>
                   <Stack gap={4}>
-                    <Title order={!isMd ? 1 : 3}>{postDetails?.title}</Title>
+                    <Title order={1}>{postDetails?.title}</Title>
                     <Group gap={4} align="center">
                       <IconClock size={14} />
                       <Text fz="xs" c="dimmed">
@@ -391,7 +390,6 @@ const PostDetails = () => {
                         case 'paragraph':
                           return (
                             <Text
-                              size={!isMd ? 'md' : 'sm'}
                               key={block.id}
                               dangerouslySetInnerHTML={{
                                 __html: block.data.text
@@ -402,7 +400,7 @@ const PostDetails = () => {
                           return (
                             <Title
                               key={block.id}
-                              order={block.data.level + (isMd ? 1 : 0)}
+                              order={block.data.level + 1}
                               dangerouslySetInnerHTML={{
                                 __html: block.data.text
                               }}
@@ -411,7 +409,6 @@ const PostDetails = () => {
                         case 'list':
                           return (
                             <List
-                              size={!isMd ? 'md' : 'sm'}
                               w="100%"
                               withPadding
                               key={block.id}
@@ -434,7 +431,6 @@ const PostDetails = () => {
                           return (
                             <Blockquote
                               color="green"
-                              fz={!isMd ? 'md' : 'sm'}
                               key={block.id}
                               cite={block.data.caption}
                               mt="xl"
@@ -455,35 +451,47 @@ const PostDetails = () => {
                             : block.data.content;
 
                           return (
-                            <Table
-                              withTableBorder
-                              withColumnBorders
+                            <Stack
+                              w="100%"
+                              style={{
+                                overflowX: 'auto'
+                              }}
                               key={block.id}
-                              layout="fixed"
                             >
-                              {withHeadings && (
-                                <Table.Thead>
-                                  <Table.Tr>
-                                    {block.data.content[0].map(
-                                      (heading: string, index: number) => (
-                                        <Table.Th key={index}>
-                                          {heading}
-                                        </Table.Th>
-                                      )
-                                    )}
-                                  </Table.Tr>
-                                </Table.Thead>
-                              )}
-                              <Table.Tbody>
-                                {rows.map((row: any, index: number) => (
-                                  <Table.Tr key={index}>
-                                    {row.map((cell: string, index: number) => (
-                                      <Table.Td key={index}>{cell}</Table.Td>
-                                    ))}
-                                  </Table.Tr>
-                                ))}
-                              </Table.Tbody>
-                            </Table>
+                              <Table
+                                withTableBorder
+                                withColumnBorders
+                                w="100%"
+                                layout="auto"
+                              >
+                                {withHeadings && (
+                                  <Table.Thead>
+                                    <Table.Tr>
+                                      {block.data.content[0].map(
+                                        (heading: string, index: number) => (
+                                          <Table.Th key={index}>
+                                            {heading}
+                                          </Table.Th>
+                                        )
+                                      )}
+                                    </Table.Tr>
+                                  </Table.Thead>
+                                )}
+                                <Table.Tbody>
+                                  {rows.map((row: any, index: number) => (
+                                    <Table.Tr key={index}>
+                                      {row.map(
+                                        (cell: string, index: number) => (
+                                          <Table.Td key={index}>
+                                            {cell}
+                                          </Table.Td>
+                                        )
+                                      )}
+                                    </Table.Tr>
+                                  ))}
+                                </Table.Tbody>
+                              </Table>
+                            </Stack>
                           );
                         case 'image':
                           if (block.data.withBackground) {
@@ -561,7 +569,7 @@ const PostDetails = () => {
 
                   {auth.isAuth && auth.profile ? (
                     <Fragment>
-                      <Title order={!isMd ? 2 : 3}>
+                      <Title order={2}>
                         Comments ({postDetails.commentCount})
                       </Title>
 
@@ -601,13 +609,11 @@ const PostDetails = () => {
                           )}
                         </Stack>
                       ) : (
-                        <Text size="sm" c="dimmed">
-                          No comments yet.
-                        </Text>
+                        <Text c="dimmed">No comments yet.</Text>
                       )}
                     </Fragment>
                   ) : (
-                    <Text size="sm" c="dimmed">
+                    <Text c="dimmed">
                       You must be logged in to comment on this post.
                     </Text>
                   )}

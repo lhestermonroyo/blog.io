@@ -1,6 +1,5 @@
 import { FC, Fragment, useEffect } from 'react';
 import { Button, Group, Stack, Text } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState } from 'recoil';
 
 import states from '../../../states';
@@ -17,8 +16,6 @@ type StepTwoProps = {
 const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile, onboarding } = auth;
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     if (profile) {
@@ -67,7 +64,7 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
     <Fragment>
       <Stack gap="xl" mt="xl">
         <Stack gap={6}>
-          <Text size={!isMd ? 'md' : 'sm'}>Upload Avatar</Text>
+          <Text>Upload Avatar</Text>
           <UploadAvatar
             avatarUri={onboarding.uploadForm.avatar}
             onSelect={handleSelectAvatar}
@@ -75,7 +72,7 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
         </Stack>
 
         <Stack gap={6}>
-          <Text size={!isMd ? 'md' : 'sm'}>Upload Cover Photo</Text>
+          <Text>Upload Cover Photo</Text>
           <UploadCover
             coverUri={onboarding.uploadForm.coverPhoto}
             onSelect={handleSelectCover}

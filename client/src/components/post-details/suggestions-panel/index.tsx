@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Card, Divider, Skeleton, Stack, Title } from '@mantine/core';
+import { Card, Divider, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { useRecoilValue } from 'recoil';
 
 import states from '../../../states';
@@ -49,9 +49,9 @@ const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ loading, list }) => {
     const renderEmpty = () => {
       return (
         <Stack gap="lg">
-          <Title order={5}>
-            Looks like there are no other posts like this.
-          </Title>
+          <Text c="dimmed">
+            Looks like the author hasn't written any other posts.
+          </Text>
         </Stack>
       );
     };

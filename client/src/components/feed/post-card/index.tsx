@@ -49,7 +49,7 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
                 <ProfileBadge avatarSize="sm" profile={item.creator} />
               </Group>
               <Stack gap={0}>
-                <Title order={!isMd ? 4 : 5} lineClamp={2}>
+                <Title order={4} lineClamp={2}>
                   {item.title}
                 </Title>
                 <Group gap={4} align="center">
@@ -60,7 +60,6 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
                 </Group>
               </Stack>
               <Text
-                size={!isMd ? 'md' : 'sm'}
                 lineClamp={2}
                 dangerouslySetInnerHTML={{
                   __html: paragraph?.data.text
@@ -93,27 +92,21 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
         <Group mt="md" gap="lg">
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              <IconHeart size={!isMd ? 24 : 20} />
+              <IconHeart size={24} />
             </ActionIcon>
-            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-              {item.likeCount}
-            </Text>
+            <Text c="dimmed">{item.likeCount}</Text>
           </Group>
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              <IconMessage size={!isMd ? 24 : 20} />
+              <IconMessage size={24} />
             </ActionIcon>
-            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-              {item.commentCount}
-            </Text>
+            <Text c="dimmed">{item.commentCount}</Text>
           </Group>
           <Group justify="center" align="center" gap={4}>
             <ActionIcon variant="transparent">
-              <IconBookmark size={!isMd ? 24 : 20} />
+              <IconBookmark size={24} />
             </ActionIcon>
-            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-              {item.saveCount}
-            </Text>
+            <Text c="dimmed">{item.saveCount}</Text>
           </Group>
         </Group>
       </Card>

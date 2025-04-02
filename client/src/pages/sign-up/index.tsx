@@ -9,7 +9,6 @@ import {
   TextInput,
   Title
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
 import { useNavigate } from 'react-router';
@@ -50,7 +49,6 @@ const SignUp: FC = () => {
 
   const [signUp] = useMutation(SIGN_UP);
 
-  const isMd = useMediaQuery('(max-width: 768px)');
   const navigate = useNavigate();
 
   const handleSubmit = async (values: typeof form.values) => {
@@ -94,8 +92,8 @@ const SignUp: FC = () => {
 
   return (
     <AuthLayout>
-      <Title order={!isMd ? 1 : 2}>Create your Account</Title>
-      <Text c="dimmed" mb="xl" size={!isMd ? 'md' : 'sm'}>
+      <Title order={1}>Create your Account</Title>
+      <Text c="dimmed" mb="xl">
         Fill-in your information and let's get started.
       </Text>
       <form onSubmit={form.onSubmit(handleSubmit)}>

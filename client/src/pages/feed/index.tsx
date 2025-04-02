@@ -80,13 +80,13 @@ const Feed = () => {
       <MainLayout>
         {profile && (
           <Stack gap={0} mb="sm">
-            <Title order={!isMd ? 1 : 3}>
+            <Title order={1}>
               {greetUser()},{' '}
               <Text span c="green" inherit>
                 {profile?.firstName} 👋
               </Text>
             </Title>
-            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+            <Text c="dimmed">
               Here are some posts that you might be interested in. Enjoy!
             </Text>
           </Stack>
@@ -114,8 +114,8 @@ const Feed = () => {
   return (
     <MainLayout>
       <Stack gap={0} mb="sm">
-        <Title order={!isMd ? 1 : 3}>Explore Feed</Title>
-        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+        <Title order={1}>Explore Feed</Title>
+        <Text c="dimmed">
           Here are some posts that you might be interested in. Enjoy!
         </Text>
       </Stack>

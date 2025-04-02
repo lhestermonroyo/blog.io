@@ -12,7 +12,6 @@ import {
 import { useForm } from '@mantine/form';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useMediaQuery } from '@mantine/hooks';
 import {
   IconClock,
   IconDotsVertical,
@@ -62,8 +61,6 @@ const CommentCard: FC<CommentCardProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   const form = useForm({
     initialValues: {
@@ -314,32 +311,30 @@ const CommentCard: FC<CommentCardProps> = ({
           </Group>
         </Stack>
 
-        <Text size={!isMd ? 'md' : 'sm'}>{comment.body}</Text>
+        <Text>{comment.body}</Text>
       </Stack>
 
       <Stack>
-        <Group mb={showReplyForm || showReplies ? 0 : -16}>
-          <Group gap={6}>
+        <Group align="center" mb={showReplyForm || showReplies ? 0 : -16}>
+          <Group align="center" gap={6}>
             <ActionIcon variant="transparent" onClick={handleLike}>
               {isLiked ? (
-                <IconHeartFilled size={!isMd ? 24 : 20} />
+                <IconHeartFilled size={24} />
               ) : (
-                <IconHeart size={!isMd ? 24 : 20} />
+                <IconHeart size={24} />
               )}
             </ActionIcon>
-            <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-              {likeCount}
-            </Text>
+            <Text c="dimmed">{likeCount}</Text>
           </Group>
 
           {replyCount && (
             <Button
               px={0}
               variant="transparent"
-              leftSection={<IconMessage size={!isMd ? 24 : 20} />}
+              leftSection={<IconMessage size={24} />}
               onClick={() => setShowReplies(!showReplies)}
             >
-              <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+              <Text c="dimmed">
                 {replyCount} {replyCount > 1 ? 'Replies' : 'Reply'}
               </Text>
             </Button>
@@ -362,7 +357,7 @@ const CommentCard: FC<CommentCardProps> = ({
           </Button>
         </Group>
 
-        <Group pb={0}>
+        <Group pb={0} align="center">
           <Divider mx="sm" mb={0} orientation="vertical" size="lg" />
           <Stack gap="lg" flex={1}>
             {showReplyForm && (
