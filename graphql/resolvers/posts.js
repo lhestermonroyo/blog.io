@@ -199,8 +199,6 @@ module.exports = {
       try {
         const post = await Post.findById(postId).populate(populatePost);
 
-        console.log('post', post);
-
         if (!post) {
           throw new Error('Post not found');
         }

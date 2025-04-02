@@ -19,31 +19,38 @@ import {
   IconEdit,
   IconHeart,
   IconHeartFilled,
-  IconMessage,
   IconTrash
 } from '@tabler/icons-react';
 import { format } from 'date-fns';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
-import {
-  TCommentItem,
-  TPostDetails,
-  TPostState,
-  TReplyItem
-} from '../../../../types';
+import { TPostDetails, TPostState, TReplyItem } from '../../../../types';
 
 import ProfileBadge from '../../profile-badge';
+import { useMutation } from '@apollo/client';
+import {
+  DELETE_REPLY,
+  LIKE_REPLY,
+  UPDATE_REPLY
+} from '../../../graphql/mutations';
 
 type ReplyCardProps = {
+  commentId?: string;
   reply: TReplyItem;
   isLastReply: boolean;
   isOwnReply: boolean;
 };
 
-const ReplyCard: FC<ReplyCardProps> = ({ reply, isLastReply, isOwnReply }) => {
+const ReplyCard: FC<ReplyCardProps> = ({
+  commentId,
+  reply,
+  isLastReply,
+  isOwnReply
+}) => {
   const auth = useRecoilValue(states.auth);
-  const setPost = useSetRecoilState(states.post);
+  const [post, setPost] = useRecoilState(states.post);
+  const { postDetails } = post;
 
   const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -61,128 +68,143 @@ const ReplyCard: FC<ReplyCardProps> = ({ reply, isLastReply, isOwnReply }) => {
     validateInputOnBlur: true
   });
 
-  // const handleSubmitUpdate = async (values: typeof form.values) => {
-  //   try {
-  //     setSubmitting(true);
+  const [likeReply] = useMutation(LIKE_REPLY);
+  const [updateReply] = useMutation(UPDATE_REPLY);
+  const [deleteReply] = useMutation(DELETE_REPLY);
 
-  //     const data = await updateComment(comment.id, values);
+  const handleLike = async () => {
+    try {
+      setSubmitting(true);
 
-  //     if (data) {
-  //       setPost((prev: TPostState) => ({
-  //         ...prev,
-  //         postDetails: {
-  //           ...(prev.postDetails as TPostDetails),
-  //           comments: data.comments,
-  //           commentCount: data.comments
-  //         }
-  //       }));
+      const response = await likeReply({
+        variables: {
+          postId: postDetails?.id,
+          commentId,
+          replyId: reply?.id
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
 
-  //       notifications.show({
-  //         title: 'Success',
-  //         message: 'Your comment has been updated successfully.',
-  //         color: 'teal',
-  //         position: 'top-center'
-  //       });
-  //       setShowEdit(false);
-  //     }
-  //   } catch (error) {
-  //     notifications.show({
-  //       title: 'Error',
-  //       message: 'An error occurred while updating the comment.',
-  //       color: 'red',
-  //       position: 'top-center'
-  //     });
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
+      if (data) {
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments,
+            commentCount: data.commentCount
+          }
+        }));
+      }
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'An error occurred while liking reply.',
+        color: 'red',
+        position: 'top-center'
+      });
+    }
+  };
 
-  // const handleDelete = async () => {
-  //   try {
-  //     const data = await deleteComment(comment.id);
+  const handleUpdate = async (values: typeof form.values) => {
+    try {
+      setSubmitting(true);
 
-  //     if (data) {
-  //       setPost((prev: TPostState) => ({
-  //         ...prev,
-  //         postDetails: {
-  //           ...(prev.postDetails as TPostDetails),
-  //           comments: data.comments.filter(
-  //             (c: TCommentItem) => c.id !== comment.id
-  //           ),
-  //           commentCount: (prev.postDetails?.commentCount || 0) - 1
-  //         }
-  //       }));
+      const response = await updateReply({
+        variables: {
+          postId: postDetails?.id,
+          commentId,
+          replyId: reply?.id,
+          body: values.comment
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
 
-  //       notifications.show({
-  //         title: 'Success',
-  //         message: 'Your comment has been deleted successfully.',
-  //         color: 'teal',
-  //         position: 'top-center'
-  //       });
-  //       modals.close('delete-comment');
-  //     }
-  //   } catch (error) {
-  //     notifications.show({
-  //       title: 'Error',
-  //       message: 'An error occurred while deleting the comment.',
-  //       color: 'red',
-  //       position: 'top-center'
-  //     });
-  //   }
-  // };
+      if (data) {
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments,
+            commentCount: data.commentCount
+          }
+        }));
 
-  // const showDeleteModal = () =>
-  //   modals.openConfirmModal({
-  //     id: 'delete-comment',
-  //     withCloseButton: false,
-  //     title: 'Delete Comment',
-  //     children: (
-  //       <Text size="sm">
-  //         Are you sure you want to delete this comment? This action cannot be
-  //         undone.
-  //       </Text>
-  //     ),
-  //     labels: { confirm: 'Confirm', cancel: 'Cancel' },
-  //     onConfirm: () => handleDelete()
-  //   });
+        notifications.show({
+          title: 'Success',
+          message: 'Your comment has been updated successfully.',
+          color: 'teal',
+          position: 'top-center'
+        });
+        setShowEdit(false);
+      }
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'An error occurred while updating the comment.',
+        color: 'red',
+        position: 'top-center'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-  // if (showEdit) {
-  //   return (
-  //     <Fragment>
-  //       <Stack key={comment.id} gap="lg">
-  //         <Stack gap={6}>
-  //           <Group justify="space-between" align="center">
-  //             <ProfileBadge profile={comment.commentor} />
-  //           </Group>
-  //           <form onSubmit={form.onSubmit(handleSubmitUpdate)}>
-  //             <Stack>
-  //               <Textarea
-  //                 label="Comment"
-  //                 placeholder="Enter your comment"
-  //                 name="comment"
-  //                 key={form.key('comment')}
-  //                 {...form.getInputProps('comment')}
-  //               />
-  //               <Group gap={6}>
-  //                 <Button type="submit" loading={submitting}>
-  //                   Submit
-  //                 </Button>
-  //                 <Button
-  //                   variant="default"
-  //                   disabled={submitting}
-  //                   onClick={() => setShowEdit(false)}
-  //                 >
-  //                   Cancel
-  //                 </Button>
-  //               </Group>
-  //             </Stack>
-  //           </form>
-  //         </Stack>
-  //       </Stack>
-  //       {!isLastComment && <Divider />}
-  //     </Fragment>
-  //   );
-  // }
+  const handleDelete = async () => {
+    try {
+      const response = await deleteReply({
+        variables: {
+          postId: postDetails?.id,
+          commentId,
+          replyId: reply?.id
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
+
+      if (data) {
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments,
+            commentCount: data.commentCount
+          }
+        }));
+
+        notifications.show({
+          title: 'Success',
+          message: 'Your comment has been deleted successfully.',
+          color: 'teal',
+          position: 'top-center'
+        });
+        modals.close('delete-comment');
+      }
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'An error occurred while deleting the comment.',
+        color: 'red',
+        position: 'top-center'
+      });
+    }
+  };
+
+  const showDeleteModal = () =>
+    modals.openConfirmModal({
+      id: 'delete-reply',
+      withCloseButton: false,
+      title: 'Delete Reply',
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this reply? This action cannot be
+          undone.
+        </Text>
+      ),
+      labels: { confirm: 'Confirm', cancel: 'Cancel' },
+      onConfirm: () => handleDelete()
+    });
 
   const profileEmail = auth?.profile?.email as string;
 
@@ -193,6 +215,44 @@ const ReplyCard: FC<ReplyCardProps> = ({ reply, isLastReply, isOwnReply }) => {
     [reply]
   );
   const likeCount = useMemo(() => reply?.likes?.length || 0, [reply]);
+
+  if (showEdit) {
+    return (
+      <Fragment>
+        <Stack key={reply.id} gap="lg">
+          <Stack gap={6}>
+            <Group justify="space-between" align="center">
+              <ProfileBadge profile={reply.replier} />
+            </Group>
+            <form onSubmit={form.onSubmit(handleUpdate)}>
+              <Stack>
+                <Textarea
+                  label="Comment"
+                  placeholder="Enter your comment"
+                  name="comment"
+                  key={form.key('comment')}
+                  {...form.getInputProps('comment')}
+                />
+                <Group gap={6}>
+                  <Button type="submit" loading={submitting}>
+                    Submit
+                  </Button>
+                  <Button
+                    variant="default"
+                    disabled={submitting}
+                    onClick={() => setShowEdit(false)}
+                  >
+                    Cancel
+                  </Button>
+                </Group>
+              </Stack>
+            </form>
+          </Stack>
+        </Stack>
+        {!isLastReply && <Divider />}
+      </Fragment>
+    );
+  }
 
   return (
     <Fragment>
@@ -223,7 +283,7 @@ const ReplyCard: FC<ReplyCardProps> = ({ reply, isLastReply, isOwnReply }) => {
 
                   <Menu.Item
                     leftSection={<IconTrash size={16} stroke={1.5} />}
-                    // onClick={showDeleteModal}
+                    onClick={showDeleteModal}
                   >
                     Delete
                   </Menu.Item>
@@ -247,23 +307,17 @@ const ReplyCard: FC<ReplyCardProps> = ({ reply, isLastReply, isOwnReply }) => {
         <Text size={!isMd ? 'md' : 'sm'}>{reply.body}</Text>
       </Stack>
 
-      <Group mb="md">
-        <Group gap={6}>
-          <ActionIcon
-            variant="transparent"
-            // disabled={!auth.isAuth && !auth.profile}
-            // onClick={onLike}
-          >
-            {isLiked ? (
-              <IconHeartFilled size={!isMd ? 24 : 20} />
-            ) : (
-              <IconHeart size={!isMd ? 24 : 20} />
-            )}
-          </ActionIcon>
-          <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-            {likeCount}
-          </Text>
-        </Group>
+      <Group gap={6}>
+        <ActionIcon variant="transparent" onClick={handleLike}>
+          {isLiked ? (
+            <IconHeartFilled size={!isMd ? 24 : 20} />
+          ) : (
+            <IconHeart size={!isMd ? 24 : 20} />
+          )}
+        </ActionIcon>
+        <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
+          {likeCount}
+        </Text>
       </Group>
       {!isLastReply && <Divider />}
     </Fragment>

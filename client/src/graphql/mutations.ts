@@ -135,18 +135,18 @@ export const CREATE_POST = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited
@@ -227,18 +227,18 @@ export const UPDATE_POST = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited
@@ -336,18 +336,18 @@ export const CREATE_COMMENT = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited
@@ -392,18 +392,18 @@ export const LIKE_COMMENT = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited
@@ -448,18 +448,18 @@ export const UPDATE_COMMENT = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited
@@ -504,18 +504,18 @@ export const DELETE_COMMENT = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited
@@ -560,6 +560,51 @@ export const CREATE_REPLY = gql`
             }
             createdAt
           }
+          isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          createdAt
+        }
+        isEdited
+        createdAt
+      }
+    }
+  }
+`;
+
+export const LIKE_REPLY = gql`
+  mutation LikeReply($postId: ID!, $commentId: ID!, $replyId: ID!) {
+    likeReply(postId: $postId, commentId: $commentId, replyId: $replyId) {
+      commentCount
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           likes {
             id
             liker {
@@ -572,6 +617,139 @@ export const CREATE_REPLY = gql`
             createdAt
           }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          createdAt
+        }
+        isEdited
+        createdAt
+      }
+    }
+  }
+`;
+
+export const UPDATE_REPLY = gql`
+  mutation UpdateReply(
+    $postId: ID!
+    $commentId: ID!
+    $replyId: ID!
+    $body: String!
+  ) {
+    updateReply(
+      postId: $postId
+      commentId: $commentId
+      replyId: $replyId
+      body: $body
+    ) {
+      commentCount
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          createdAt
+        }
+        isEdited
+        createdAt
+      }
+    }
+  }
+`;
+
+export const DELETE_REPLY = gql`
+  mutation DeleteReply($postId: ID!, $commentId: ID!, $replyId: ID!) {
+    deleteReply(postId: $postId, commentId: $commentId, replyId: $replyId) {
+      commentCount
+      comments {
+        id
+        body
+        commentor {
+          id
+          email
+          firstName
+          lastName
+          avatar
+        }
+        replies {
+          id
+          body
+          replier {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
+          likes {
+            id
+            liker {
+              id
+              email
+              firstName
+              lastName
+              avatar
+            }
+            createdAt
+          }
+          isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited

@@ -22,10 +22,16 @@ import {
   IconMessage,
   IconTrash
 } from '@tabler/icons-react';
+import { useMutation } from '@apollo/client';
 import { format } from 'date-fns';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import states from '../../../states';
+import {
+  DELETE_COMMENT,
+  LIKE_COMMENT,
+  UPDATE_COMMENT
+} from '../../../graphql/mutations';
 import {
   TCommentItem,
   TPostDetails,
@@ -41,19 +47,16 @@ type CommentCardProps = {
   comment: TCommentItem;
   isOwnComment: boolean;
   isLastComment: boolean;
-  updateComment: (commentId: string, values: any) => Promise<any>;
-  deleteComment: (commentId: string) => Promise<any>;
 };
 
 const CommentCard: FC<CommentCardProps> = ({
   comment,
   isOwnComment,
-  isLastComment,
-  updateComment,
-  deleteComment
+  isLastComment
 }) => {
   const auth = useRecoilValue(states.auth);
-  const setPost = useSetRecoilState(states.post);
+  const [post, setPost] = useRecoilState(states.post);
+  const { postDetails } = post;
 
   const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -73,11 +76,56 @@ const CommentCard: FC<CommentCardProps> = ({
     validateInputOnBlur: true
   });
 
-  const handleSubmitUpdate = async (values: typeof form.values) => {
+  const [likeComment] = useMutation(LIKE_COMMENT);
+  const [updateComment] = useMutation(UPDATE_COMMENT);
+  const [deleteComment] = useMutation(DELETE_COMMENT);
+
+  const handleLike = async () => {
     try {
       setSubmitting(true);
 
-      const data = await updateComment(comment.id, values);
+      const response = await likeComment({
+        variables: {
+          postId: postDetails?.id,
+          commentId: comment?.id
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
+
+      if (data) {
+        setPost((prev: TPostState) => ({
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: data.comments,
+            commentCount: data.commentCount
+          }
+        }));
+      }
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'An error occurred while liking the comment.',
+        color: 'red',
+        position: 'top-center'
+      });
+    }
+  };
+
+  const handleUpdate = async (values: typeof form.values) => {
+    try {
+      setSubmitting(true);
+
+      const response = await updateComment({
+        variables: {
+          postId: postDetails?.id,
+          commentId: comment?.id,
+          body: values.comment
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
 
       if (data) {
         setPost((prev: TPostState) => ({
@@ -111,17 +159,22 @@ const CommentCard: FC<CommentCardProps> = ({
 
   const handleDelete = async () => {
     try {
-      const data = await deleteComment(comment.id);
+      const response = await deleteComment({
+        variables: {
+          postId: postDetails?.id,
+          commentId: comment?.id
+        }
+      });
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
 
       if (data) {
         setPost((prev: TPostState) => ({
           ...prev,
           postDetails: {
             ...(prev.postDetails as TPostDetails),
-            comments: data.comments.filter(
-              (c: TCommentItem) => c.id !== comment.id
-            ),
-            commentCount: (prev.postDetails?.commentCount || 0) - 1
+            comments: data.comments,
+            commentCount: data.commentCount
           }
         }));
 
@@ -158,6 +211,21 @@ const CommentCard: FC<CommentCardProps> = ({
       onConfirm: () => handleDelete()
     });
 
+  const profileEmail = auth?.profile?.email as string;
+
+  const isLiked = useMemo(
+    () =>
+      Array.isArray(comment?.likes) &&
+      comment?.likes.some((like) => like.liker?.email === profileEmail),
+    [comment]
+  );
+  const likeCount = useMemo(() => comment?.likes?.length || 0, [comment]);
+  const replyCount = useMemo(() => comment?.replies?.length || 0, [comment]);
+  const replies = useMemo(
+    () => (Array.isArray(comment?.replies) ? comment?.replies : []),
+    [comment]
+  );
+
   if (showEdit) {
     return (
       <Fragment>
@@ -166,7 +234,7 @@ const CommentCard: FC<CommentCardProps> = ({
             <Group justify="space-between" align="center">
               <ProfileBadge profile={comment.commentor} />
             </Group>
-            <form onSubmit={form.onSubmit(handleSubmitUpdate)}>
+            <form onSubmit={form.onSubmit(handleUpdate)}>
               <Stack>
                 <Textarea
                   label="Comment"
@@ -195,21 +263,6 @@ const CommentCard: FC<CommentCardProps> = ({
       </Fragment>
     );
   }
-
-  const profileEmail = auth?.profile?.email as string;
-
-  const isLiked = useMemo(
-    () =>
-      Array.isArray(comment?.likes) &&
-      comment?.likes.some((like) => like.liker?.email === profileEmail),
-    [comment]
-  );
-  const likeCount = useMemo(() => comment?.likes?.length || 0, [comment]);
-  const replyCount = useMemo(() => comment?.replies?.length || 0, [comment]);
-  const replies = useMemo(
-    () => (Array.isArray(comment?.replies) && comment?.replies) || [],
-    [comment]
-  );
 
   return (
     <Fragment>
@@ -264,14 +317,10 @@ const CommentCard: FC<CommentCardProps> = ({
         <Text size={!isMd ? 'md' : 'sm'}>{comment.body}</Text>
       </Stack>
 
-      <Stack gap={0}>
-        <Group mb="md">
+      <Stack>
+        <Group mb={showReplyForm || showReplies ? 0 : -16}>
           <Group gap={6}>
-            <ActionIcon
-              variant="transparent"
-              // disabled={!auth.isAuth && !auth.profile}
-              // onClick={onLike}
-            >
+            <ActionIcon variant="transparent" onClick={handleLike}>
               {isLiked ? (
                 <IconHeartFilled size={!isMd ? 24 : 20} />
               ) : (
@@ -288,11 +337,10 @@ const CommentCard: FC<CommentCardProps> = ({
               px={0}
               variant="transparent"
               leftSection={<IconMessage size={!isMd ? 24 : 20} />}
-              // disabled={!auth.isAuth && !auth.profile}
               onClick={() => setShowReplies(!showReplies)}
             >
               <Text c="dimmed" size={!isMd ? 'md' : 'sm'}>
-                {replyCount} replies
+                {replyCount} {replyCount > 1 ? 'Replies' : 'Reply'}
               </Text>
             </Button>
           )}
@@ -314,20 +362,22 @@ const CommentCard: FC<CommentCardProps> = ({
           </Button>
         </Group>
 
-        <Group>
-          <Divider mx="sm" orientation="vertical" size="lg" />
-          <Stack flex={1}>
+        <Group pb={0}>
+          <Divider mx="sm" mb={0} orientation="vertical" size="lg" />
+          <Stack gap="lg" flex={1}>
             {showReplyForm && (
               <ReplyForm
                 comment={comment}
                 onHide={() => setShowReplyForm(false)}
+                onShowReplies={() => setShowReplies(true)}
               />
             )}
             {showReplies && (
-              <Stack>
+              <Stack gap="md">
                 {replies.map((reply: TReplyItem, index: number) => (
                   <ReplyCard
                     key={index}
+                    commentId={comment?.id}
                     reply={reply}
                     isLastReply={replies.length === index + 1}
                     isOwnReply={reply.replier.email === profileEmail}

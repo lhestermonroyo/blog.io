@@ -38,8 +38,6 @@ import { GET_POST_BY_ID } from '../../graphql/queries';
 import {
   DELETE_POST,
   CREATE_COMMENT,
-  UPDATE_COMMENT,
-  DELETE_COMMENT,
   LIKE_POST,
   SAVE_POST
 } from '../../graphql/mutations';
@@ -93,8 +91,6 @@ const PostDetails = () => {
   const [likePost] = useMutation(LIKE_POST);
   const [savePost] = useMutation(SAVE_POST);
   const [createComment] = useMutation(CREATE_COMMENT);
-  const [updateComment] = useMutation(UPDATE_COMMENT);
-  const [deleteComment] = useMutation(DELETE_COMMENT);
 
   useEffect(() => {
     window.addEventListener('scroll', stickyListener);
@@ -251,29 +247,6 @@ const PostDetails = () => {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleUpdateComment = async (commentId: string, values: any) => {
-    const response = await updateComment({
-      variables: {
-        postId: params.id,
-        commentId,
-        body: values.comment
-      }
-    });
-    const key = Object.keys(response.data)[0];
-    return response.data[key];
-  };
-
-  const handleDeleteComment = async (commentId: string) => {
-    const response = await deleteComment({
-      variables: {
-        postId: params.id,
-        commentId
-      }
-    });
-    const key = Object.keys(response.data)[0];
-    return response.data[key];
   };
 
   const handleSavePost = async () => {
@@ -623,8 +596,6 @@ const PostDetails = () => {
                                 isOwnComment={
                                   comment.commentor.email === profileEmail
                                 }
-                                updateComment={handleUpdateComment}
-                                deleteComment={handleDeleteComment}
                               />
                             )
                           )}

@@ -1,41 +1,21 @@
-import { FC, Fragment, useMemo, useState } from 'react';
-import {
-  ActionIcon,
-  Button,
-  Divider,
-  Group,
-  Menu,
-  Stack,
-  Textarea
-} from '@mantine/core';
+import { FC, useState } from 'react';
+import { Button, Group, Stack, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { useMediaQuery } from '@mantine/hooks';
-import {
-  IconClock,
-  IconDotsVertical,
-  IconEdit,
-  IconHeart,
-  IconHeartFilled,
-  IconTrash
-} from '@tabler/icons-react';
-import { format } from 'date-fns';
+import { useMutation } from '@apollo/client';
+import { useRecoilState } from 'recoil';
 
 import { TCommentItem, TPostDetails, TPostState } from '../../../../types';
-
-import ProfileBadge from '../../profile-badge';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import states from '../../../states';
-import { useMutation } from '@apollo/client';
 import { CREATE_REPLY } from '../../../graphql/mutations';
+import states from '../../../states';
 
 type ReplyFormProps = {
   comment: TCommentItem;
   onHide: () => void;
+  onShowReplies: () => void;
 };
 
-const ReplyForm: FC<ReplyFormProps> = ({ comment, onHide }) => {
+const ReplyForm: FC<ReplyFormProps> = ({ comment, onHide, onShowReplies }) => {
   const [post, setPost] = useRecoilState(states.post);
   const { postDetails } = post;
 
@@ -56,7 +36,6 @@ const ReplyForm: FC<ReplyFormProps> = ({ comment, onHide }) => {
   const [createReply] = useMutation(CREATE_REPLY);
 
   const handleSubmitReply = async (values: typeof form.values) => {
-    // Implement reply submission logic here
     try {
       setSubmitting(true);
 
@@ -81,6 +60,7 @@ const ReplyForm: FC<ReplyFormProps> = ({ comment, onHide }) => {
         }));
         form.reset();
         onHide();
+        onShowReplies();
 
         notifications.show({
           title: 'Success',

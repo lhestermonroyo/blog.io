@@ -315,18 +315,18 @@ export const GET_POST_BY_ID = gql`
             }
             createdAt
           }
-          likes {
-            id
-            liker {
-              id
-              email
-              firstName
-              lastName
-              avatar
-            }
-            createdAt
-          }
           isEdited
+          createdAt
+        }
+        likes {
+          id
+          liker {
+            id
+            email
+            firstName
+            lastName
+            avatar
+          }
           createdAt
         }
         isEdited

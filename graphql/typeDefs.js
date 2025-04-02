@@ -242,11 +242,11 @@ module.exports = gql`
     savePost(postId: ID!): SaveResponse!
     # Comments
     createComment(postId: ID!, body: String!): CommentResponse!
-    likeComment(postId: ID!, commentId: ID!): LikeResponse!
+    likeComment(postId: ID!, commentId: ID!): CommentResponse!
     updateComment(postId: ID!, commentId: ID!, body: String!): CommentResponse!
     deleteComment(postId: ID!, commentId: ID!): CommentResponse!
     createReply(postId: ID!, commentId: ID!, body: String!): CommentResponse!
-    likeReply(postId: ID!, commentId: ID!, replyId: ID!): LikeResponse!
+    likeReply(postId: ID!, commentId: ID!, replyId: ID!): CommentResponse!
     updateReply(
       postId: ID!
       commentId: ID!
