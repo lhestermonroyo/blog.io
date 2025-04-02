@@ -109,7 +109,10 @@ li > .mantine-List-itemWrapper {
     font-size: var(--mantine-font-size-sm) !important;
   }
 
-  p[data-size='sm'] {
+  p[data-size='sm'],
+  p.mantine-Text-root[data-size='sm'],
+  p[data-size='xs'],
+  p.mantine-Text-root[data-size='xs'] {
     font-size: var(--mantine-font-size-xs) !important;
   }
 
