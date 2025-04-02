@@ -15,6 +15,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import cx from 'clsx';
 import EditorJS from '@editorjs/editorjs';
+// @ts-ignore
 import Embed from '@editorjs/embed';
 import Header from '@editorjs/header';
 import List from '@editorjs/list';

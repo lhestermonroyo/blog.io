@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Stack, Tabs, Text, Title } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { useRecoilState } from 'recoil';
 import { useQuery } from '@apollo/client';
 
@@ -22,8 +21,6 @@ import Following from '../../components/feed/following';
 const Feed = () => {
   const [auth, setAuth] = useRecoilState(states.auth);
   const { profile, isAuth } = auth;
-
-  const isMd = useMediaQuery('(max-width: 768px)');
 
   const { data: statsResponse, refetch: fetchStats } = useQuery(
     GET_STATS_BY_EMAIL,
