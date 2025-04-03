@@ -81,8 +81,8 @@ module.exports = {
           notification = new Notification({
             user: post.creator,
             sender: user.id,
-            post: postId,
             type: 'new_comment',
+            post: postId,
             message: `${currUser.firstName} ${currUser.lastName} commented on your post.`,
             latestUser: [currUser.id],
             createdAt: new Date().toISOString()

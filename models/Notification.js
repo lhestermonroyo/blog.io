@@ -10,7 +10,16 @@ const notificationSchema = new mongoose.Schema(
     }, // Who triggered the notification
     type: {
       type: String,
-      enum: ['new_post', 'new_comment', 'like', 'save', 'follow'],
+      enum: [
+        'new_post',
+        'new_comment',
+        'reply',
+        'like_comment',
+        'like_reply',
+        'like',
+        'save',
+        'follow'
+      ],
       required: true
     },
     latestUser: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // for condensing notifications
@@ -19,6 +28,11 @@ const notificationSchema = new mongoose.Schema(
       ref: 'Post',
       required: false
     }, // If related to a post
+    comment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+      required: false
+    },
     isRead: { type: Boolean, default: false },
     message: { type: String, required: true },
     createdAt: String
