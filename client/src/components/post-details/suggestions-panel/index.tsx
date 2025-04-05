@@ -20,7 +20,7 @@ const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ loading, list }) => {
     return (
       <Card withBorder>
         <Stack gap="lg">
-          <Title order={3}>Posts Like This</Title>
+          <Title order={3}>Posts like this</Title>
           <Stack gap="xs">
             <Skeleton height={100} />
             <Divider />
@@ -59,7 +59,7 @@ const SuggestionsPanel: FC<SuggestionsPanelProps> = ({ loading, list }) => {
     return (
       <Card withBorder>
         <Stack gap="lg">
-          <Title order={3}>Posts Like This</Title>
+          <Title order={3}>Posts like this</Title>
           {filteredPosts.length > 0 ? renderList() : renderEmpty()}
         </Stack>
       </Card>

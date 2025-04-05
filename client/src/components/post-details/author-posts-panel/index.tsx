@@ -19,7 +19,7 @@ const AuthorPostsPanel = ({ loading }: { loading: boolean }) => {
     return (
       <Card withBorder>
         <Stack gap="lg">
-          <Title order={3}>More Posts from the Author</Title>
+          <Title order={3}>More from the Author</Title>
           <Stack gap="lg">
             <Skeleton height={100} />
             <Divider />
@@ -59,7 +59,7 @@ const AuthorPostsPanel = ({ loading }: { loading: boolean }) => {
     return (
       <Card withBorder>
         <Stack gap="lg">
-          <Title order={3}>More Posts from the Author</Title>
+          <Title order={3}>More from the Author</Title>
           {filteredPosts.length > 0 ? renderList() : renderEmpty()}
         </Stack>
       </Card>
