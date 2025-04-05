@@ -36,7 +36,15 @@ const theme = createTheme({
     ]
   },
   primaryColor: 'green',
-  components: {}
+  components: {
+    Title: {
+      styles: () => ({
+        root: {
+          fontWeight: 650 // <--- Default font weight
+        }
+      })
+    }
+  }
 });
 
 function App() {

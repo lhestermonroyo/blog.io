@@ -167,7 +167,15 @@ export type TNotificationState = {
 
 export type TNotificationItem = {
   id: string;
-  type: 'new_post' | 'new_comment' | 'like' | 'save' | 'follow';
+  type:
+    | 'new_post'
+    | 'new_comment'
+    | 'like'
+    | 'like_comment'
+    | 'reply_comment'
+    | 'like_reply'
+    | 'save'
+    | 'follow';
   user: TProfileBadge;
   sender: TProfileBadge;
   latestUser: [TProfileBadge];

@@ -61,6 +61,7 @@ export const GET_NOTIFICATIONS = gql`
           id
           title
         }
+        comment 
         isRead
         message
         createdAt

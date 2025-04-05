@@ -200,9 +200,12 @@ const NotificationPanel = () => {
                 const typeIcon =
                   item?.type === 'new_post' ? (
                     <IconBallpen {...iconProps} />
-                  ) : item?.type === 'new_comment' ? (
+                  ) : item?.type === 'new_comment' ||
+                    item?.type === 'reply_comment' ? (
                     <IconMessage {...iconProps} />
-                  ) : item?.type === 'like' ? (
+                  ) : item?.type === 'like' ||
+                    item?.type === 'like_comment' ||
+                    item?.type === 'like_reply' ? (
                     <IconHeart {...iconProps} />
                   ) : item?.type === 'follow' ? (
                     <IconUserPlus {...iconProps} />
@@ -222,12 +225,16 @@ const NotificationPanel = () => {
                         <Avatar src={avatar} alt="notif-avatar" size="md" />
                       </Indicator>
                       <Stack gap={0} flex={1}>
-                        <Text size="sm" fw={!item?.isRead ? 700 : 500}>
+                        <Text
+                          size="sm"
+                          lineClamp={2}
+                          fw={!item?.isRead ? 700 : 500}
+                        >
                           {item.message}
                         </Text>
                         <Group gap={4} align="center">
                           <IconClock size={14} />
-                          <Text fz="xs" c="dimmed">
+                          <Text size="xs" c="dimmed">
                             {format(
                               new Date(item.createdAt),
                               'MMMM dd - hh:mm a'

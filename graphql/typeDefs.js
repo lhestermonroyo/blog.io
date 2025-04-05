@@ -4,6 +4,9 @@ module.exports = gql`
   enum NotificationType {
     new_post
     new_comment
+    like_comment
+    reply_comment
+    like_reply
     like
     save
     follow
@@ -158,6 +161,7 @@ module.exports = gql`
     sender: ProfileBadge!
     latestUser: [ProfileBadge]!
     post: PostBadge
+    comment: String
     isRead: Boolean!
     message: String!
     createdAt: String!

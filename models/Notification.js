@@ -13,8 +13,8 @@ const notificationSchema = new mongoose.Schema(
       enum: [
         'new_post',
         'new_comment',
-        'reply',
         'like_comment',
+        'reply_comment',
         'like_reply',
         'like',
         'save',
@@ -30,7 +30,6 @@ const notificationSchema = new mongoose.Schema(
     }, // If related to a post
     comment: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Comment',
       required: false
     },
     isRead: { type: Boolean, default: false },

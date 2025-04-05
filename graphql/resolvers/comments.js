@@ -64,15 +64,16 @@ module.exports = {
             const msgUser = notification.latestUser[0];
 
             if (notification.latestUser.length === 1) {
-              notification.message = `${msgUser.firstName} ${msgUser.lastName} commented your post.`;
+              notification.message = `${msgUser.firstName} ${msgUser.lastName} commented your post "${post.title}".`;
             } else {
               notification.message = `${msgUser.firstName} ${
                 msgUser.lastName
               } and ${
                 notification.latestUser.length - 1
-              } others commented your post.`;
+              } others commented your post "${post.title}".`;
             }
 
+            notification.comment = post.comments[0];
             notification.isRead = false;
             notification.createdAt = new Date().toISOString();
             await notification.save();
@@ -83,7 +84,8 @@ module.exports = {
             sender: user.id,
             type: 'new_comment',
             post: postId,
-            message: `${currUser.firstName} ${currUser.lastName} commented on your post.`,
+            comment: post.comments[0],
+            message: `${currUser.firstName} ${currUser.lastName} commented on your post "${post.title}".`,
             latestUser: [currUser.id],
             createdAt: new Date().toISOString()
           });
@@ -126,7 +128,10 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const post = await Post.findById(postId);
+        const requests = [Post.findById(postId), User.findById(user.id)];
+
+        let [post, currUser] = await Promise.all(requests);
+
         if (!post) {
           throw new Error('Post not found');
         }
@@ -144,18 +149,112 @@ module.exports = {
           (like) => like.liker.toString() === user.id
         );
 
+        let notification = await Notification.findOne({
+          user: comment.commentor,
+          post: postId,
+          comment: commentId,
+          type: 'like_comment'
+        }).populate('latestUser', profileBadgeProj);
+
         if (alreadyLiked) {
           comment.likes = comment.likes.filter(
             (like) => like.liker.toString() !== user.id
           );
+
+          if (notification) {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (existing) {
+              notification.latestUser = notification.latestUser.filter(
+                (user) => user._id.toString() !== currUser._id.toString()
+              );
+            }
+
+            if (notification.latestUser.length === 0) {
+              await notification.deleteOne();
+            } else {
+              const msgUser = notification.latestUser[0];
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${msgUser.firstName} ${msgUser.lastName} liked your comment "${comment.body}".`;
+              } else {
+                notification.message = `${msgUser.firstName} ${
+                  msgUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others liked your comment "${comment.body}".`;
+              }
+
+              notification.createdAt = new Date().toISOString();
+              await notification.save();
+            }
+          }
         } else {
           comment.likes.push({
             liker: user.id,
             createdAt: new Date().toISOString()
           });
+
+          if (!notification) {
+            notification = new Notification({
+              user: comment.commentor,
+              sender: user.id,
+              type: 'like_comment',
+              post: postId,
+              comment: commentId,
+              latestUser: [user.id],
+              message: `${currUser.firstName} ${currUser.lastName} liked your comment "${comment.body}".`,
+              createdAt: new Date().toISOString()
+            });
+            await notification.save();
+          } else {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (!existing) {
+              notification.latestUser.unshift(currUser._id);
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${currUser.firstName} ${currUser.lastName} liked your comment "${comment.body}".`;
+              } else {
+                notification.message = `${currUser.firstName} ${
+                  currUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others liked your comment "${comment.body}".`;
+              }
+
+              notification.isRead = false;
+              notification.createdAt = new Date().toISOString();
+            }
+            await notification.save();
+          }
         }
         await post.save();
         await post.populate(populateComment);
+
+        const exists = await Notification.exists({ _id: notification._id });
+
+        if (exists) {
+          await notification.populate(populateNotification);
+          const unreadCount = await Notification.countDocuments({
+            user: comment.commentor._id,
+            isRead: false
+          });
+
+          pubSub.publish(NEW_NOTIFICATION, {
+            onNewNotification: {
+              unreadCount,
+              notification: {
+                id: notification._id,
+                ...notification._doc
+              }
+            }
+          });
+        }
 
         return {
           comments: post.comments
@@ -251,7 +350,17 @@ module.exports = {
           throw new UserInputError('Validation Error', { errors });
         }
 
-        const post = await Post.findById(postId);
+        const requests = [
+          Post.findById(postId),
+          Notification.findOne({
+            post: postId,
+            comment: commentId,
+            type: 'reply_comment'
+          }).populate('latestUser', profileBadgeProj),
+          User.findById(user.id)
+        ];
+
+        let [post, notification, currUser] = await Promise.all(requests);
 
         if (!post) {
           throw new Error('Post not found');
@@ -276,6 +385,64 @@ module.exports = {
         await post.save();
         await post.populate(populateComment);
 
+        if (notification) {
+          const existing = notification.latestUser.some(
+            (user) => user._id.toString() === currUser._id.toString()
+          );
+
+          if (!existing) {
+            notification.latestUser.unshift(currUser);
+
+            const msgUser = notification.latestUser[0];
+
+            if (notification.latestUser.length === 1) {
+              notification.message = `${msgUser.firstName} ${msgUser.lastName} replied to your comment "${comment.body}".`;
+            } else {
+              notification.message = `${msgUser.firstName} ${
+                msgUser.lastName
+              } and ${
+                notification.latestUser.length - 1
+              } others replied to your comment "${comment.body}".`;
+            }
+
+            notification.comment = post.comments[0];
+            notification.isRead = false;
+            notification.createdAt = new Date().toISOString();
+            await notification.save();
+          }
+        } else {
+          notification = new Notification({
+            user: comment.commentor,
+            sender: user.id,
+            type: 'reply_comment',
+            post: postId,
+            comment: commentId,
+            message: `${currUser.firstName} ${currUser.lastName} replied to your comment "${comment.body}".`,
+            latestUser: [currUser.id],
+            createdAt: new Date().toISOString()
+          });
+          await notification.save();
+        }
+
+        const exists = await Notification.exists({ _id: notification._id });
+
+        if (exists) {
+          await notification.populate(populateNotification);
+          const unreadCount = await Notification.countDocuments({
+            user: comment.commentor._id,
+            isRead: false
+          });
+
+          pubSub.publish(NEW_NOTIFICATION, {
+            onNewNotification: {
+              unreadCount,
+              notification: {
+                id: notification._id,
+                ...notification._doc
+              }
+            }
+          });
+        }
         return {
           comments: post.comments
         };
@@ -291,7 +458,9 @@ module.exports = {
           throw new Error('User not authenticated');
         }
 
-        const post = await Post.findById(postId);
+        const requests = [Post.findById(postId), User.findById(user.id)];
+
+        let [post, currUser] = await Promise.all(requests);
 
         if (!post) {
           throw new Error('Post not found');
@@ -319,18 +488,112 @@ module.exports = {
           (like) => like.liker.toString() === user.id
         );
 
+        let notification = await Notification.findOne({
+          user: reply.replier,
+          post: postId,
+          comment: commentId,
+          type: 'like_reply'
+        }).populate('latestUser', profileBadgeProj);
+
         if (alreadyLiked) {
           reply.likes = reply.likes.filter(
             (like) => like.liker.toString() !== user.id
           );
+
+          if (notification) {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (existing) {
+              notification.latestUser = notification.latestUser.filter(
+                (user) => user._id.toString() !== currUser._id.toString()
+              );
+            }
+
+            if (notification.latestUser.length === 0) {
+              await notification.deleteOne();
+            } else {
+              const msgUser = notification.latestUser[0];
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${msgUser.firstName} ${msgUser.lastName} liked your reply "${reply.body}".`;
+              } else {
+                notification.message = `${msgUser.firstName} ${
+                  msgUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others liked your reply "${reply.body}".`;
+              }
+
+              notification.createdAt = new Date().toISOString();
+              await notification.save();
+            }
+          }
         } else {
           reply.likes.push({
             liker: user.id,
             createdAt: new Date().toISOString()
           });
+
+          if (!notification) {
+            notification = new Notification({
+              user: reply.replier,
+              sender: user.id,
+              type: 'like_reply',
+              post: postId,
+              comment: commentId,
+              latestUser: [user.id],
+              message: `${currUser.firstName} ${currUser.lastName} liked your reply "${reply.body}".`,
+              createdAt: new Date().toISOString()
+            });
+            await notification.save();
+          } else {
+            const existing = notification.latestUser.some(
+              (user) => user._id.toString() === currUser._id.toString()
+            );
+
+            if (!existing) {
+              notification.latestUser.unshift(currUser._id);
+
+              if (notification.latestUser.length === 1) {
+                notification.message = `${currUser.firstName} ${currUser.lastName} liked your reply "${reply.body}".`;
+              } else {
+                notification.message = `${currUser.firstName} ${
+                  currUser.lastName
+                } and ${
+                  notification.latestUser.length - 1
+                } others liked your reply "${reply.body}".`;
+              }
+
+              notification.isRead = false;
+              notification.createdAt = new Date().toISOString();
+            }
+            await notification.save();
+          }
         }
         await post.save();
         await post.populate(populateComment);
+
+        const exists = await Notification.exists({ _id: notification._id });
+
+        if (exists) {
+          await notification.populate(populateNotification);
+          const unreadCount = await Notification.countDocuments({
+            user: reply.replier._id,
+            isRead: false
+          });
+
+          pubSub.publish(NEW_NOTIFICATION, {
+            onNewNotification: {
+              unreadCount,
+              notification: {
+                id: notification._id,
+                ...notification._doc
+              }
+            }
+          });
+        }
 
         return {
           comments: post.comments

@@ -32,6 +32,7 @@ export const ON_NEW_NOTIFICATION = gql`
           id
           title
         }
+        comment
         isRead
         message
         createdAt
