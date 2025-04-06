@@ -184,6 +184,7 @@ export type TNotificationItem = {
     id: string;
     title: string;
   };
+  comment?: string;
   isRead: boolean;
   message: string;
   createdAt: string;

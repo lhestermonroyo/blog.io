@@ -97,22 +97,46 @@ const NotificationPanel = () => {
     }
   }, [notifResponse]);
 
+  const redirect = (item: TNotificationItem) => {
+    switch (item.type) {
+      case 'new_post':
+        navigate(`/post/${item.post?.id}`);
+        break;
+      case 'new_comment':
+      case 'like_comment':
+        if (item.comment) {
+          navigate(`/post/${item.post?.id}?comment=${item?.comment}`);
+        } else {
+          navigate(`/post/${item.post?.id}`);
+        }
+        break;
+      case 'reply_comment':
+      case 'like_reply':
+        if (item.comment) {
+          navigate(
+            `/post/${item.post?.id}?comment=${item?.comment}&showReplies=true`
+          );
+        } else {
+          navigate(`/post/${item.post?.id}`);
+        }
+        break;
+      case 'follow':
+        navigate(`/profile`);
+        break;
+      default:
+        navigate(`/post/${item.post?.id}`);
+        break;
+    }
+  };
+
   const handleRead = async (item: TNotificationItem) => {
     if (item.isRead) {
-      if (item.type === 'follow') {
-        navigate(`/profile`);
-      } else {
-        navigate(`/post/${item.post?.id}`);
-        return;
-      }
+      redirect(item);
+      return;
     }
 
     try {
-      if (item.type === 'follow') {
-        navigate(`/profile`);
-      } else {
-        navigate(`/post/${item.post?.id}`);
-      }
+      redirect(item);
 
       const response = await markAsRead({
         variables: {

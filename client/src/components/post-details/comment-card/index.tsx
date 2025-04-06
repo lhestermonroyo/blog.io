@@ -1,4 +1,5 @@
-import { FC, Fragment, useMemo, useState } from 'react';
+import { FC, Fragment, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import {
   ActionIcon,
   Button,
@@ -76,6 +77,32 @@ const CommentCard: FC<CommentCardProps> = ({
   const [likeComment] = useMutation(LIKE_COMMENT);
   const [updateComment] = useMutation(UPDATE_COMMENT);
   const [deleteComment] = useMutation(DELETE_COMMENT);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.search.includes('comment') && comment) {
+      const commentId = new URLSearchParams(location.search).get('comment');
+      const showReplies = new URLSearchParams(location.search).get(
+        'showReplies'
+      );
+
+      if (commentId === comment.id) {
+        const el = document.getElementById(comment.id);
+
+        if (el) {
+          el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+
+          if (comment.replies.length > 0 && Boolean(showReplies)) {
+            setShowReplies(true);
+          }
+        }
+      }
+    }
+  }, [location, comment]);
 
   const handleLike = async () => {
     try {
@@ -263,7 +290,7 @@ const CommentCard: FC<CommentCardProps> = ({
 
   return (
     <Fragment>
-      <Stack key={comment.id} gap="lg">
+      <Stack id={comment.id} key={comment.id} gap="lg">
         <Stack gap={6}>
           <Group justify="space-between" align="center">
             <ProfileBadge profile={comment.commentor} />
