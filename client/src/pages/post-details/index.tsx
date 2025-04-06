@@ -376,6 +376,7 @@ const PostDetails = () => {
   }, [postDetails?.creator.email, profileEmail]);
 
   const content = postDetails && JSON.parse(postDetails?.content);
+  console.log('content', content);
 
   return (
     <Fragment>
@@ -608,6 +609,18 @@ const PostDetails = () => {
                                   alt={block.data.caption}
                                 />
                               </ExpandableImage>
+                            );
+                          case 'embed':
+                            return (
+                              <iframe
+                                key={block.id}
+                                src={block.data.embed}
+                                style={{
+                                  width: '100%',
+                                  aspectRatio: '16/9',
+                                  border: 'none'
+                                }}
+                              />
                             );
                           default:
                             return (
