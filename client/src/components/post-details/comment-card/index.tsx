@@ -34,6 +34,7 @@ import {
 } from '../../../graphql/mutations';
 import {
   TCommentItem,
+  TLikeItem,
   TPostDetails,
   TPostState,
   TReplyItem
@@ -106,7 +107,53 @@ const CommentCard: FC<CommentCardProps> = ({
 
   const handleLike = async () => {
     try {
-      setSubmitting(true);
+      // Optimistic UI update
+      setPost((prev: TPostState) => {
+        const currPostDetails = {
+          ...(prev.postDetails as TPostDetails)
+        };
+        let currComment = currPostDetails?.comments.find(
+          (c: TCommentItem) => c.id === comment.id
+        ) as TCommentItem;
+        let likes = [...(currComment.likes as TLikeItem[])];
+
+        if (isLiked) {
+          likes = likes.filter(
+            (like: TLikeItem) => like.liker.email !== auth?.profile?.email
+          );
+        } else {
+          likes.push({
+            id: String(likes.length + 1),
+            liker: {
+              id: auth?.profile?.id,
+              email: auth?.profile?.email,
+              firstName: auth?.profile?.firstName,
+              lastName: auth?.profile?.lastName,
+              avatar: auth?.profile?.avatar
+            },
+            createdAt: new Date().toISOString()
+          } as TLikeItem);
+        }
+
+        return {
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: (prev.postDetails as TPostDetails)?.comments.map(
+              (c: TCommentItem) => {
+                if (c.id === currComment.id) {
+                  return {
+                    ...currComment,
+                    likes
+                  };
+                } else {
+                  return c;
+                }
+              }
+            )
+          }
+        };
+      });
 
       const response = await likeComment({
         variables: {
@@ -128,6 +175,7 @@ const CommentCard: FC<CommentCardProps> = ({
         }));
       }
     } catch (error) {
+      console.log('error', error);
       notifications.show({
         title: 'Error',
         message: 'An error occurred while liking the comment.',

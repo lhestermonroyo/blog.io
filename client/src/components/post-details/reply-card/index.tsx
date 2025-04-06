@@ -30,7 +30,13 @@ import {
   LIKE_REPLY,
   UPDATE_REPLY
 } from '../../../graphql/mutations';
-import { TPostDetails, TPostState, TReplyItem } from '../../../../types';
+import {
+  TCommentItem,
+  TLikeItem,
+  TPostDetails,
+  TPostState,
+  TReplyItem
+} from '../../../../types';
 
 import ProfileBadge from '../../profile-badge';
 
@@ -71,7 +77,57 @@ const ReplyCard: FC<ReplyCardProps> = ({
 
   const handleLike = async () => {
     try {
-      setSubmitting(true);
+      // Optimistically update the UI
+      setPost((prev: TPostState) => {
+        const currPostDetails = {
+          ...(prev.postDetails as TPostDetails)
+        };
+        let currComment = currPostDetails?.comments.find(
+          (c: TCommentItem) => c.id === commentId
+        ) as TCommentItem;
+        let currReply = currComment?.replies.find(
+          (r: TReplyItem) => r.id === reply.id
+        ) as TReplyItem;
+        let likes = [...(currReply?.likes as TLikeItem[])];
+
+        if (isLiked) {
+          likes = likes.filter(
+            (like: TLikeItem) => like.liker?.email !== auth?.profile?.email
+          );
+        } else {
+          likes.push({
+            id: String(likes.length + 1),
+            liker: {
+              id: auth?.profile?.id,
+              email: auth?.profile?.email,
+              firstName: auth?.profile?.firstName,
+              lastName: auth?.profile?.lastName,
+              avatar: auth?.profile?.avatar
+            },
+            createdAt: new Date().toISOString()
+          } as TLikeItem);
+        }
+
+        return {
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            comments: currPostDetails.comments.map((c: TCommentItem) => {
+              if (c.id === commentId) {
+                return {
+                  ...c,
+                  replies: c.replies.map((r: TReplyItem) => {
+                    if (r.id === reply.id) {
+                      return { ...currReply, likes };
+                    }
+                    return r;
+                  })
+                };
+              }
+            })
+          }
+        } as TPostState;
+      });
 
       const response = await likeReply({
         variables: {

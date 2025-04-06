@@ -10,7 +10,13 @@ import {
   Title
 } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { IconAt, IconMapPin } from '@tabler/icons-react';
+import {
+  IconArrowUpRight,
+  IconAt,
+  IconMapPin,
+  IconUserMinus,
+  IconUserPlus
+} from '@tabler/icons-react';
 import { useMutation } from '@apollo/client';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -50,6 +56,39 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
 
   const handleFollow = async () => {
     try {
+      // Optimistically update the state
+      setPost((prev: TPostState) => {
+        let followerList = [...prev.creatorStats.followers.list];
+        let followerCount = prev.creatorStats.followers.count;
+
+        if (isFollowed) {
+          followerList = followerList.filter(
+            (follower: TProfileBadge) => follower?.email !== profileEmail
+          );
+          followerCount -= 1;
+        } else {
+          followerList.push({
+            id: auth.profile?.id,
+            email: auth.profile?.email,
+            firstName: auth.profile?.firstName,
+            lastName: auth.profile?.lastName,
+            avatar: auth.profile?.avatar
+          } as TProfileBadge);
+          followerCount += 1;
+        }
+
+        return {
+          ...prev,
+          creatorStats: {
+            ...prev.creatorStats,
+            followers: {
+              count: followerCount,
+              list: followerList
+            }
+          }
+        };
+      });
+
       const response = await followUser({
         variables: { email: creatorProfile?.email }
       });
@@ -71,15 +110,6 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
             }
           }
         }));
-
-        notifications.show({
-          title: 'Success',
-          message: `You have ${
-            isFollowed ? 'unfollowed' : 'followed'
-          } the author.`,
-          color: 'green',
-          position: 'top-center'
-        });
       }
     } catch (error) {
       console.error(error);
@@ -218,6 +248,13 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
               <Button
                 flex={1}
                 variant={isFollowed ? 'light' : 'outline'}
+                leftSection={
+                  isFollowed ? (
+                    <IconUserMinus size={20} />
+                  ) : (
+                    <IconUserPlus size={20} />
+                  )
+                }
                 onClick={handleFollow}
               >
                 {isFollowed ? 'Unfollow' : 'Follow'}
@@ -225,6 +262,7 @@ const AuthorPanel = ({ loading }: { loading: boolean }) => {
             )}
             <Button
               flex={1}
+              leftSection={<IconArrowUpRight size={20} />}
               onClick={() => navigate(`/profile/${creatorProfile?.email}`)}
             >
               View Profile

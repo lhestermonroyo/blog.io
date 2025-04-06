@@ -15,9 +15,9 @@ import { TPostDetails } from '../../../../types';
 
 type PostReactionProps = {
   post: TPostDetails;
-  onLike: () => void;
+  onLike: (isLiked: boolean) => void;
   onComment: () => void;
-  onSave: () => void;
+  onSave: (isSaved: boolean) => void;
 };
 
 const PostReaction: FC<PostReactionProps> = ({
@@ -52,7 +52,7 @@ const PostReaction: FC<PostReactionProps> = ({
         <ActionIcon
           variant="transparent"
           disabled={!auth.isAuth && !auth.profile}
-          onClick={onLike}
+          onClick={() => onLike(isLiked)}
         >
           {isLiked ? <IconHeartFilled size={24} /> : <IconHeart size={24} />}
         </ActionIcon>
@@ -76,7 +76,7 @@ const PostReaction: FC<PostReactionProps> = ({
         <ActionIcon
           variant="transparent"
           disabled={!auth.isAuth && !auth.profile}
-          onClick={onSave}
+          onClick={() => onSave(isSaved)}
         >
           {isSaved ? (
             <IconBookmarkFilled size={24} />

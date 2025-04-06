@@ -36,7 +36,7 @@ import {
   GET_STATS_BY_EMAIL
 } from '../../graphql/queries';
 import { FOLLOW_USER } from '../../graphql/mutations';
-import { TPostItem, TProfile, TProfileBadge, TStats } from '../../../types';
+import { TPostItem, TProfile, TProfileBadge, TStat } from '../../../types';
 
 import MainLayout from '../../layouts/main';
 import PostCard from '../../components/feed/post-card';
@@ -48,7 +48,7 @@ import ExpandableImage from '../../components/expandable-image';
 
 const Profile = () => {
   const [profile, setProfile] = useState<TProfile | null>(null);
-  const [stats, setStats] = useState<TStats>({
+  const [stats, setStats] = useState<TStat>({
     posts: {
       count: 0,
       list: []
@@ -129,7 +129,7 @@ const Profile = () => {
       const key = Object.keys(statsResponse)[0];
       const data = statsResponse[key];
 
-      setStats((prev: TStats) => ({
+      setStats((prev: TStat) => ({
         ...prev,
         posts: data.posts,
         savedPosts: data.savedPosts,
@@ -154,6 +154,36 @@ const Profile = () => {
 
   const handleFollow = async () => {
     try {
+      // Optimistically update the state
+      setStats((prev: TStat) => {
+        let followerList = [...prev.followers.list];
+        let followerCount = prev.followers.count;
+
+        if (isFollowed) {
+          followerList = followerList.filter(
+            (follower: TProfileBadge) => follower?.email !== auth.profile?.email
+          );
+          followerCount -= 1;
+        } else {
+          followerList.push({
+            id: auth.profile?.id,
+            email: auth.profile?.email,
+            firstName: auth.profile?.firstName,
+            lastName: auth.profile?.lastName,
+            avatar: auth.profile?.avatar
+          } as TProfileBadge);
+          followerCount += 1;
+        }
+
+        return {
+          ...prev,
+          followers: {
+            count: followerCount,
+            list: followerList
+          }
+        };
+      });
+
       const response = await followUser({
         variables: { email: profile?.email }
       });
@@ -161,7 +191,7 @@ const Profile = () => {
       const data = response.data[key];
 
       if (data) {
-        setStats((prev: TStats) => ({
+        setStats((prev: TStat) => ({
           ...prev,
           followers: {
             count: data.followers.count,
@@ -172,15 +202,6 @@ const Profile = () => {
             list: data.following.list
           }
         }));
-
-        notifications.show({
-          title: 'Success',
-          message: `You have ${
-            isFollowed ? 'unfollowed' : 'followed'
-          } the author.`,
-          color: 'green',
-          position: 'top-center'
-        });
       }
     } catch (error) {
       console.error(error);

@@ -46,7 +46,13 @@ import {
 
 import states from '../../states';
 import { deleteBlogFiles } from '../../utils/upload.util';
-import { TCommentItem, TPostDetails, TPostState } from '../../../types';
+import {
+  TCommentItem,
+  TLikeItem,
+  TPostDetails,
+  TPostState,
+  TSaveItem
+} from '../../../types';
 
 import MainLayout from '../../layouts/main';
 import LoadingPost from '../../components/post-details/loading-post';
@@ -175,8 +181,41 @@ const PostDetails = () => {
     }
   };
 
-  const handleLike = async () => {
+  const handleLike = async (isLiked: boolean) => {
     try {
+      setPost((prev: TPostState) => {
+        let likes = [
+          ...((prev.postDetails as TPostDetails).likes as TLikeItem[])
+        ];
+        let likeCount = (prev.postDetails as TPostDetails).likeCount as number;
+
+        if (isLiked) {
+          likes = likes.filter((like) => like.liker.id !== auth.profile?.id);
+          likeCount -= 1;
+        } else {
+          likes.push({
+            liker: {
+              id: auth.profile?.id,
+              email: auth.profile?.email,
+              firstName: auth.profile?.firstName,
+              lastName: auth.profile?.lastName,
+              avatar: auth.profile?.avatar
+            },
+            createdAt: new Date().toISOString()
+          } as TLikeItem);
+          likeCount += 1;
+        }
+
+        return {
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            likes,
+            likeCount
+          }
+        };
+      });
+
       const response = await likePost({
         variables: {
           postId: params.id
@@ -250,8 +289,42 @@ const PostDetails = () => {
     }
   };
 
-  const handleSavePost = async () => {
+  const handleSavePost = async (isSaved: boolean) => {
     try {
+      // Optimistic update
+      setPost((prev: TPostState) => {
+        let saves = [
+          ...(prev.postDetails as TPostDetails).saves
+        ] as TSaveItem[];
+        let saveCount = (prev.postDetails as TPostDetails).saveCount as number;
+
+        if (isSaved) {
+          saves = saves.filter((save) => save.user.id !== auth.profile?.id);
+          saveCount -= 1;
+        } else {
+          saves.push({
+            user: {
+              id: auth.profile?.id,
+              email: auth.profile?.email,
+              firstName: auth.profile?.firstName,
+              lastName: auth.profile?.lastName,
+              avatar: auth.profile?.avatar
+            },
+            createdAt: new Date().toISOString()
+          } as TSaveItem);
+          saveCount += 1;
+        }
+
+        return {
+          ...prev,
+          postDetails: {
+            ...(prev.postDetails as TPostDetails),
+            saves,
+            saveCount
+          }
+        };
+      });
+
       const response = await savePost({
         variables: {
           postId: params.id

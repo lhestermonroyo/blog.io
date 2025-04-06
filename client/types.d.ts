@@ -92,7 +92,7 @@ export type TSaveItem = {
   createdAt: string;
 };
 
-export type TStats = {
+export type TStat = {
   posts: {
     count: number;
     list: TPostItem[];
