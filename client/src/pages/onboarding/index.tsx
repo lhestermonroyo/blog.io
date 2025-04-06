@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import {
   Box,
   Container,
@@ -140,36 +142,49 @@ const Onboarding = () => {
   };
 
   return (
-    <Container size="sm" pt={40} pb={120}>
-      <Stack gap="xl">
-        <Group>
-          <Logo />
-        </Group>
-        <Box>
-          <Title order={1}>Profile Setup</Title>
-          <Text c="dimmed">We would like to know you first.</Text>
-        </Box>
-        <Stepper active={active}>
-          <Stepper.Step label="First step" description="Profile Info">
-            <StepOne onNextStep={nextStep} />
-          </Stepper.Step>
-          <Stepper.Step label="Second step" description="Avatar & Cover Photo">
-            <StepTwo onPrevStep={prevStep} onNextStep={nextStep} />
-          </Stepper.Step>
-          <Stepper.Step label="Final step" description="Tags & Interests">
-            <StepThree onPrevStep={prevStep} onNextStep={nextStep} />
-          </Stepper.Step>
-          <Stepper.Completed>
-            <Review
-              submitting={submitting}
-              onNavigateStep={(step) => setActive(step)}
-              onPrevStep={prevStep}
-              onSave={handleSave}
-            />
-          </Stepper.Completed>
-        </Stepper>
-      </Stack>
-    </Container>
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Profile Setup</title>
+        <meta
+          name="description"
+          content="Complete your profile setup to get the most out of our platform."
+        />
+        <link rel="canonical" href="/onboarding" />
+      </Helmet>
+      <Container size="sm" pt={40} pb={120}>
+        <Stack gap="xl">
+          <Group>
+            <Logo />
+          </Group>
+          <Box>
+            <Title order={1}>Profile Setup</Title>
+            <Text c="dimmed">We would like to know you first.</Text>
+          </Box>
+          <Stepper active={active}>
+            <Stepper.Step label="First step" description="Profile Info">
+              <StepOne onNextStep={nextStep} />
+            </Stepper.Step>
+            <Stepper.Step
+              label="Second step"
+              description="Avatar & Cover Photo"
+            >
+              <StepTwo onPrevStep={prevStep} onNextStep={nextStep} />
+            </Stepper.Step>
+            <Stepper.Step label="Final step" description="Tags & Interests">
+              <StepThree onPrevStep={prevStep} onNextStep={nextStep} />
+            </Stepper.Step>
+            <Stepper.Completed>
+              <Review
+                submitting={submitting}
+                onNavigateStep={(step) => setActive(step)}
+                onPrevStep={prevStep}
+                onSave={handleSave}
+              />
+            </Stepper.Completed>
+          </Stepper>
+        </Stack>
+      </Container>
+    </Fragment>
   );
 };
 

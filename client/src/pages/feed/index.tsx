@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router';
 import { Stack, Tabs, Text, Title } from '@mantine/core';
 import { useRecoilState } from 'recoil';
@@ -74,50 +76,64 @@ const Feed = () => {
 
   if (profile && isAuth) {
     return (
-      <MainLayout>
-        {profile && (
-          <Stack gap={0} mb="sm">
-            <Title order={1}>
-              {greetUser()},{' '}
-              <Text span c="green" inherit>
-                {profile?.firstName} 👋
+      <Fragment>
+        <Helmet>
+          <title>blog.io | Write, share, and inspire with ease.</title>
+          <meta name="description" content="Explore feed" />
+          <link rel="canonical" href="/" />
+        </Helmet>
+        <MainLayout>
+          {profile && (
+            <Stack gap={0} mb="sm">
+              <Title order={1}>
+                {greetUser()},{' '}
+                <Text span c="green" inherit>
+                  {profile?.firstName} 👋
+                </Text>
+              </Title>
+              <Text c="dimmed">
+                Here are some posts that you might be interested in. Enjoy!
               </Text>
-            </Title>
-            <Text c="dimmed">
-              Here are some posts that you might be interested in. Enjoy!
-            </Text>
-          </Stack>
-        )}
-        <Tabs defaultValue="1">
-          <Tabs.List justify="center">
-            <Tabs.Tab value="1">For You</Tabs.Tab>
-            <Tabs.Tab value="2">Explore</Tabs.Tab>
-            <Tabs.Tab value="3">Following</Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel value="1">
-            <ForYou />
-          </Tabs.Panel>
-          <Tabs.Panel value="2">
-            <Explore />
-          </Tabs.Panel>
-          <Tabs.Panel value="3">
-            <Following />
-          </Tabs.Panel>
-        </Tabs>
-      </MainLayout>
+            </Stack>
+          )}
+          <Tabs defaultValue="1">
+            <Tabs.List justify="center">
+              <Tabs.Tab value="1">For You</Tabs.Tab>
+              <Tabs.Tab value="2">Explore</Tabs.Tab>
+              <Tabs.Tab value="3">Following</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="1">
+              <ForYou />
+            </Tabs.Panel>
+            <Tabs.Panel value="2">
+              <Explore />
+            </Tabs.Panel>
+            <Tabs.Panel value="3">
+              <Following />
+            </Tabs.Panel>
+          </Tabs>
+        </MainLayout>
+      </Fragment>
     );
   }
 
   return (
-    <MainLayout>
-      <Stack gap={0} mb="sm">
-        <Title order={1}>Explore Feed</Title>
-        <Text c="dimmed">
-          Here are some posts that you might be interested in. Enjoy!
-        </Text>
-      </Stack>
-      <Explore />
-    </MainLayout>
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Write, share, and inspire with ease.</title>
+        <meta name="description" content="Explore feed" />
+        <link rel="canonical" href="/" />
+      </Helmet>
+      <MainLayout>
+        <Stack gap={0} mb="sm">
+          <Title order={1}>Explore Feed</Title>
+          <Text c="dimmed">
+            Here are some posts that you might be interested in. Enjoy!
+          </Text>
+        </Stack>
+        <Explore />
+      </MainLayout>
+    </Fragment>
   );
 };
 

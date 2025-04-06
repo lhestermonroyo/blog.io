@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import {
   Anchor,
   Button,
@@ -76,46 +78,53 @@ const Login = () => {
   };
 
   return (
-    <AuthLayout>
-      <Title order={1}>Hello there!</Title>
-      <Text c="dimmed" mb="xl">
-        Login and continue sharing your ideas to the world
-      </Text>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack>
-          <TextInput
-            label="Email"
-            placeholder="Enter your email"
-            key={form.key('email')}
-            {...form.getInputProps('email')}
-          />
-          <PasswordInput
-            label="Password"
-            placeholder="Enter your password"
-            key={form.key('password')}
-            {...form.getInputProps('password')}
-          />
-        </Stack>
-        <Group justify="space-between" mt="xl">
-          <Text size="sm">
-            Don't have an account yet?{' '}
-            <Anchor
-              component="button"
-              type="button"
-              variant="light"
-              size="sm"
-              onClick={() => navigate('/sign-up')}
-            >
-              Sign Up
-            </Anchor>
-          </Text>
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Login</title>
+        <meta name="description" content="Login to your account" />
+        <link rel="canonical" href="/login" />
+      </Helmet>
+      <AuthLayout>
+        <Title order={1}>Hello there!</Title>
+        <Text c="dimmed" mb="xl">
+          Login and continue sharing your ideas to the world
+        </Text>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack>
+            <TextInput
+              label="Email"
+              placeholder="Enter your email"
+              key={form.key('email')}
+              {...form.getInputProps('email')}
+            />
+            <PasswordInput
+              label="Password"
+              placeholder="Enter your password"
+              key={form.key('password')}
+              {...form.getInputProps('password')}
+            />
+          </Stack>
+          <Group justify="space-between" mt="xl">
+            <Text size="sm">
+              Don't have an account yet?{' '}
+              <Anchor
+                component="button"
+                type="button"
+                variant="light"
+                size="sm"
+                onClick={() => navigate('/sign-up')}
+              >
+                Sign Up
+              </Anchor>
+            </Text>
 
-          <Button type="submit" loading={submitting}>
-            Login
-          </Button>
-        </Group>
-      </form>
-    </AuthLayout>
+            <Button type="submit" loading={submitting}>
+              Login
+            </Button>
+          </Group>
+        </form>
+      </AuthLayout>
+    </Fragment>
   );
 };
 

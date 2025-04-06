@@ -1,4 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import states from '../../states';
@@ -205,104 +207,142 @@ const Profile = () => {
 
   if (profile && stats) {
     return (
-      <MainLayout>
-        <Stack gap="lg">
-          <Title order={1}>Profile</Title>
-          <Grid gutter="xl">
-            <Grid.Col span={!isLg ? 8 : 12}>
-              <LoadingProfile
-                loading={profileLoading || statsLoading}
-                error={null}
-              >
-                <Stack gap="lg">
-                  <Card withBorder>
-                    <Card.Section h={300} pos="relative">
-                      <ExpandableImage src={profile.coverPhoto}>
-                        <Image
-                          src={profile.coverPhoto}
-                          alt="Cover photo"
-                          w="100%"
-                          h="100%"
-                          style={{
-                            alignSelf: 'center',
-                            aspectRatio: '16/9'
-                          }}
-                        />
-                      </ExpandableImage>
-                      {ownProfile && (
-                        <ActionIcon
-                          radius="xl"
-                          pos="absolute"
-                          top={12}
-                          right={12}
-                          onClick={() => navigate('edit?tab=4')}
+      <Fragment>
+        <Helmet>
+          <title>
+            blog.io | {`${profile.firstName} ${profile.lastName}'s Profile`}
+          </title>
+          <meta
+            name="description"
+            content={`Profile of ${profile.firstName} ${profile.lastName}`}
+          />
+          <link rel="canonical" href="/profile" />
+        </Helmet>
+        <MainLayout>
+          <Stack gap="lg">
+            <Title order={1}>Profile</Title>
+            <Grid gutter="xl">
+              <Grid.Col span={!isLg ? 8 : 12}>
+                <LoadingProfile
+                  loading={profileLoading || statsLoading}
+                  error={null}
+                >
+                  <Stack gap="lg">
+                    <Card withBorder>
+                      <Card.Section h={300} pos="relative">
+                        <ExpandableImage src={profile.coverPhoto}>
+                          <Image
+                            src={profile.coverPhoto}
+                            alt="Cover photo"
+                            w="100%"
+                            h="100%"
+                            style={{
+                              alignSelf: 'center',
+                              aspectRatio: '16/9'
+                            }}
+                          />
+                        </ExpandableImage>
+                        {ownProfile && (
+                          <ActionIcon
+                            radius="xl"
+                            pos="absolute"
+                            top={12}
+                            right={12}
+                            onClick={() => navigate('edit?tab=4')}
+                          >
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                        )}
+                      </Card.Section>
+                      <Stack>
+                        <Group
+                          mt={-40}
+                          justify="space-between"
+                          align="flex-end"
                         >
-                          <IconEdit size={16} />
-                        </ActionIcon>
-                      )}
-                    </Card.Section>
-                    <Stack>
-                      <Group mt={-40} justify="space-between" align="flex-end">
-                        <Box pos="relative">
-                          <ExpandableImage src={profile?.avatar}>
-                            <Avatar
-                              src={profile?.avatar}
-                              alt={profile?.firstName}
-                              name={`${profile?.firstName} ${profile?.lastName}`}
-                              radius="md"
-                              color="initials"
-                              size={100}
-                              className="profile-avatar"
-                            />
-                          </ExpandableImage>
-                          {ownProfile && (
-                            <ActionIcon
-                              radius="xl"
-                              pos="absolute"
-                              right={-10}
-                              bottom={-10}
-                              onClick={() => navigate('edit?tab=4')}
-                            >
-                              <IconEdit size={16} />
-                            </ActionIcon>
-                          )}
-                        </Box>
-                      </Group>
+                          <Box pos="relative">
+                            <ExpandableImage src={profile?.avatar}>
+                              <Avatar
+                                src={profile?.avatar}
+                                alt={profile?.firstName}
+                                name={`${profile?.firstName} ${profile?.lastName}`}
+                                radius="md"
+                                color="initials"
+                                size={100}
+                                className="profile-avatar"
+                              />
+                            </ExpandableImage>
+                            {ownProfile && (
+                              <ActionIcon
+                                radius="xl"
+                                pos="absolute"
+                                right={-10}
+                                bottom={-10}
+                                onClick={() => navigate('edit?tab=4')}
+                              >
+                                <IconEdit size={16} />
+                              </ActionIcon>
+                            )}
+                          </Box>
+                        </Group>
 
-                      <Group justify="space-between" align="flex-start">
-                        <Stack gap="md" flex={1}>
-                          <Stack gap={0}>
-                            <Text size="xs" tt="uppercase" c="dimmed">
-                              {profile?.title}
-                            </Text>
-                            <Group gap={4} align="center">
-                              <Title order={3}>
-                                {`${profile?.firstName} ${profile?.lastName}`}
-                              </Title>
-                              {profile?.pronouns && (
-                                <Title order={5} c="dimmed">
-                                  ({profile?.pronouns})
+                        <Group justify="space-between" align="flex-start">
+                          <Stack gap="md" flex={1}>
+                            <Stack gap={0}>
+                              <Text size="xs" tt="uppercase" c="dimmed">
+                                {profile?.title}
+                              </Text>
+                              <Group gap={4} align="center">
+                                <Title order={3}>
+                                  {`${profile?.firstName} ${profile?.lastName}`}
                                 </Title>
-                              )}
-                            </Group>
-                          </Stack>
-                          <Stack gap={2}>
-                            <Group gap={4} align="center">
-                              <IconAt size={16} />
-                              <Text size="sm" c="dimmed">
-                                {profile?.email}
-                              </Text>
-                            </Group>
+                                {profile?.pronouns && (
+                                  <Title order={5} c="dimmed">
+                                    ({profile?.pronouns})
+                                  </Title>
+                                )}
+                              </Group>
+                            </Stack>
+                            <Stack gap={2}>
+                              <Group gap={4} align="center">
+                                <IconAt size={16} />
+                                <Text size="sm" c="dimmed">
+                                  {profile?.email}
+                                </Text>
+                              </Group>
 
-                            <Group gap={4} align="center">
-                              <IconMapPin size={16} />
-                              <Text size="sm" c="dimmed">
-                                {profile?.location || 'Not set a location yet'}
-                              </Text>
-                            </Group>
+                              <Group gap={4} align="center">
+                                <IconMapPin size={16} />
+                                <Text size="sm" c="dimmed">
+                                  {profile?.location ||
+                                    'Not set a location yet'}
+                                </Text>
+                              </Group>
+                            </Stack>
                           </Stack>
-                        </Stack>
-                        <Group flex={1} visibleFrom="sm">
+                          <Group flex={1} visibleFrom="sm">
+                            <Stack gap={4} flex={1}>
+                              <Text size="sm" color="dimmed">
+                                Post Written
+                              </Text>
+                              <Text size="lg">{stats.posts.count}</Text>
+                            </Stack>
+                            <Stack gap={4} flex={1}>
+                              <Text size="sm" color="dimmed">
+                                Followers
+                              </Text>
+                              <Text size="lg">{stats.followers.count}</Text>
+                            </Stack>
+                            <Stack gap={4} flex={1}>
+                              <Text size="sm" color="dimmed">
+                                Following
+                              </Text>
+                              <Text size="lg">{stats.following.count}</Text>
+                            </Stack>
+                          </Group>
+                        </Group>
+
+                        <Group flex={1} hiddenFrom="sm">
                           <Stack gap={4} flex={1}>
                             <Text size="sm" color="dimmed">
                               Post Written
@@ -322,191 +362,172 @@ const Profile = () => {
                             <Text size="lg">{stats.following.count}</Text>
                           </Stack>
                         </Group>
-                      </Group>
 
-                      <Group flex={1} hiddenFrom="sm">
-                        <Stack gap={4} flex={1}>
-                          <Text size="sm" color="dimmed">
-                            Post Written
-                          </Text>
-                          <Text size="lg">{stats.posts.count}</Text>
-                        </Stack>
-                        <Stack gap={4} flex={1}>
-                          <Text size="sm" color="dimmed">
-                            Followers
-                          </Text>
-                          <Text size="lg">{stats.followers.count}</Text>
-                        </Stack>
-                        <Stack gap={4} flex={1}>
-                          <Text size="sm" color="dimmed">
-                            Following
-                          </Text>
-                          <Text size="lg">{stats.following.count}</Text>
-                        </Stack>
-                      </Group>
+                        <Text mt="lg">{profile?.bio}</Text>
 
-                      <Text mt="lg">{profile?.bio}</Text>
+                        <Group gap={6} mt="lg" flex={1}>
+                          {!ownProfile && (
+                            <Fragment>
+                              {auth.isAuth && auth.profile && (
+                                <Button
+                                  flex={1}
+                                  variant={isFollowed ? 'light' : 'outline'}
+                                  leftSection={
+                                    isFollowed ? (
+                                      <IconUserMinus size={20} />
+                                    ) : (
+                                      <IconUserPlus size={20} />
+                                    )
+                                  }
+                                  onClick={handleFollow}
+                                >
+                                  {isFollowed ? 'Unfollow' : 'Follow'}
+                                </Button>
+                              )}
 
-                      <Group gap={6} mt="lg" flex={1}>
-                        {!ownProfile && (
-                          <Fragment>
-                            {auth.isAuth && auth.profile && (
                               <Button
                                 flex={1}
-                                variant={isFollowed ? 'light' : 'outline'}
-                                leftSection={
-                                  isFollowed ? (
-                                    <IconUserMinus size={20} />
-                                  ) : (
-                                    <IconUserPlus size={20} />
-                                  )
-                                }
-                                onClick={handleFollow}
+                                component="a"
+                                leftSection={<IconMessage2 size={20} />}
+                                href={`mailto:${profile?.email}`}
                               >
-                                {isFollowed ? 'Unfollow' : 'Follow'}
+                                Get in Touch
                               </Button>
-                            )}
+                            </Fragment>
+                          )}
+                          {ownProfile && (
+                            <Fragment>
+                              <Button
+                                flex={1}
+                                variant="outline"
+                                leftSection={<IconBallpen size={20} />}
+                                onClick={() => navigate('/compose')}
+                              >
+                                Compose New Post
+                              </Button>
+                              <Button
+                                flex={1}
+                                leftSection={<IconEdit size={20} />}
+                                onClick={() => navigate('edit')}
+                              >
+                                Edit Profile
+                              </Button>
+                            </Fragment>
+                          )}
+                        </Group>
+                      </Stack>
+                    </Card>
 
-                            <Button
-                              flex={1}
-                              component="a"
-                              leftSection={<IconMessage2 size={20} />}
-                              href={`mailto:${profile?.email}`}
-                            >
-                              Get in Touch
-                            </Button>
-                          </Fragment>
-                        )}
-                        {ownProfile && (
-                          <Fragment>
-                            <Button
-                              flex={1}
-                              variant="outline"
-                              leftSection={<IconBallpen size={20} />}
-                              onClick={() => navigate('/compose')}
-                            >
-                              Compose New Post
-                            </Button>
-                            <Button
-                              flex={1}
-                              leftSection={<IconEdit size={20} />}
-                              onClick={() => navigate('edit')}
-                            >
-                              Edit Profile
-                            </Button>
-                          </Fragment>
-                        )}
-                      </Group>
-                    </Stack>
-                  </Card>
-
-                  {auth.isAuth && auth.profile ? (
-                    <Card withBorder p={0}>
-                      <Tabs defaultValue="1">
-                        <Tabs.List justify="center">
-                          <Tabs.Tab value="1">Posts</Tabs.Tab>
-                          <Tabs.Tab value="2">Saved Posts</Tabs.Tab>
-                          <Tabs.Tab value="3">Followers</Tabs.Tab>
-                          <Tabs.Tab value="4">Following</Tabs.Tab>
-                        </Tabs.List>
-                        <Tabs.Panel
-                          value="1"
-                          p={stats.posts.list.length ? 'lg' : 0}
-                        >
-                          <Stack gap="xl">
-                            {stats.posts.list.length ? (
+                    {auth.isAuth && auth.profile ? (
+                      <Card withBorder p={0}>
+                        <Tabs defaultValue="1">
+                          <Tabs.List justify="center">
+                            <Tabs.Tab value="1">Posts</Tabs.Tab>
+                            <Tabs.Tab value="2">Saved Posts</Tabs.Tab>
+                            <Tabs.Tab value="3">Followers</Tabs.Tab>
+                            <Tabs.Tab value="4">Following</Tabs.Tab>
+                          </Tabs.List>
+                          <Tabs.Panel
+                            value="1"
+                            p={stats.posts.list.length ? 'lg' : 0}
+                          >
+                            <Stack gap="xl">
+                              {stats.posts.list.length ? (
+                                <Stack gap="xl">
+                                  {stats.posts.list.map((post: TPostItem) => (
+                                    <PostCard key={post.id} item={post} />
+                                  ))}
+                                </Stack>
+                              ) : (
+                                <Empty text="No created post yet." />
+                              )}
+                            </Stack>
+                          </Tabs.Panel>
+                          <Tabs.Panel
+                            value="2"
+                            p={stats.savedPosts.list.length ? 'lg' : 0}
+                          >
+                            {stats.savedPosts.list.length ? (
                               <Stack gap="xl">
-                                {stats.posts.list.map((post: TPostItem) => (
-                                  <PostCard key={post.id} item={post} />
-                                ))}
+                                {stats.savedPosts.list.map(
+                                  (post: TPostItem) => (
+                                    <PostCard key={post.id} item={post} />
+                                  )
+                                )}
                               </Stack>
                             ) : (
-                              <Empty text="No created post yet." />
+                              <Empty text="No saved posts yet." />
                             )}
-                          </Stack>
-                        </Tabs.Panel>
-                        <Tabs.Panel
-                          value="2"
-                          p={stats.savedPosts.list.length ? 'lg' : 0}
-                        >
-                          {stats.savedPosts.list.length ? (
+                          </Tabs.Panel>
+                          <Tabs.Panel value="3">
+                            {stats.followers.list.length ? (
+                              stats.followers.list.map(
+                                (follower: TProfileBadge) => (
+                                  <ProfileButton
+                                    key={follower.id}
+                                    profile={follower}
+                                  />
+                                )
+                              )
+                            ) : (
+                              <Empty text="No followers yet." />
+                            )}
+                          </Tabs.Panel>
+                          <Tabs.Panel value="4">
+                            {stats.following.list.length ? (
+                              stats.following.list.map(
+                                (following: TProfileBadge) => (
+                                  <ProfileButton
+                                    key={following.id}
+                                    profile={following}
+                                  />
+                                )
+                              )
+                            ) : (
+                              <Empty text="Not following anyone yet." />
+                            )}
+                          </Tabs.Panel>
+                        </Tabs>
+                      </Card>
+                    ) : (
+                      <Card withBorder>
+                        <Title order={3} mb="md">
+                          Posts
+                        </Title>
+                        <Stack gap="xl">
+                          {stats.posts.list.length ? (
                             <Stack gap="xl">
-                              {stats.savedPosts.list.map((post: TPostItem) => (
+                              {stats.posts.list.map((post: TPostItem) => (
                                 <PostCard key={post.id} item={post} />
                               ))}
                             </Stack>
                           ) : (
-                            <Empty text="No saved posts yet." />
+                            <Empty text="No created post yet." />
                           )}
-                        </Tabs.Panel>
-                        <Tabs.Panel value="3">
-                          {stats.followers.list.length ? (
-                            stats.followers.list.map(
-                              (follower: TProfileBadge) => (
-                                <ProfileButton
-                                  key={follower.id}
-                                  profile={follower}
-                                />
-                              )
-                            )
-                          ) : (
-                            <Empty text="No followers yet." />
-                          )}
-                        </Tabs.Panel>
-                        <Tabs.Panel value="4">
-                          {stats.following.list.length ? (
-                            stats.following.list.map(
-                              (following: TProfileBadge) => (
-                                <ProfileButton
-                                  key={following.id}
-                                  profile={following}
-                                />
-                              )
-                            )
-                          ) : (
-                            <Empty text="Not following anyone yet." />
-                          )}
-                        </Tabs.Panel>
-                      </Tabs>
-                    </Card>
-                  ) : (
-                    <Card withBorder>
-                      <Title order={3} mb="md">
-                        Posts
-                      </Title>
-                      <Stack gap="xl">
-                        {stats.posts.list.length ? (
-                          <Stack gap="xl">
-                            {stats.posts.list.map((post: TPostItem) => (
-                              <PostCard key={post.id} item={post} />
-                            ))}
-                          </Stack>
-                        ) : (
-                          <Empty text="No created post yet." />
-                        )}
-                      </Stack>
-                    </Card>
-                  )}
+                        </Stack>
+                      </Card>
+                    )}
+                  </Stack>
+                </LoadingProfile>
+              </Grid.Col>
+              <Grid.Col span={!isLg ? 4 : 12}>
+                <Stack gap="lg" className="sidebar-container">
+                  <SocialsPanel
+                    loading={profileLoading || statsLoading}
+                    ownProfile={ownProfile}
+                    socials={profile?.socials}
+                  />
+                  <TagsPanel
+                    loading={profileLoading || statsLoading}
+                    ownProfile={ownProfile}
+                    tags={profile?.tags}
+                  />
                 </Stack>
-              </LoadingProfile>
-            </Grid.Col>
-            <Grid.Col span={!isLg ? 4 : 12}>
-              <Stack gap="lg" className="sidebar-container">
-                <SocialsPanel
-                  loading={profileLoading || statsLoading}
-                  ownProfile={ownProfile}
-                  socials={profile?.socials}
-                />
-                <TagsPanel
-                  loading={profileLoading || statsLoading}
-                  ownProfile={ownProfile}
-                  tags={profile?.tags}
-                />
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Stack>
-      </MainLayout>
+              </Grid.Col>
+            </Grid>
+          </Stack>
+        </MainLayout>
+      </Fragment>
     );
   }
 };

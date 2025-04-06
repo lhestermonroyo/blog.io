@@ -1,4 +1,6 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router';
 import { useMutation, useQuery } from '@apollo/client';
 import {
@@ -303,330 +305,337 @@ const PostDetails = () => {
   const content = postDetails && JSON.parse(postDetails?.content);
 
   return (
-    <MainLayout>
-      <Grid gutter="xl">
-        <Grid.Col span={!isLg ? 8 : 12}>
-          <Stack gap="lg">
-            <Group justify="space-between" align="center">
-              <Button
-                variant="default"
-                leftSection={<IconArrowLeft size={16} />}
-                onClick={() => navigate('/')}
-              >
-                Back
-              </Button>
-
-              {isOwnPost && (
-                <Menu
-                  width={120}
-                  position="bottom-end"
-                  transitionProps={{ transition: 'pop-top-right' }}
-                  withinPortal
+    <Fragment>
+      <Helmet>
+        <title>blog.io | {`${postDetails?.title}`}</title>
+        <meta name="description" content="Login to your account" />
+        <link rel="canonical" href="/login" />
+      </Helmet>
+      <MainLayout>
+        <Grid gutter="xl">
+          <Grid.Col span={!isLg ? 8 : 12}>
+            <Stack gap="lg">
+              <Group justify="space-between" align="center">
+                <Button
+                  variant="default"
+                  leftSection={<IconArrowLeft size={16} />}
+                  onClick={() => navigate('/')}
                 >
-                  <Menu.Target>
-                    <ActionIcon variant="transparent" color="dimmed">
-                      <IconDotsVertical />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item
-                      leftSection={<IconEdit size={16} stroke={1.5} />}
-                      onClick={() => navigate(`/edit-post/${params.id}`)}
-                    >
-                      Edit
-                    </Menu.Item>
-                    <Menu.Divider />
+                  Back
+                </Button>
 
-                    <Menu.Item
-                      leftSection={
-                        <IconTrash
-                          size={16}
-                          color={theme.colors.red[6]}
-                          stroke={1.5}
-                        />
-                      }
-                      onClick={showDeleteModal}
-                    >
-                      Delete
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              )}
-            </Group>
-            <LoadingPost loading={loading}>
-              {postDetails && (
-                <Fragment>
-                  <Stack gap={4}>
-                    <Title order={1}>{postDetails?.title}</Title>
-                    <Group gap={4} align="center">
-                      <IconClock size={14} />
-                      <Text fz="xs" c="dimmed">
-                        {format(
-                          new Date(postDetails?.createdAt),
-                          'MMMM dd - hh:mm a'
-                        )}
-                      </Text>
-                    </Group>
-                  </Stack>
+                {isOwnPost && (
+                  <Menu
+                    width={120}
+                    position="bottom-end"
+                    transitionProps={{ transition: 'pop-top-right' }}
+                    withinPortal
+                  >
+                    <Menu.Target>
+                      <ActionIcon variant="transparent" color="dimmed">
+                        <IconDotsVertical />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                      <Menu.Item
+                        leftSection={<IconEdit size={16} stroke={1.5} />}
+                        onClick={() => navigate(`/edit-post/${params.id}`)}
+                      >
+                        Edit
+                      </Menu.Item>
+                      <Menu.Divider />
 
-                  <Stack gap="xs">
-                    <Group align="center" justify="space-between">
-                      <Group gap={6}>
-                        <ProfileBadge profile={postDetails?.creator} />
+                      <Menu.Item
+                        leftSection={
+                          <IconTrash
+                            size={16}
+                            color={theme.colors.red[6]}
+                            stroke={1.5}
+                          />
+                        }
+                        onClick={showDeleteModal}
+                      >
+                        Delete
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                )}
+              </Group>
+              <LoadingPost loading={loading}>
+                {postDetails && (
+                  <Fragment>
+                    <Stack gap={4}>
+                      <Title order={1}>{postDetails?.title}</Title>
+                      <Group gap={4} align="center">
+                        <IconClock size={14} />
+                        <Text fz="xs" c="dimmed">
+                          {format(
+                            new Date(postDetails?.createdAt),
+                            'MMMM dd - hh:mm a'
+                          )}
+                        </Text>
                       </Group>
+                    </Stack>
+
+                    <Stack gap="xs">
+                      <Group align="center" justify="space-between">
+                        <Group gap={6}>
+                          <ProfileBadge profile={postDetails?.creator} />
+                        </Group>
+                        <PostReaction
+                          post={postDetails}
+                          onLike={handleLike}
+                          onComment={() => commentRef.current?.focus()}
+                          onSave={handleSavePost}
+                        />
+                      </Group>
+                      <Divider />
+                    </Stack>
+
+                    <Stack flex={1} w="100%">
+                      {content.blocks.map((block: any) => {
+                        switch (block.type) {
+                          case 'paragraph':
+                            return (
+                              <Text
+                                key={block.id}
+                                dangerouslySetInnerHTML={{
+                                  __html: block.data.text
+                                }}
+                              />
+                            );
+                          case 'header':
+                            return (
+                              <Title
+                                key={block.id}
+                                order={block.data.level + 1}
+                                dangerouslySetInnerHTML={{
+                                  __html: block.data.text
+                                }}
+                              />
+                            );
+                          case 'list':
+                            return (
+                              <List
+                                w="100%"
+                                withPadding
+                                key={block.id}
+                                type={block.data.style}
+                              >
+                                {block.data.items.map(
+                                  (item: any, index: number) => (
+                                    <List.Item key={index}>
+                                      <span
+                                        dangerouslySetInnerHTML={{
+                                          __html: item.content
+                                        }}
+                                      />
+                                    </List.Item>
+                                  )
+                                )}
+                              </List>
+                            );
+                          case 'quote':
+                            return (
+                              <Blockquote
+                                color="green"
+                                key={block.id}
+                                cite={block.data.caption}
+                                mt="xl"
+                              >
+                                {block.data.text}
+                              </Blockquote>
+                            );
+                          case 'code':
+                            return (
+                              <Code key={block.id} block>
+                                {block.data.code}
+                              </Code>
+                            );
+                          case 'table':
+                            const withHeadings = block.data.withHeadings;
+                            const rows = withHeadings
+                              ? block.data.content.slice(1)
+                              : block.data.content;
+
+                            return (
+                              <Stack
+                                w="100%"
+                                style={{
+                                  overflowX: 'auto'
+                                }}
+                                key={block.id}
+                              >
+                                <Table
+                                  withTableBorder
+                                  withColumnBorders
+                                  w="100%"
+                                  layout="auto"
+                                >
+                                  {withHeadings && (
+                                    <Table.Thead>
+                                      <Table.Tr>
+                                        {block.data.content[0].map(
+                                          (heading: string, index: number) => (
+                                            <Table.Th key={index}>
+                                              {heading}
+                                            </Table.Th>
+                                          )
+                                        )}
+                                      </Table.Tr>
+                                    </Table.Thead>
+                                  )}
+                                  <Table.Tbody>
+                                    {rows.map((row: any, index: number) => (
+                                      <Table.Tr key={index}>
+                                        {row.map(
+                                          (cell: string, index: number) => (
+                                            <Table.Td key={index}>
+                                              {cell}
+                                            </Table.Td>
+                                          )
+                                        )}
+                                      </Table.Tr>
+                                    ))}
+                                  </Table.Tbody>
+                                </Table>
+                              </Stack>
+                            );
+                          case 'image':
+                            if (block.data.withBackground) {
+                              return (
+                                <Group
+                                  justify="center"
+                                  bg="dimmed"
+                                  key={block.id}
+                                  style={{
+                                    borderRadius: theme.radius.sm
+                                  }}
+                                >
+                                  <ExpandableImage src={block.data.file.url}>
+                                    <Image
+                                      fit="contain"
+                                      w="100%"
+                                      h="auto"
+                                      src={block.data.file.url}
+                                      alt={block.data.caption}
+                                    />
+                                  </ExpandableImage>
+                                  <Text>{block.data.caption}</Text>
+                                </Group>
+                              );
+                            }
+
+                            return (
+                              <ExpandableImage src={block.data.file.url}>
+                                <Image
+                                  radius="sm"
+                                  key={block.id}
+                                  src={block.data.file.url}
+                                  alt={block.data.caption}
+                                />
+                              </ExpandableImage>
+                            );
+                          default:
+                            return (
+                              <Text
+                                key={block.id}
+                                dangerouslySetInnerHTML={{
+                                  __html: block.data
+                                }}
+                              />
+                            );
+                        }
+                      })}
+                    </Stack>
+
+                    <Group gap={6} mb="lg">
+                      {postDetails.tags.map((tag: string) => (
+                        <Badge
+                          key={tag}
+                          variant="light"
+                          style={{
+                            cursor: 'pointer'
+                          }}
+                          component="button"
+                          onClick={() => navigate(`/tag/${tag}`)}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </Group>
+
+                    <Stack gap="xs">
+                      <Divider />
                       <PostReaction
                         post={postDetails}
                         onLike={handleLike}
                         onComment={() => commentRef.current?.focus()}
                         onSave={handleSavePost}
                       />
-                    </Group>
-                    <Divider />
-                  </Stack>
+                    </Stack>
 
-                  <Stack flex={1} w="100%">
-                    {content.blocks.map((block: any) => {
-                      switch (block.type) {
-                        case 'paragraph':
-                          return (
-                            <Text
-                              key={block.id}
-                              dangerouslySetInnerHTML={{
-                                __html: block.data.text
-                              }}
+                    {auth.isAuth && auth.profile ? (
+                      <Fragment>
+                        <Title order={2}>
+                          Comments ({postDetails.commentCount})
+                        </Title>
+
+                        <form onSubmit={form.onSubmit(handleSubmitComment)}>
+                          <Stack>
+                            <Textarea
+                              ref={commentRef}
+                              label="Comment"
+                              placeholder="Enter your comment"
+                              name="comment"
+                              key={form.key('comment')}
+                              {...form.getInputProps('comment')}
                             />
-                          );
-                        case 'header':
-                          return (
-                            <Title
-                              key={block.id}
-                              order={block.data.level + 1}
-                              dangerouslySetInnerHTML={{
-                                __html: block.data.text
-                              }}
-                            />
-                          );
-                        case 'list':
-                          return (
-                            <List
-                              w="100%"
-                              withPadding
-                              key={block.id}
-                              type={block.data.style}
-                            >
-                              {block.data.items.map(
-                                (item: any, index: number) => (
-                                  <List.Item key={index}>
-                                    <span
-                                      dangerouslySetInnerHTML={{
-                                        __html: item.content
-                                      }}
-                                    />
-                                  </List.Item>
-                                )
-                              )}
-                            </List>
-                          );
-                        case 'quote':
-                          return (
-                            <Blockquote
-                              color="green"
-                              key={block.id}
-                              cite={block.data.caption}
-                              mt="xl"
-                            >
-                              {block.data.text}
-                            </Blockquote>
-                          );
-                        case 'code':
-                          return (
-                            <Code key={block.id} block>
-                              {block.data.code}
-                            </Code>
-                          );
-                        case 'table':
-                          const withHeadings = block.data.withHeadings;
-                          const rows = withHeadings
-                            ? block.data.content.slice(1)
-                            : block.data.content;
+                            <Group>
+                              <Button type="submit" loading={submitting}>
+                                Submit
+                              </Button>
+                            </Group>
+                          </Stack>
+                        </form>
 
-                          return (
-                            <Stack
-                              w="100%"
-                              style={{
-                                overflowX: 'auto'
-                              }}
-                              key={block.id}
-                            >
-                              <Table
-                                withTableBorder
-                                withColumnBorders
-                                w="100%"
-                                layout="auto"
-                              >
-                                {withHeadings && (
-                                  <Table.Thead>
-                                    <Table.Tr>
-                                      {block.data.content[0].map(
-                                        (heading: string, index: number) => (
-                                          <Table.Th key={index}>
-                                            {heading}
-                                          </Table.Th>
-                                        )
-                                      )}
-                                    </Table.Tr>
-                                  </Table.Thead>
-                                )}
-                                <Table.Tbody>
-                                  {rows.map((row: any, index: number) => (
-                                    <Table.Tr key={index}>
-                                      {row.map(
-                                        (cell: string, index: number) => (
-                                          <Table.Td key={index}>
-                                            {cell}
-                                          </Table.Td>
-                                        )
-                                      )}
-                                    </Table.Tr>
-                                  ))}
-                                </Table.Tbody>
-                              </Table>
-                            </Stack>
-                          );
-                        case 'image':
-                          if (block.data.withBackground) {
-                            return (
-                              <Group
-                                justify="center"
-                                bg="dimmed"
-                                key={block.id}
-                                style={{
-                                  borderRadius: theme.radius.sm
-                                }}
-                              >
-                                <ExpandableImage src={block.data.file.url}>
-                                  <Image
-                                    fit="contain"
-                                    w="100%"
-                                    h="auto"
-                                    src={block.data.file.url}
-                                    alt={block.data.caption}
-                                  />
-                                </ExpandableImage>
-                                <Text>{block.data.caption}</Text>
-                              </Group>
-                            );
-                          }
-
-                          return (
-                            <ExpandableImage src={block.data.file.url}>
-                              <Image
-                                radius="sm"
-                                key={block.id}
-                                src={block.data.file.url}
-                                alt={block.data.caption}
-                              />
-                            </ExpandableImage>
-                          );
-                        default:
-                          return (
-                            <Text
-                              key={block.id}
-                              dangerouslySetInnerHTML={{
-                                __html: block.data
-                              }}
-                            />
-                          );
-                      }
-                    })}
-                  </Stack>
-
-                  <Group gap={6} mb="lg">
-                    {postDetails.tags.map((tag: string) => (
-                      <Badge
-                        key={tag}
-                        variant="light"
-                        style={{
-                          cursor: 'pointer'
-                        }}
-                        component="button"
-                        onClick={() => navigate(`/tag/${tag}`)}
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </Group>
-
-                  <Stack gap="xs">
-                    <Divider />
-                    <PostReaction
-                      post={postDetails}
-                      onLike={handleLike}
-                      onComment={() => commentRef.current?.focus()}
-                      onSave={handleSavePost}
-                    />
-                  </Stack>
-
-                  {auth.isAuth && auth.profile ? (
-                    <Fragment>
-                      <Title order={2}>
-                        Comments ({postDetails.commentCount})
-                      </Title>
-
-                      <form onSubmit={form.onSubmit(handleSubmitComment)}>
-                        <Stack>
-                          <Textarea
-                            ref={commentRef}
-                            label="Comment"
-                            placeholder="Enter your comment"
-                            name="comment"
-                            key={form.key('comment')}
-                            {...form.getInputProps('comment')}
-                          />
-                          <Group>
-                            <Button type="submit" loading={submitting}>
-                              Submit
-                            </Button>
-                          </Group>
-                        </Stack>
-                      </form>
-
-                      {postDetails.comments.length > 0 ? (
-                        <Stack gap="lg" my="xl">
-                          {postDetails.comments.map(
-                            (comment: TCommentItem, index: number) => (
-                              <CommentCard
-                                key={comment.id}
-                                comment={comment}
-                                isLastComment={
-                                  postDetails.comments.length === index + 1
-                                }
-                                isOwnComment={
-                                  comment.commentor.email === profileEmail
-                                }
-                              />
-                            )
-                          )}
-                        </Stack>
-                      ) : (
-                        <Text c="dimmed">No comments yet.</Text>
-                      )}
-                    </Fragment>
-                  ) : (
-                    <Text c="dimmed">
-                      You must be logged in to comment on this post.
-                    </Text>
-                  )}
-                </Fragment>
-              )}
-            </LoadingPost>
-          </Stack>
-        </Grid.Col>
-        <Grid.Col span={!isLg ? 4 : 12}>
-          {postDetails && <PostSidebar />}
-        </Grid.Col>
-      </Grid>
-    </MainLayout>
+                        {postDetails.comments.length > 0 ? (
+                          <Stack gap="lg" my="xl">
+                            {postDetails.comments.map(
+                              (comment: TCommentItem, index: number) => (
+                                <CommentCard
+                                  key={comment.id}
+                                  comment={comment}
+                                  isLastComment={
+                                    postDetails.comments.length === index + 1
+                                  }
+                                  isOwnComment={
+                                    comment.commentor.email === profileEmail
+                                  }
+                                />
+                              )
+                            )}
+                          </Stack>
+                        ) : (
+                          <Text c="dimmed">No comments yet.</Text>
+                        )}
+                      </Fragment>
+                    ) : (
+                      <Text c="dimmed">
+                        You must be logged in to react and comment on this post.
+                      </Text>
+                    )}
+                  </Fragment>
+                )}
+              </LoadingPost>
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={!isLg ? 4 : 12}>
+            {postDetails && <PostSidebar />}
+          </Grid.Col>
+        </Grid>
+      </MainLayout>
+    </Fragment>
   );
 };
 

@@ -1,4 +1,5 @@
 declare module 'lodash';
+declare module 'react-helmet';
 declare module 'editorjs-text-alignment-blocktune' {
   const TextAlignTune: any;
   export default TextAlignTune;

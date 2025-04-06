@@ -37,10 +37,7 @@ const ExtrasPostCard: FC<IExtrasPostCardProps> = ({
       >
         <Stack gap="xs">
           {displayProfile && (
-            <ProfileBadge
-              avatarSize="sm"
-              profile={item.creator}
-            />
+            <ProfileBadge avatarSize="sm" profile={item.creator} />
           )}
           <Stack gap={0}>
             <Title order={5} lineClamp={2}>

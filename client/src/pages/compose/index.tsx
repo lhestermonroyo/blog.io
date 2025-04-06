@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router';
 import {
   Button,
@@ -183,51 +185,58 @@ const Compose = () => {
   };
 
   return (
-    <MainLayout>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack display="flex" justify="stretch" gap="lg">
-          <Group justify="space-between" align="center">
-            <Title order={1}>Compose Blog</Title>
-            <Button loading={submitting} type="submit">
-              Publish
-            </Button>
-          </Group>
-          <TextInput
-            variant="filled"
-            label="Title"
-            placeholder="Enter your title"
-            name="title"
-            key={form.key('title')}
-            {...form.getInputProps('title')}
-          />
-          <TagsInput
-            variant="filled"
-            label="Tags"
-            name="tags"
-            placeholder="Enter your tags"
-            clearable
-            key={form.key('tags')}
-            {...form.getInputProps('tags')}
-          />
-          <Stack gap={2}>
-            <Paper
-              p={6}
-              flex={1}
-              className={cx(classes.editor, {
-                [classes.dark]: isDark,
-                [classes.error]: form.errors.content
-              })}
-              ref={editorRef}
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Compose</title>
+        <meta name="description" content="Compose your blog post." />
+        <link rel="canonical" href="/compose" />
+      </Helmet>
+      <MainLayout>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack display="flex" justify="stretch" gap="lg">
+            <Group justify="space-between" align="center">
+              <Title order={1}>Compose Blog</Title>
+              <Button loading={submitting} type="submit">
+                Publish
+              </Button>
+            </Group>
+            <TextInput
+              variant="filled"
+              label="Title"
+              placeholder="Enter your title"
+              name="title"
+              key={form.key('title')}
+              {...form.getInputProps('title')}
             />
-            {form.errors.content && (
-              <Text color="red" fz="xs">
-                {form.errors.content}
-              </Text>
-            )}
+            <TagsInput
+              variant="filled"
+              label="Tags"
+              name="tags"
+              placeholder="Enter your tags"
+              clearable
+              key={form.key('tags')}
+              {...form.getInputProps('tags')}
+            />
+            <Stack gap={2}>
+              <Paper
+                p={6}
+                flex={1}
+                className={cx(classes.editor, {
+                  [classes.dark]: isDark,
+                  [classes.error]: form.errors.content
+                })}
+                ref={editorRef}
+              />
+              {form.errors.content && (
+                <Text color="red" fz="xs">
+                  {form.errors.content}
+                </Text>
+              )}
+            </Stack>
           </Stack>
-        </Stack>
-      </form>
-    </MainLayout>
+        </form>
+      </MainLayout>
+    </Fragment>
   );
 };
 

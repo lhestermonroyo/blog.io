@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router';
 import {
   Button,
@@ -210,60 +212,67 @@ const EditPost = () => {
   if (loading) return null;
 
   return (
-    <MainLayout>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack display="flex" justify="stretch" gap="lg">
-          <Group>
-            <Button
-              variant="default"
-              leftSection={<IconArrowLeft size={16} />}
-              onClick={() => navigate(`/post/${params.id}`)}
-            >
-              Back
-            </Button>
-          </Group>
-          <Group justify="space-between" align="center">
-            <Title order={1}>Edit Post</Title>
-            <Button loading={submitting} type="submit">
-              Save Changes
-            </Button>
-          </Group>
-          <TextInput
-            variant="filled"
-            label="Title"
-            placeholder="Enter your title"
-            name="title"
-            key={form.key('title')}
-            {...form.getInputProps('title')}
-          />
-          <TagsInput
-            variant="filled"
-            label="Tags"
-            name="tags"
-            placeholder="Enter your tags"
-            clearable
-            key={form.key('tags')}
-            {...form.getInputProps('tags')}
-          />
-          <Stack gap={2}>
-            <Paper
-              p={6}
-              flex={1}
-              className={cx(classes.editor, {
-                [classes.dark]: isDark,
-                [classes.error]: form.errors.content
-              })}
-              ref={editorRef}
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Edit Post</title>
+        <meta name="description" content="Edit your post" />
+        <link rel="canonical" href={`/edit-post/${params.id}`} />
+      </Helmet>
+      <MainLayout>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack display="flex" justify="stretch" gap="lg">
+            <Group>
+              <Button
+                variant="default"
+                leftSection={<IconArrowLeft size={16} />}
+                onClick={() => navigate(`/post/${params.id}`)}
+              >
+                Back
+              </Button>
+            </Group>
+            <Group justify="space-between" align="center">
+              <Title order={1}>Edit Post</Title>
+              <Button loading={submitting} type="submit">
+                Save Changes
+              </Button>
+            </Group>
+            <TextInput
+              variant="filled"
+              label="Title"
+              placeholder="Enter your title"
+              name="title"
+              key={form.key('title')}
+              {...form.getInputProps('title')}
             />
-            {form.errors.content && (
-              <Text color="red" fz="xs">
-                {form.errors.content}
-              </Text>
-            )}
+            <TagsInput
+              variant="filled"
+              label="Tags"
+              name="tags"
+              placeholder="Enter your tags"
+              clearable
+              key={form.key('tags')}
+              {...form.getInputProps('tags')}
+            />
+            <Stack gap={2}>
+              <Paper
+                p={6}
+                flex={1}
+                className={cx(classes.editor, {
+                  [classes.dark]: isDark,
+                  [classes.error]: form.errors.content
+                })}
+                ref={editorRef}
+              />
+              {form.errors.content && (
+                <Text color="red" fz="xs">
+                  {form.errors.content}
+                </Text>
+              )}
+            </Stack>
           </Stack>
-        </Stack>
-      </form>
-    </MainLayout>
+        </form>
+      </MainLayout>
+    </Fragment>
   );
 };
 

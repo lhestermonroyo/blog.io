@@ -1,4 +1,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useMutation } from '@apollo/client';
 import {
   Badge,
@@ -89,108 +91,119 @@ const Search = () => {
   };
 
   return (
-    <MainLayout size="sm">
-      <Stack gap="lg">
-        <Title order={1} ta="center">
-          Find something in mind
-        </Title>
-        <TextInput
-          ref={searchFieldRef}
-          size={!isMd ? 'xl' : 'lg'}
-          radius="xl"
-          placeholder="Search posts, authors and topics/tags..."
-          leftSection={<IconSearch size={24} />}
-          onChange={(e) => setQuery(e.target.value)}
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Search</title>
+        <meta
+          name="description"
+          content="Find posts, authors and topics/tags of your interest."
         />
+        <meta name="robots" content="noindex" />
+        <link rel="canonical" href="/search" />
+      </Helmet>
+      <MainLayout size="sm">
+        <Stack gap="lg">
+          <Title order={1} ta="center">
+            Find something in mind
+          </Title>
+          <TextInput
+            ref={searchFieldRef}
+            size={!isMd ? 'xl' : 'lg'}
+            radius="xl"
+            placeholder="Search posts, authors and topics/tags..."
+            leftSection={<IconSearch size={24} />}
+            onChange={(e) => setQuery(e.target.value)}
+          />
 
-        {query.length > 2 && (
-          <Stack gap="xl">
-            <Title order={2}>
-              Results for{' '}
-              <Title component="span" order={2} c="green">
-                {query}
+          {query.length > 2 && (
+            <Stack gap="xl">
+              <Title order={2}>
+                Results for{' '}
+                <Title component="span" order={2} c="green">
+                  {query}
+                </Title>
               </Title>
-            </Title>
-            {loading ? (
-              <Loading />
-            ) : (
-              <Fragment>
-                {results.totalCount === 0 ? (
-                  <Title order={5} ta="center">
-                    No results found.
-                  </Title>
-                ) : (
-                  <Fragment>
-                    {results.users.length > 0 && (
-                      <Stack gap="md">
-                        <Divider
-                          labelPosition="left"
-                          label={
-                            <Title c="dark" order={3}>
-                              Authors ({results.users.length})
-                            </Title>
-                          }
-                        />
+              {loading ? (
+                <Loading />
+              ) : (
+                <Fragment>
+                  {results.totalCount === 0 ? (
+                    <Title order={5} ta="center">
+                      No results found.
+                    </Title>
+                  ) : (
+                    <Fragment>
+                      {results.users.length > 0 && (
+                        <Stack gap="md">
+                          <Divider
+                            labelPosition="left"
+                            label={
+                              <Title c="dark" order={3}>
+                                Authors ({results.users.length})
+                              </Title>
+                            }
+                          />
 
-                        <Group gap="lg">
-                          {results.users.map((user: TProfileBadge) => (
-                            <ProfileBadge profile={user} key={user.id} />
-                          ))}
-                        </Group>
-                      </Stack>
-                    )}
-                    {results.tags.length > 0 && (
-                      <Stack gap={6}>
-                        <Divider
-                          labelPosition="left"
-                          label={
-                            <Title c="dark" order={3}>
-                              Tags ({results.tags.length})
-                            </Title>
-                          }
-                        />
+                          <Group gap="lg">
+                            {results.users.map((user: TProfileBadge) => (
+                              <ProfileBadge profile={user} key={user.id} />
+                            ))}
+                          </Group>
+                        </Stack>
+                      )}
+                      {results.tags.length > 0 && (
+                        <Stack gap={6}>
+                          <Divider
+                            labelPosition="left"
+                            label={
+                              <Title c="dark" order={3}>
+                                Tags ({results.tags.length})
+                              </Title>
+                            }
+                          />
 
-                        <Group gap="lg">
-                          {results.tags.map((tag: string) => (
-                            <Badge
-                              variant="light"
-                              component="button"
-                              style={{ cursor: 'pointer' }}
-                              key={tag}
-                              onClick={() => navigate(`/tag/${tag}`)}
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </Group>
-                      </Stack>
-                    )}
-                    {results.posts.length > 0 && (
-                      <Stack gap="md">
-                        <Divider
-                          labelPosition="left"
-                          label={
-                            <Title c="dark" order={3}>
-                              Posts ({results.posts.length})
-                            </Title>
-                          }
-                        />
+                          <Group gap="lg">
+                            {results.tags.map((tag: string) => (
+                              <Badge
+                                variant="light"
+                                component="button"
+                                style={{ cursor: 'pointer' }}
+                                key={tag}
+                                onClick={() => navigate(`/tag/${tag}`)}
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </Group>
+                        </Stack>
+                      )}
+                      {results.posts.length > 0 && (
+                        <Stack gap="md">
+                          <Divider
+                            labelPosition="left"
+                            label={
+                              <Title c="dark" order={3}>
+                                Posts ({results.posts.length})
+                              </Title>
+                            }
+                          />
 
-                        <Group gap="lg">
-                          {results.posts.map((item: TPostItem) => (
-                            <PostCard item={item} key={item.id} />
-                          ))}
-                        </Group>
-                      </Stack>
-                    )}
-                  </Fragment>
-                )}
-              </Fragment>
-            )}
-          </Stack>
-        )}
-      </Stack>
-    </MainLayout>
+                          <Group gap="lg">
+                            {results.posts.map((item: TPostItem) => (
+                              <PostCard item={item} key={item.id} />
+                            ))}
+                          </Group>
+                        </Stack>
+                      )}
+                    </Fragment>
+                  )}
+                </Fragment>
+              )}
+            </Stack>
+          )}
+        </Stack>
+      </MainLayout>
+    </Fragment>
   );
 };
 

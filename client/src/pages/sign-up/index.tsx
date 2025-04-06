@@ -1,4 +1,6 @@
-import { FC, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import {
   Anchor,
   Button,
@@ -91,70 +93,77 @@ const SignUp: FC = () => {
   };
 
   return (
-    <AuthLayout>
-      <Title order={1}>Create your Account</Title>
-      <Text c="dimmed" mb="xl">
-        Fill-in your information and let's get started.
-      </Text>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack>
-          <TextInput
-            label="Firstname"
-            placeholder="Enter your firstname"
-            name="firstName"
-            key={form.key('firstName')}
-            {...form.getInputProps('firstName')}
-          />
-          <TextInput
-            label="Lastname"
-            placeholder="Enter your lastname"
-            name="lastname"
-            key={form.key('lastName')}
-            {...form.getInputProps('lastName')}
-          />
-          <TextInput
-            label="Email"
-            placeholder="Enter your email"
-            name="email"
-            key={form.key('email')}
-            {...form.getInputProps('email')}
-          />
-          <PasswordInput
-            label="Password"
-            placeholder="Enter your password"
-            name="password"
-            key={form.key('password')}
-            {...form.getInputProps('password')}
-          />
-          <PasswordInput
-            label="Confirm Password"
-            placeholder="Enter confirm password"
-            name="confirmPassword"
-            key={form.key('confirmPassword')}
-            {...form.getInputProps('confirmPassword')}
-          />
-        </Stack>
+    <Fragment>
+      <Helmet>
+        <title>blog.io | Sign Up</title>
+        <meta name="description" content="Sign up to your account" />
+        <link rel="canonical" href="/sign-up" />
+      </Helmet>
+      <AuthLayout>
+        <Title order={1}>Create your Account</Title>
+        <Text c="dimmed" mb="xl">
+          Fill-in your information and let's get started.
+        </Text>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack>
+            <TextInput
+              label="Firstname"
+              placeholder="Enter your firstname"
+              name="firstName"
+              key={form.key('firstName')}
+              {...form.getInputProps('firstName')}
+            />
+            <TextInput
+              label="Lastname"
+              placeholder="Enter your lastname"
+              name="lastname"
+              key={form.key('lastName')}
+              {...form.getInputProps('lastName')}
+            />
+            <TextInput
+              label="Email"
+              placeholder="Enter your email"
+              name="email"
+              key={form.key('email')}
+              {...form.getInputProps('email')}
+            />
+            <PasswordInput
+              label="Password"
+              placeholder="Enter your password"
+              name="password"
+              key={form.key('password')}
+              {...form.getInputProps('password')}
+            />
+            <PasswordInput
+              label="Confirm Password"
+              placeholder="Enter confirm password"
+              name="confirmPassword"
+              key={form.key('confirmPassword')}
+              {...form.getInputProps('confirmPassword')}
+            />
+          </Stack>
 
-        <Group justify="space-between" mt="xl">
-          <Text size="sm">
-            Don't have an account yet?{' '}
-            <Anchor
-              component="button"
-              type="button"
-              variant="light"
-              size="sm"
-              onClick={() => navigate('/login')}
-            >
-              Login
-            </Anchor>
-          </Text>
+          <Group justify="space-between" mt="xl">
+            <Text size="sm">
+              Don't have an account yet?{' '}
+              <Anchor
+                component="button"
+                type="button"
+                variant="light"
+                size="sm"
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </Anchor>
+            </Text>
 
-          <Button type="submit" loading={submitting}>
-            Sign Up
-          </Button>
-        </Group>
-      </form>
-    </AuthLayout>
+            <Button type="submit" loading={submitting}>
+              Sign Up
+            </Button>
+          </Group>
+        </form>
+      </AuthLayout>
+    </Fragment>
   );
 };
 

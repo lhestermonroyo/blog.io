@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
+// @ts-ignore
+import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router';
 import { Badge, Divider, Group, SimpleGrid, Stack, Title } from '@mantine/core';
 import { useQuery } from '@apollo/client';
@@ -42,61 +44,72 @@ const Tag = () => {
   const posts = data.posts || [];
 
   return (
-    <MainLayout>
-      <Stack gap="lg">
-        <Title order={1} tt="capitalize">
-          {param.tag}
-        </Title>
-        <LoadingFeed loading={loading} error={error} refetch={fetchPostsByTags}>
-          <Stack>
-            <Title order={3}>
-              <Title order={3} component="span" c="green">
-                {posts?.length}
-              </Title>{' '}
-              {posts?.length === 1 ? 'post' : 'posts'} found
-            </Title>
-            <SimpleGrid
-              cols={{
-                base: 1,
-                md: posts?.length === 1 ? 1 : 2
-              }}
-              spacing={24}
-            >
-              {posts.map((post: TPostItem) => (
-                <PostCard key={post.id} item={post} />
-              ))}
-            </SimpleGrid>
-          </Stack>
-        </LoadingFeed>
-        <Divider
-          labelPosition="left"
-          label={
-            <Title c="dark" order={3}>
-              Explore other topics/tags
-            </Title>
-          }
-        />
-        <Group gap={6}>
-          {list.map((item: string) => {
-            if (item === param.tag) return null;
-
-            return (
-              <Badge
-                style={{
-                  cursor: 'pointer'
+    <Fragment>
+      <Helmet>
+        <title>blog.io | {`${param.tag}`}</title>
+        <meta name="description" content={`Tag: ${param.tag}`} />
+        <link rel="canonical" href={`/tag/${param.tag}`} />
+      </Helmet>
+      <MainLayout>
+        <Stack gap="lg">
+          <Title order={1} tt="capitalize">
+            {param.tag}
+          </Title>
+          <LoadingFeed
+            loading={loading}
+            error={error}
+            refetch={fetchPostsByTags}
+          >
+            <Stack>
+              <Title order={3}>
+                <Title order={3} component="span" c="green">
+                  {posts?.length}
+                </Title>{' '}
+                {posts?.length === 1 ? 'post' : 'posts'} found
+              </Title>
+              <SimpleGrid
+                cols={{
+                  base: 1,
+                  md: posts?.length === 1 ? 1 : 2
                 }}
-                key={item}
-                onClick={() => navigate(`/tag/${item}`)}
-                variant="light"
-                component="button"
+                spacing={24}
               >
-                {item}
-              </Badge>
-            );
-          })}
-        </Group>
-      </Stack>
-    </MainLayout>
+                {posts.map((post: TPostItem) => (
+                  <PostCard key={post.id} item={post} />
+                ))}
+              </SimpleGrid>
+            </Stack>
+          </LoadingFeed>
+          <Divider
+            labelPosition="left"
+            label={
+              <Title c="dark" order={3}>
+                Explore other topics/tags
+              </Title>
+            }
+          />
+          <Group gap={6}>
+            {list.map((item: string) => {
+              if (item === param.tag) return null;
+
+              return (
+                <Badge
+                  style={{
+                    cursor: 'pointer'
+                  }}
+                  key={item}
+                  onClick={() => navigate(`/tag/${item}`)}
+                  variant="light"
+                  component="button"
+                >
+                  {item}
+                </Badge>
+              );
+            })}
+          </Group>
+        </Stack>
+      </MainLayout>
+    </Fragment>
   );
 };
 
