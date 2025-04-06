@@ -28,6 +28,14 @@
 - **Database**: MongoDB
 - **Other Services**: Firebase Storage - for storing uploaded files
 
+## Test Account
+Use the following credentials to explore the app without creating a new account:
+
+- **Email:** claude@mailinator.com
+- **Password:** Password1
+
+This test account has access to most features, including reading, writing, liking, commenting, and exploring user profiles.
+
 ## Contact
 
 For inquiries, reach me at [lhestermoon3011@gmail.com](mailto:lhestermoon3011@gmail.com)
