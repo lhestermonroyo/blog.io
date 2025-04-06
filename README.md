@@ -7,19 +7,19 @@
 ## Features
 
 - **Blog Creation & Management**: Users can write, edit, and publish their own blog posts.
-- **User Interaction**: Readers can like, share, and comment on blog posts.
+- **Infinite Scrolling**: Seamless browsing experience with infinite scroll on the blog feed.
+- **User Interaction**: Readers can like, share, comment and reply on blog posts.
 - **Profile Management**: Users can edit personal information, upload cover photos and avatars to personalize their profiles.
 - **Follow System**: Users can follow other content creators to stay updated with their latest posts.
 - **Search & Categorization**: Posts can be searched and categorized by topics, tags, or followed users.
-- **Real-Time Notifications**: Users receive instant notifications for likes, comments, new followers, and other interactions.
+- **Real-Time Notifications**: Users receive instant notifications for likes, comments, replies, new followers, and other interactions.
 - **Public View**: Unauthenticated readers can explore and read blog posts, as well as view user profiles.
 - **Cookie-based Authentication**: Secure user authentication using cookies for session management.
 
 ## Future Developments
 
-- **Responsive UI**
 - **Messaging System**
-- **Embed External Links/Contents**
+- **Google Sign-in Authentication**
 
 ## Technologies Used
 
