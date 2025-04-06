@@ -17,10 +17,11 @@ const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
 module.exports = {
   Query: {
-    async getPosts(_, { limit }, __) {
+    async getPosts(_, { limit, offset = 0 }, __) {
       try {
         const query = Post.find()
           .sort({ createdAt: -1 })
+          .skip(offset)
           .populate('creator', profileBadgeProj);
 
         if (limit) {
@@ -54,7 +55,7 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getPostsByTags(_, { tags, limit }, __) {
+    async getPostsByTags(_, { tags, limit, offset = 0 }, __) {
       try {
         const query = Post.find({
           tags: {
@@ -62,6 +63,7 @@ module.exports = {
           }
         })
           .sort({ createdAt: -1 })
+          .skip(offset)
           .populate('creator', profileBadgeProj);
 
         if (limit) {
@@ -136,7 +138,7 @@ module.exports = {
         throw new Error(error);
       }
     },
-    async getPostsByFollowing(_, { limit }, context) {
+    async getPostsByFollowing(_, { limit, offset = 0 }, context) {
       try {
         const user = checkAuth(context);
 
@@ -158,6 +160,7 @@ module.exports = {
           }
         })
           .sort({ createdAt: -1 })
+          .skip(offset)
           .populate('creator', profileBadgeProj);
 
         if (limit) {

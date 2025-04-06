@@ -77,6 +77,7 @@ const PostCard: FC<PostCardProps> = ({ item }) => {
           {thumbnail && (
             <Grid.Col flex={1} display="flex" span={!isMd ? 4 : 5}>
               <Image
+                loading="eager"
                 radius="sm"
                 src={thumbnail?.data.file.url}
                 fallbackSrc="https://placehold.co/600x400?text=No%20Image%20Available"

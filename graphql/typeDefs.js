@@ -220,9 +220,9 @@ module.exports = gql`
     getProfile: Profile!
     getProfileByEmail(email: String!): Profile!
     # Posts
-    getPosts(limit: Int): Posts!
-    getPostsByTags(tags: [String]!, limit: Int): Posts!
-    getPostsByFollowing(limit: Int): Posts!
+    getPosts(limit: Int, offset: Int): Posts!
+    getPostsByTags(tags: [String]!, limit: Int, offset: Int): Posts!
+    getPostsByFollowing(limit: Int, offset: Int): Posts!
     getPostsByCreator(creator: ID!, limit: Int): Posts!
     getPostById(postId: ID!): PostDetails!
     getTags: [String]!

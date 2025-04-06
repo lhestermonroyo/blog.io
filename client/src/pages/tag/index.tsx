@@ -24,7 +24,6 @@ const Tag = () => {
   const {
     data: response,
     loading,
-    error,
     refetch: fetchPostsByTags
   } = useQuery(GET_POSTS_BY_TAGS, {
     variables: { tags: [param.tag] },
@@ -55,11 +54,9 @@ const Tag = () => {
           <Title order={1} tt="capitalize">
             {param.tag}
           </Title>
-          <LoadingFeed
-            loading={loading}
-            error={error}
-            refetch={fetchPostsByTags}
-          >
+          {loading ? (
+            <LoadingFeed />
+          ) : (
             <Stack>
               <Title order={3}>
                 <Title order={3} component="span" c="green">
@@ -79,7 +76,8 @@ const Tag = () => {
                 ))}
               </SimpleGrid>
             </Stack>
-          </LoadingFeed>
+          )}
+
           <Divider
             labelPosition="left"
             label={

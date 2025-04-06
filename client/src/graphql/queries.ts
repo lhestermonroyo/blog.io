@@ -61,7 +61,7 @@ export const GET_NOTIFICATIONS = gql`
           id
           title
         }
-        comment 
+        comment
         isRead
         message
         createdAt
@@ -168,8 +168,8 @@ export const GET_STATS_BY_EMAIL = gql`
 `;
 
 export const GET_POSTS = gql`
-  query GetPosts($limit: Int) {
-    getPosts(limit: $limit) {
+  query GetPosts($limit: Int, $offset: Int) {
+    getPosts(limit: $limit, offset: $offset) {
       totalCount
       currentCount
       posts {
@@ -194,8 +194,8 @@ export const GET_POSTS = gql`
 `;
 
 export const GET_POSTS_BY_FOLLOWING = gql`
-  query GetPostsByFollowing($limit: Int) {
-    getPostsByFollowing(limit: $limit) {
+  query GetPostsByFollowing($limit: Int, $offset: Int) {
+    getPostsByFollowing(limit: $limit, offset: $offset) {
       totalCount
       currentCount
       posts {
@@ -220,8 +220,8 @@ export const GET_POSTS_BY_FOLLOWING = gql`
 `;
 
 export const GET_POSTS_BY_TAGS = gql`
-  query GetPostsByTags($tags: [String!]!, $limit: Int) {
-    getPostsByTags(tags: $tags, limit: $limit) {
+  query GetPostsByTags($tags: [String!]!, $limit: Int, $offset: Int) {
+    getPostsByTags(tags: $tags, limit: $limit, offset: $offset) {
       totalCount
       currentCount
       posts {
