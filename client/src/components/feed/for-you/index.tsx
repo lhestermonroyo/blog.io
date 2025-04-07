@@ -40,7 +40,7 @@ const ForYou = () => {
     refetch: fetchPostsByTags,
     fetchMore: fetchPostsByTagsMore
   } = useQuery(GET_POSTS_BY_TAGS, {
-    variables: { tags: filters.length ? filters : profile?.tags, limit: 8 },
+    variables: { tags: filters.length ? filters : profile?.tags, limit: 7 },
     skip: !profile,
     fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true,
