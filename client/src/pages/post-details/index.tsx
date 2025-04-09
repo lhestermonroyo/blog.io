@@ -29,6 +29,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import {
   IconArrowLeft,
   IconClock,
+  IconCopy,
   IconDotsVertical,
   IconEdit,
   IconTrash
@@ -354,6 +355,18 @@ const PostDetails = () => {
     }
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(
+      `${window.location.origin}/#/post/${params.id}`
+    );
+    notifications.show({
+      title: 'Success',
+      message: 'Post link copied to clipboard.',
+      color: 'teal',
+      position: 'top-center'
+    });
+  };
+
   const showDeleteModal = () =>
     modals.openConfirmModal({
       id: 'delete-post',
@@ -398,42 +411,50 @@ const PostDetails = () => {
                   Back
                 </Button>
 
-                {isOwnPost && (
-                  <Menu
-                    width={120}
-                    position="bottom-end"
-                    transitionProps={{ transition: 'pop-top-right' }}
-                    withinPortal
-                  >
-                    <Menu.Target>
-                      <ActionIcon variant="transparent" color="dimmed">
-                        <IconDotsVertical />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item
-                        leftSection={<IconEdit size={16} stroke={1.5} />}
-                        onClick={() => navigate(`/edit-post/${params.id}`)}
-                      >
-                        Edit
-                      </Menu.Item>
-                      <Menu.Divider />
+                <Menu
+                  width={130}
+                  position="bottom-end"
+                  transitionProps={{ transition: 'pop-top-right' }}
+                  withinPortal
+                >
+                  <Menu.Target>
+                    <ActionIcon variant="transparent" color="dimmed">
+                      <IconDotsVertical />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      leftSection={<IconCopy size={16} stroke={1.5} />}
+                      onClick={handleCopyLink}
+                    >
+                      Copy Link
+                    </Menu.Item>
+                    {isOwnPost && (
+                      <Fragment>
+                        <Menu.Item
+                          leftSection={<IconEdit size={16} stroke={1.5} />}
+                          onClick={() => navigate(`/edit-post/${params.id}`)}
+                        >
+                          Edit
+                        </Menu.Item>
+                        <Menu.Divider />
 
-                      <Menu.Item
-                        leftSection={
-                          <IconTrash
-                            size={16}
-                            color={theme.colors.red[6]}
-                            stroke={1.5}
-                          />
-                        }
-                        onClick={showDeleteModal}
-                      >
-                        Delete
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                )}
+                        <Menu.Item
+                          leftSection={
+                            <IconTrash
+                              size={16}
+                              color={theme.colors.red[6]}
+                              stroke={1.5}
+                            />
+                          }
+                          onClick={showDeleteModal}
+                        >
+                          Delete
+                        </Menu.Item>
+                      </Fragment>
+                    )}
+                  </Menu.Dropdown>
+                </Menu>
               </Group>
               <LoadingPost loading={loading}>
                 {postDetails && (
@@ -615,6 +636,7 @@ const PostDetails = () => {
                               <iframe
                                 key={block.id}
                                 src={block.data.embed}
+                                allowFullScreen
                                 style={{
                                   width: '100%',
                                   aspectRatio: '16/9',
