@@ -92,7 +92,6 @@ const Login = () => {
         setSubmitting(true);
 
         const idToken = await result.user.getIdToken();
-
         const response = await loginWithGoogle({
           variables: {
             idToken

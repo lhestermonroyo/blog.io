@@ -81,6 +81,89 @@ module.exports = {
         throw new Error(error);
       }
     },
+    async signUpWithGoogle(_, { idToken }, ctx) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const { name, email, picture } = decodedToken;
+
+        const user = await User.findOne({ email });
+
+        if (user) {
+          throw new UserInputError('Email is already taken.', {
+            errors: {
+              email: 'Email is already taken.'
+            }
+          });
+        }
+
+        const firstName = name.split(' ')[0];
+        const lastName = name.split(' ')[1];
+
+        const newUser = new User({
+          firstName,
+          lastName,
+          email,
+          password: '',
+          pronouns: '',
+          title: '',
+          location: '',
+          birthdate: '',
+          bio: '',
+          avatar: picture,
+          coverPhoto: '',
+          tags: [],
+          socials: {
+            facebook: '',
+            twitter: '',
+            instagram: '',
+            linkedin: '',
+            github: ''
+          },
+          createdAt: new Date().toISOString()
+        });
+        const response = await newUser.save();
+
+        await setGoogleToken(idToken, response._id, ctx);
+        return {
+          id: response._id,
+          email: response._doc.email
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async login(_, { email, password }, ctx) {
+      try {
+        const { valid, errors } = validateLoginInput(email, password);
+
+        if (!valid) {
+          throw new UserInputError('Validation Error', { errors });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+          errors.general = 'User not found.';
+          throw new UserInputError('User not found.', { errors });
+        }
+
+        const match = await bcrypt.compare(password, user.password);
+
+        if (!match) {
+          errors.general = 'Wrong credentials.';
+          throw new UserInputError('Wrong credentials.', { errors });
+        }
+
+        await genAndStoreToken(user, ctx);
+
+        return {
+          id: user._id,
+          email: user._doc.email
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
     async loginWithGoogle(_, { idToken }, ctx) {
       try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
@@ -129,38 +212,6 @@ module.exports = {
         return {
           id: returnId,
           email: returnEmail
-        };
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-    async login(_, { email, password }, ctx) {
-      try {
-        const { valid, errors } = validateLoginInput(email, password);
-
-        if (!valid) {
-          throw new UserInputError('Validation Error', { errors });
-        }
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-          errors.general = 'User not found.';
-          throw new UserInputError('User not found.', { errors });
-        }
-
-        const match = await bcrypt.compare(password, user.password);
-
-        if (!match) {
-          errors.general = 'Wrong credentials.';
-          throw new UserInputError('Wrong credentials.', { errors });
-        }
-
-        await genAndStoreToken(user, ctx);
-
-        return {
-          id: user._id,
-          email: user._doc.email
         };
       } catch (error) {
         throw new Error(error);

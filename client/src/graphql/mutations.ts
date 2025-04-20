@@ -27,6 +27,15 @@ export const SIGN_UP = gql`
   }
 `;
 
+export const SIGN_UP_WITH_GOOGLE = gql`
+  mutation SignUpWithGoogle($idToken: String!) {
+    signUpWithGoogle(idToken: $idToken) {
+      id
+      email
+    }
+  }
+`;
+
 export const LOGOUT = gql`
   mutation Logout {
     logout {

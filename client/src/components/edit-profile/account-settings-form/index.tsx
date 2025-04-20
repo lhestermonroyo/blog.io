@@ -129,8 +129,6 @@ const AccountSettingsForm = () => {
         error.graphQLErrors?.[0]?.message ||
         'An error occurred while changing your password.';
 
-      console.log('error', errorMessage);
-
       notifications.show({
         title: 'Error',
         message: errorMessage,

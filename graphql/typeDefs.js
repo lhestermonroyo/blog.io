@@ -235,6 +235,7 @@ module.exports = gql`
   type Mutation {
     # Users
     signUp(signUpInput: SignUpInput): Session!
+    signUpWithGoogle(idToken: String!): Session!
     login(email: String!, password: String!): Session!
     loginWithGoogle(idToken: String!): Session!
     logout: Status!

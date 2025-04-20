@@ -21,7 +21,7 @@ import { useMutation } from '@apollo/client';
 import { useSetRecoilState } from 'recoil';
 
 import states from '../../states';
-import { SIGN_UP } from '../../graphql/mutations';
+import { SIGN_UP, SIGN_UP_WITH_GOOGLE } from '../../graphql/mutations';
 import { auth, provider } from '../../../firebase.config';
 
 import AuthLayout from '../../layouts/auth';
@@ -55,6 +55,7 @@ const SignUp: FC = () => {
   });
 
   const [signUp] = useMutation(SIGN_UP);
+  const [signUpWithGoogle] = useMutation(SIGN_UP_WITH_GOOGLE);
 
   const navigate = useNavigate();
 
@@ -100,51 +101,41 @@ const SignUp: FC = () => {
   const handleGoogleSignUp = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
 
-      const displayName = user.displayName?.split(' ') as string[];
-      let firstName = '';
-      let lastName = '';
+      if (result) {
+        setSubmitting(true);
 
-      if (displayName.length > 2) {
-        firstName = displayName.slice(0, 2).join(' ');
-        lastName = displayName[2];
-      } else {
-        firstName = displayName[0];
-        lastName = displayName.slice(1).join(' ');
-      }
-
-      const response = await signUp({
-      variables: {
-          signUpInput: {
-            email: user.email,
-            firstName,
-            lastName,
-            password: '',
-            confirmPassword: ''
+        const idToken = await result.user.getIdToken();
+        const response = await signUpWithGoogle({
+          variables: {
+            idToken
           }
+        });
+        const key = Object.keys(response.data)[0];
+        const data = response.data[key];
+
+        if (data) {
+          setAuth((prev: any) => ({
+            ...prev,
+            isAuth: true
+          }));
+
+          navigate('/');
         }
-      });
-
-      const key = Object.keys(response.data)[0];
-      const data = response.data[key];
-
-      if (data) {
-        setAuth((prev: any) => ({
-          ...prev,
-          isAuth: true
-        }));
-
-        navigate('/onboarding');
       }
-    } catch (error) {
-      console.error('error', error);
+    } catch (error: any) {
+      const errorMessage =
+        error.graphQLErrors?.[0]?.message ||
+        'An error occurred while signing up.';
+
       notifications.show({
         title: 'Error',
-        message: 'An error occurred while creating the account.',
+        message: errorMessage,
         color: 'red',
         position: 'top-center'
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -164,6 +155,7 @@ const SignUp: FC = () => {
           <Button
             variant="default"
             leftSection={<Image src={google} alt="google-icon" />}
+            loading={submitting}
             onClick={handleGoogleSignUp}
           >
             Sign with Google
