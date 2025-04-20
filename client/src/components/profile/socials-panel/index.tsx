@@ -24,7 +24,7 @@ import facebook from '../../../assets/Facebook.png';
 import twitter from '../../../assets/Twitter.png';
 import instagram from '../../../assets/Instagram.png';
 import github from '../../../assets/GitHub.png';
-import linkedin from '../../../assets/Linkedin.png';
+import linkedin from '../../../assets/LinkedIn.png';
 
 const SocialsPanel = ({
   loading,
