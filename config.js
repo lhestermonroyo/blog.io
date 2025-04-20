@@ -21,5 +21,5 @@ module.exports = {
   secretKey: process.env.SECRET_KEY,
   port: process.env.PORT || 4000,
   firebaseAdmin,
-  clientUrl: 'http://localhost:5173'
+  clientUrl: process.env.CLIENT_URL
 };
