@@ -1,7 +1,8 @@
 const { AuthenticationError } = require('apollo-server');
 const jwt = require('jsonwebtoken');
+
 const admin = require('../utils/firebaseAdmin.util');
-const { SECRET_KEY } = require('../config');
+const { secretKey } = require('../config');
 
 const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
@@ -11,7 +12,7 @@ module.exports.checkAuth = async (ctx) => {
 
   if (token) {
     try {
-      const user = jwt.verify(token, SECRET_KEY);
+      const user = jwt.verify(token, secretKey);
       return {
         id: user.id,
         email: user.email
@@ -61,7 +62,7 @@ module.exports.genAndStoreToken = async (user, ctx) => {
       id: user.id,
       email: user.email
     },
-    SECRET_KEY,
+    secretKey,
     { expiresIn }
   );
 
