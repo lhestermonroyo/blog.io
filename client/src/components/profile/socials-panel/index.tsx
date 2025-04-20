@@ -11,11 +11,6 @@ import {
 } from '@mantine/core';
 import {
   IconArrowUpRight,
-  IconBrandFacebookFilled,
-  IconBrandGithubFilled,
-  IconBrandInstagramFilled,
-  IconBrandLinkedinFilled,
-  IconBrandTwitterFilled,
   IconEdit,
   IconGlobeFilled
 } from '@tabler/icons-react';

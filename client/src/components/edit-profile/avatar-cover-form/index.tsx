@@ -59,11 +59,11 @@ const AvatarCoverForm = () => {
       setSubmittingAvatar(true);
 
       // await deleteProfile(profile?.avatar as string);
-      const avatarUrl = await uploadProfile(
+      const avatarUrl = (await uploadProfile(
         'avatar',
         avatar,
         profile?.email as string
-      );
+      )) as string;
       const data = await saveUpload('avatar', avatarUrl);
 
       if (data) {
@@ -100,12 +100,12 @@ const AvatarCoverForm = () => {
       setSubmittingCoverPhoto(true);
 
       // await deleteProfile(profile?.avatar as string);
-      const avatarUrl = await uploadProfile(
+      const coverUrl = (await uploadProfile(
         'cover',
         coverPhoto,
         profile?.email as string
-      );
-      const data = await saveUpload('coverPhoto', avatarUrl);
+      )) as string;
+      const data = await saveUpload('coverPhoto', coverUrl);
 
       if (data) {
         setAuth((prev: TAuthState) => ({
