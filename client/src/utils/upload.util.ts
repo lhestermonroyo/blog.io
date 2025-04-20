@@ -26,6 +26,13 @@ const uploadProfile = async (
   email: string
 ) => {
   try {
+    const base64Regex =
+      /^(data:image\/(png|jpeg|jpg|gif|webp);base64,)[A-Za-z0-9+/=]+$/;
+
+    if (!base64Regex.test(imgFile)) {
+      return null;
+    }
+
     const file = `/blog.io-uploads/${type}s/${email}.jpg?v=${Date.now()}`;
     const storageRef = ref(storage, file);
 
@@ -33,6 +40,7 @@ const uploadProfile = async (
 
     return await getDownloadURL(storageRef);
   } catch (error) {
+    console.log('Error uploading file:', error);
     throw new Error();
   }
 };

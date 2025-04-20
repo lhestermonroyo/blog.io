@@ -254,6 +254,7 @@ const Profile = () => {
                         <ExpandableImage src={profile.coverPhoto}>
                           <Image
                             src={profile.coverPhoto}
+                            fallbackSrc="https://t4.ftcdn.net/jpg/03/13/99/15/360_F_313991528_xkWq6AjZIkRu21XCF1jDqRFDx9v93M7r.jpg"
                             alt="Cover photo"
                             w="100%"
                             h="100%"

@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 // @ts-ignore
 import { Helmet } from 'react-helmet';
+import { signInWithPopup } from 'firebase/auth';
 import {
   Anchor,
   Button,
@@ -9,18 +10,23 @@ import {
   Stack,
   Text,
   TextInput,
-  Title
+  Title,
+  Image,
+  Divider
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
+import { useMutation } from '@apollo/client';
 import { useNavigate } from 'react-router';
 import { useSetRecoilState } from 'recoil';
 
+import { auth, provider } from '../../../firebase.config';
 import states from '../../states';
-import { useMutation } from '@apollo/client';
-import { LOGIN } from '../../graphql/mutations';
+import { LOGIN_WITH_GOOGLE, LOGIN } from '../../graphql/mutations';
 
 import AuthLayout from '../../layouts/auth';
+
+import google from '../../assets/Google.png';
 
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -40,6 +46,7 @@ const Login = () => {
   });
 
   const [login] = useMutation(LOGIN);
+  const [loginWithGoogle] = useMutation(LOGIN_WITH_GOOGLE);
 
   const navigate = useNavigate();
 
@@ -77,6 +84,45 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+
+      if (result) {
+        setSubmitting(true);
+
+        const idToken = await result.user.getIdToken();
+
+        const response = await loginWithGoogle({
+          variables: {
+            idToken
+          }
+        });
+        const key = Object.keys(response.data)[0];
+        const data = response.data[key];
+
+        if (data) {
+          setAuth((prev: any) => ({
+            ...prev,
+            isAuth: true
+          }));
+
+          navigate('/');
+        }
+      }
+    } catch (error) {
+      console.error('error', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Invalid email or password. Please try again.',
+        color: 'red',
+        position: 'top-center'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <Fragment>
       <Helmet>
@@ -89,6 +135,17 @@ const Login = () => {
         <Text c="dimmed" mb="xl">
           Login and continue sharing your ideas to the world
         </Text>
+        <Stack>
+          <Button
+            variant="default"
+            leftSection={<Image src={google} alt="google-icon" />}
+            loading={submitting}
+            onClick={handleGoogleLogin}
+          >
+            Login with Google
+          </Button>
+          <Divider label="or" labelPosition="center" my="sm" />
+        </Stack>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack>
             <TextInput

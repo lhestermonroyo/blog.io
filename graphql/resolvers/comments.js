@@ -18,7 +18,7 @@ module.exports = {
   Mutation: {
     async createComment(_, { postId, body }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -122,7 +122,7 @@ module.exports = {
     },
     async likeComment(_, { postId, commentId }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -265,7 +265,7 @@ module.exports = {
     },
     async updateComment(_, { postId, commentId, body }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -305,7 +305,7 @@ module.exports = {
     },
     async deleteComment(_, { postId, commentId }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -338,7 +338,7 @@ module.exports = {
     },
     async createReply(_, { postId, commentId, body }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -452,7 +452,7 @@ module.exports = {
     },
     async likeReply(_, { postId, commentId, replyId }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -604,7 +604,7 @@ module.exports = {
     },
     async updateReply(_, { postId, commentId, replyId, body }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -658,7 +658,7 @@ module.exports = {
     },
     async deleteReply(_, { postId, commentId, replyId }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');

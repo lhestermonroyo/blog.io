@@ -60,10 +60,23 @@ const Onboarding = () => {
       const { profileInfoForm, uploadForm, tagsForm } = onboarding;
       const email = profile?.email as string;
 
+      const requests = [];
+
+      if (uploadForm.avatar) {
+        requests.push(uploadProfile('avatar', uploadForm.avatar, email));
+      }
+
+      if (uploadForm.coverPhoto) {
+        requests.push(uploadProfile('cover', uploadForm.coverPhoto, email));
+      }
+
       const [avatarUrl, coverUrl] = await Promise.all([
         uploadProfile('avatar', uploadForm.avatar, email),
         uploadProfile('cover', uploadForm.coverPhoto, email)
       ]);
+
+      console.log('avatarUrl', avatarUrl);
+      console.log('coverUrl', coverUrl);
 
       const response = await updateProfile({
         variables: {
@@ -84,8 +97,8 @@ const Onboarding = () => {
               website: profileInfoForm.website
             },
             tags: [...tagsForm],
-            avatar: avatarUrl,
-            coverPhoto: coverUrl
+            avatar: avatarUrl || profile?.avatar,
+            coverPhoto: coverUrl || profile?.coverPhoto
           }
         }
       });
@@ -130,6 +143,7 @@ const Onboarding = () => {
         navigate(`/`);
       }
     } catch (error) {
+      console.log('error', error);
       notifications.show({
         title: 'Error',
         message: 'An error occurred while saving your onboarding data.',

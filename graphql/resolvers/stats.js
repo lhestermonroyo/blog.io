@@ -17,7 +17,7 @@ module.exports = {
   Mutation: {
     async followUser(_, { email }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');

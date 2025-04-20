@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
+
 const { UserInputError } = require('apollo-server');
 
 const User = require('../../models/User');
+const admin = require('../../utils/firebaseAdmin.util');
 const {
   validateSignUpInput,
   validateLoginInput,
@@ -10,7 +12,8 @@ const {
 const {
   checkAuth,
   genAndStoreToken,
-  clearToken
+  clearToken,
+  setGoogleToken
 } = require('../../utils/auth.util');
 
 module.exports = {
@@ -78,6 +81,59 @@ module.exports = {
         throw new Error(error);
       }
     },
+    async loginWithGoogle(_, { idToken }, ctx) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const { name, email, picture } = decodedToken;
+
+        const user = await User.findOne({ email });
+
+        const firstName = name.split(' ')[0];
+        const lastName = name.split(' ')[1];
+        let returnId;
+        let returnEmail;
+
+        if (!user) {
+          // create account
+          const newUser = new User({
+            firstName,
+            lastName,
+            email,
+            password: '',
+            pronouns: '',
+            title: '',
+            location: '',
+            birthdate: '',
+            bio: '',
+            avatar: picture,
+            coverPhoto: '',
+            tags: [],
+            socials: {
+              facebook: '',
+              twitter: '',
+              instagram: '',
+              linkedin: '',
+              github: ''
+            },
+            createdAt: new Date().toISOString()
+          });
+          const response = await newUser.save();
+          returnId = response._id;
+          returnEmail = response._doc.email;
+        } else {
+          returnId = user._id;
+          returnEmail = user._doc.email;
+        }
+
+        await setGoogleToken(idToken, returnId, ctx);
+        return {
+          id: returnId,
+          email: returnEmail
+        };
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
     async login(_, { email, password }, ctx) {
       try {
         const { valid, errors } = validateLoginInput(email, password);
@@ -123,7 +179,7 @@ module.exports = {
     },
     async changePassword(_, { oldPassword, newPassword }, ctx) {
       try {
-        const user = checkAuth(ctx);
+        const user = await checkAuth(ctx);
 
         if (!user) {
           throw new Error('User not authenticated.');
@@ -157,7 +213,7 @@ module.exports = {
     },
     async updateProfile(_, { profileInput }, ctx) {
       try {
-        const user = checkAuth(ctx);
+        const user = await checkAuth(ctx);
 
         if (!user) {
           throw new Error('User not authenticated.');
@@ -226,7 +282,7 @@ module.exports = {
   Query: {
     async getProfile(_, __, ctx) {
       try {
-        const user = checkAuth(ctx);
+        const user = await checkAuth(ctx);
 
         const response = await User.findOne({
           email: user.email

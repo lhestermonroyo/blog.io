@@ -60,6 +60,8 @@ const StepTwo: FC<StepTwoProps> = ({ onNextStep, onPrevStep }) => {
     }));
   };
 
+  console.log('onboarding', onboarding);
+
   return (
     <Fragment>
       <Stack gap="xl" mt="xl">

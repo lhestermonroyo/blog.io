@@ -389,7 +389,6 @@ const PostDetails = () => {
   }, [postDetails?.creator.email, profileEmail]);
 
   const content = postDetails && JSON.parse(postDetails?.content);
-  console.log('content', content);
 
   return (
     <Fragment>

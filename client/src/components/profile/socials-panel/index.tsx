@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   Group,
+  Image,
   Skeleton,
   Stack,
   Text,
@@ -23,6 +24,12 @@ import { useNavigate } from 'react-router';
 import { TProfile } from '../../../../types';
 
 import classes from './style.module.css';
+
+import facebook from '../../../assets/Facebook.png';
+import twitter from '../../../assets/Twitter.png';
+import instagram from '../../../assets/Instagram.png';
+import github from '../../../assets/Github.png';
+import linkedin from '../../../assets/Linkedin.png';
 
 const SocialsPanel = ({
   loading,
@@ -102,11 +109,11 @@ const SocialItem = ({ type, link }: { type: string; link: string }) => {
     color: '#fff'
   };
   const socialIcon = {
-    facebook: <IconBrandFacebookFilled {...iconProps} />,
-    twitter: <IconBrandTwitterFilled {...iconProps} />,
-    linkedin: <IconBrandLinkedinFilled {...iconProps} />,
-    instagram: <IconBrandInstagramFilled {...iconProps} />,
-    github: <IconBrandGithubFilled {...iconProps} />,
+    facebook: <Image src={facebook} alt="facebook" w={48} />,
+    twitter: <Image src={twitter} alt="twitter" w={48} />,
+    linkedin: <Image src={linkedin} alt="linkedin" w={48} />,
+    instagram: <Image src={instagram} alt="instagram" w={48} />,
+    github: <Image src={github} alt="github" w={48} />,
     website: <IconGlobeFilled {...iconProps} />
   } as Record<string, JSX.Element>;
 
@@ -118,16 +125,7 @@ const SocialItem = ({ type, link }: { type: string; link: string }) => {
     >
       <Group justify="space-between" align="center">
         <Group gap={6} align="center">
-          <Group
-            w={32}
-            h={32}
-            bg="green"
-            justify="center"
-            align="center"
-            style={{ borderRadius: 6 }}
-          >
-            {socialIcon[type]}
-          </Group>
+          {socialIcon[type]}
           <Text tt="capitalize">{type}</Text>
         </Group>
         <IconArrowUpRight size={24} />

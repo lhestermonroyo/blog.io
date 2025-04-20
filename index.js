@@ -16,7 +16,7 @@ const { useServer } = require('graphql-ws/lib/use/ws');
 const pubSub = require('./pubSub');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
-const { MONGODB_URI, CLIENT_URL, PORT } = require('./config');
+const { mongodbUri, clientUrl, port } = require('./config');
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -59,13 +59,13 @@ const apolloServer = new ApolloServer({
   const __dirname = path.resolve();
 
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(mongodbUri);
     await apolloServer.start();
     app
       .use(
         '/graphql',
         cors({
-          origin: CLIENT_URL,
+          origin: clientUrl,
           credentials: true
         }),
         cookieParser(),
@@ -86,7 +86,7 @@ const apolloServer = new ApolloServer({
   }
 })();
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/graphql`);
-  console.log(`Subscriptions ready at ws://localhost:${PORT}/subscriptions`);
+httpServer.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/graphql`);
+  console.log(`Subscriptions ready at ws://localhost:${port}/subscriptions`);
 });

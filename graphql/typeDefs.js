@@ -236,6 +236,7 @@ module.exports = gql`
     # Users
     signUp(signUpInput: SignUpInput): Session!
     login(email: String!, password: String!): Session!
+    loginWithGoogle(idToken: String!): Session!
     logout: Status!
     changePassword(oldPassword: String!, newPassword: String!): Status!
     updateProfile(profileInput: ProfileInput): Profile!

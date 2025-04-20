@@ -140,7 +140,7 @@ module.exports = {
     },
     async getPostsByFollowing(_, { limit, offset = 0 }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -230,7 +230,7 @@ module.exports = {
   Mutation: {
     async createPost(_, { postInput }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -304,7 +304,7 @@ module.exports = {
     },
     async updatePost(_, { postId, postInput }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -345,7 +345,7 @@ module.exports = {
     },
     async deletePost(_, { postId }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');
@@ -371,7 +371,7 @@ module.exports = {
     },
     async savePost(_, { postId }, context) {
       try {
-        const user = checkAuth(context);
+        const user = await checkAuth(context);
 
         if (!user) {
           throw new Error('User not authenticated');

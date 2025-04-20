@@ -8,7 +8,7 @@ const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 module.exports = {
   Query: {
     async getNotifications(_, __, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       if (!user) {
         throw new Error('User not authenticated');
@@ -27,7 +27,7 @@ module.exports = {
   },
   Mutation: {
     async markAsRead(_, { notificationId }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       if (!user) {
         throw new Error('User not authenticated');

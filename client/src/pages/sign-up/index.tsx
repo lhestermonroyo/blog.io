@@ -1,10 +1,13 @@
 import { FC, Fragment, useState } from 'react';
 // @ts-ignore
 import { Helmet } from 'react-helmet';
+import { signInWithPopup } from 'firebase/auth';
 import {
   Anchor,
   Button,
+  Divider,
   Group,
+  Image,
   PasswordInput,
   Stack,
   Text,
@@ -19,8 +22,10 @@ import { useSetRecoilState } from 'recoil';
 
 import states from '../../states';
 import { SIGN_UP } from '../../graphql/mutations';
+import { auth, provider } from '../../../firebase.config';
 
 import AuthLayout from '../../layouts/auth';
+import google from '../../assets/Google.png';
 
 const SignUp: FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -92,6 +97,57 @@ const SignUp: FC = () => {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const displayName = user.displayName?.split(' ') as string[];
+      let firstName = '';
+      let lastName = '';
+
+      if (displayName.length > 2) {
+        firstName = displayName.slice(0, 2).join(' ');
+        lastName = displayName[2];
+      } else {
+        firstName = displayName[0];
+        lastName = displayName.slice(1).join(' ');
+      }
+
+      const response = await signUp({
+      variables: {
+          signUpInput: {
+            email: user.email,
+            firstName,
+            lastName,
+            password: '',
+            confirmPassword: ''
+          }
+        }
+      });
+
+      const key = Object.keys(response.data)[0];
+      const data = response.data[key];
+
+      if (data) {
+        setAuth((prev: any) => ({
+          ...prev,
+          isAuth: true
+        }));
+
+        navigate('/onboarding');
+      }
+    } catch (error) {
+      console.error('error', error);
+      notifications.show({
+        title: 'Error',
+        message: 'An error occurred while creating the account.',
+        color: 'red',
+        position: 'top-center'
+      });
+    }
+  };
+
   return (
     <Fragment>
       <Helmet>
@@ -104,6 +160,16 @@ const SignUp: FC = () => {
         <Text c="dimmed" mb="xl">
           Fill-in your information and let's get started.
         </Text>
+        <Stack>
+          <Button
+            variant="default"
+            leftSection={<Image src={google} alt="google-icon" />}
+            onClick={handleGoogleSignUp}
+          >
+            Sign with Google
+          </Button>
+          <Divider label="or" labelPosition="center" my="sm" />
+        </Stack>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack>
             <TextInput

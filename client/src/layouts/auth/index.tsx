@@ -14,7 +14,7 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
 
   return (
     <div className={classes.wrapper}>
-      <Paper className={classes.form} radius={0} p="xl" pt={80}>
+      <Paper className={classes.form} radius={0} p="xl" pt={60}>
         <Group mb="lg">
           <Anchor onClick={() => navigate('/')}>
             <Logo />
