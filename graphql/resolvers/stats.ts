@@ -1,26 +1,40 @@
-const { UserInputError } = require('apollo-server');
-const pubSub = require('../../pubSub');
+import {
+  ApolloError,
+  AuthenticationError,
+  UserInputError
+} from 'apollo-server';
+import pubSub from '../../pubSub';
 
-const User = require('../../models/User');
-const Follow = require('../../models/Follow');
-const Post = require('../../models/Post');
-const Notification = require('../../models/Notification');
-const { checkAuth } = require('../../utils/auth.util');
-const {
+import User from '../../models/User';
+import Follow from '../../models/Follow';
+import Post from '../../models/Post';
+import Notification from '../../models/Notification';
+
+import { checkAuth } from '../../middleware/auth.middleware';
+import {
   profileBadgeProj,
   populateNotification
-} = require('../../utils/populate.util');
+} from '../../utils/populate.util';
+import { ContextType } from '../../types';
 
 const NEW_NOTIFICATION = 'NEW_NOTIFICATION';
 
-module.exports = {
+export default {
   Mutation: {
-    async followUser(_, { email }, context) {
+    async followUser(
+      _: {},
+      {
+        email
+      }: {
+        email: string;
+      },
+      ctx: ContextType
+    ) {
       try {
-        const user = await checkAuth(context);
+        const user = await checkAuth(ctx);
 
         if (!user) {
-          throw new Error('User not authenticated');
+          throw new AuthenticationError('User not authenticated');
         }
 
         if (user.email === email) {
@@ -38,14 +52,13 @@ module.exports = {
           following: email
         });
 
-        const requests = [
-          Notification.findOne({
+        let [notification, currUser] = await Promise.all([
+          await Notification.findOne({
             user: followingUser._id,
             type: 'follow'
           }).populate('latestUser', profileBadgeProj),
-          User.findById(user.id)
-        ];
-        let [notification, currUser] = await Promise.all(requests);
+          await User.findById(user.id)
+        ]);
 
         if (isAlreadyFollowing) {
           await Follow.deleteOne({ follower: user.email, following: email });
@@ -64,7 +77,7 @@ module.exports = {
             if (notification.latestUser.length === 0) {
               await notification.deleteOne();
             } else {
-              const msgUser = notification.latestUser[0];
+              const msgUser = notification.latestUser[0] as Record<string, any>;
 
               if (notification.latestUser.length === 1) {
                 notification.message = `${msgUser.firstName} ${msgUser.lastName} followed you.`;
@@ -76,7 +89,6 @@ module.exports = {
                 } others followed you.`;
               }
 
-              notification.createdAt = new Date().toISOString();
               await notification.save();
             }
           }
@@ -93,8 +105,7 @@ module.exports = {
               sender: user.id,
               type: 'follow',
               latestUser: [user.id],
-              message: `${currUser.firstName} ${currUser.lastName} followed you.`,
-              createdAt: new Date().toISOString()
+              message: `${currUser.firstName} ${currUser.lastName} followed you.`
             });
             await notification.save();
           } else {
@@ -116,7 +127,6 @@ module.exports = {
               }
 
               notification.isRead = false;
-              notification.createdAt = new Date().toISOString();
               await notification.save();
             }
           }
@@ -126,7 +136,6 @@ module.exports = {
           const exists = await Notification.exists({ _id: notification._id });
 
           if (exists) {
-            // remove last item at populateNotification
             await notification.populate(populateNotification);
             const unreadCount = await Notification.countDocuments({
               user: followingUser._id,
@@ -138,7 +147,7 @@ module.exports = {
                 unreadCount,
                 notification: {
                   id: notification._id,
-                  ...notification._doc
+                  ...notification.toObject()
                 }
               }
             });
@@ -170,13 +179,20 @@ module.exports = {
           }
         };
       } catch (error) {
-        console.log('error', error);
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     }
   },
   Query: {
-    async getStatsByEmail(_, { email }, __) {
+    async getStatsByEmail(
+      _: {},
+      {
+        email
+      }: {
+        email: string;
+      },
+      __: {}
+    ) {
       try {
         const statUser = await User.findOne({ email });
 

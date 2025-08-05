@@ -1,18 +1,21 @@
-const { AuthenticationError } = require('apollo-server');
-const jwt = require('jsonwebtoken');
+import { ContextType, SessionUser } from '../types';
 
-const admin = require('../utils/firebaseAdmin.util');
-const { secretKey } = require('../config');
+import { AuthenticationError } from 'apollo-server';
+import jwt from 'jsonwebtoken';
+
+import admin from '../utils/firebaseAdmin.util';
+import { secretKey } from '../config';
 
 const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
-module.exports.checkAuth = async (ctx) => {
+export const checkAuth = async (ctx: ContextType) => {
   const token = ctx.req.cookies.JWT_TOKEN;
   const googleIdToken = ctx.req.cookies.GOOGLE_ID_TOKEN;
 
   if (token) {
     try {
-      const user = jwt.verify(token, secretKey);
+      const user = jwt.verify(token, secretKey) as SessionUser;
+
       return {
         id: user.id,
         email: user.email
@@ -26,6 +29,7 @@ module.exports.checkAuth = async (ctx) => {
     try {
       const user = await admin.auth().verifySessionCookie(googleIdToken, true);
       const userId = ctx.req.cookies.USER_ID;
+
       return {
         id: userId,
         email: user.email
@@ -38,25 +42,29 @@ module.exports.checkAuth = async (ctx) => {
   throw new Error('Authorization header must be provided');
 };
 
-module.exports.checkEmail = (email) => {
+export const checkEmail = (email: string) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 };
 
-module.exports.setGoogleToken = async (idToken, userId, ctx) => {
+export const setGoogleToken = async (
+  idToken: string,
+  userId: string,
+  ctx: ContextType
+) => {
   const sessionCookie = await admin
     .auth()
     .createSessionCookie(idToken, { expiresIn });
 
-  await ctx.res.cookie('GOOGLE_ID_TOKEN', sessionCookie, {
+  ctx.res.cookie('GOOGLE_ID_TOKEN', sessionCookie, {
     httpOnly: true,
-    sameSite: 'Strict',
+    sameSite: 'strict',
     maxAge: expiresIn
   });
-  await ctx.res.cookie('USER_ID', userId);
+  ctx.res.cookie('USER_ID', userId);
 };
 
-module.exports.genAndStoreToken = async (user, ctx) => {
+export const genAndStoreToken = async (user: SessionUser, ctx: ContextType) => {
   const token = jwt.sign(
     {
       id: user.id,
@@ -66,28 +74,28 @@ module.exports.genAndStoreToken = async (user, ctx) => {
     { expiresIn }
   );
 
-  await ctx.res.cookie('JWT_TOKEN', token, {
+  ctx.res.cookie('JWT_TOKEN', token, {
     httpOnly: true,
-    sameSite: 'Strict',
+    sameSite: 'strict',
     maxAge: 3600000
   });
 };
 
-module.exports.clearToken = async (ctx) => {
+export const clearToken = async (ctx: ContextType) => {
   const token = ctx.req.cookies.JWT_TOKEN;
   const googleIdToken = ctx.req.cookies.GOOGLE_ID_TOKEN;
 
   if (token) {
-    await ctx.res.clearCookie('JWT_TOKEN', {
+    ctx.res.clearCookie('JWT_TOKEN', {
       httpOnly: true,
-      sameSite: 'Strict'
+      sameSite: 'strict'
     });
   }
 
   if (googleIdToken) {
-    await ctx.res.clearCookie('GOOGLE_ID_TOKEN', {
+    ctx.res.clearCookie('GOOGLE_ID_TOKEN', {
       httpOnly: true,
-      sameSite: 'Strict'
+      sameSite: 'strict'
     });
   }
 };

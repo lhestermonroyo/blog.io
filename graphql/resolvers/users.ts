@@ -1,48 +1,40 @@
-const bcrypt = require('bcryptjs');
-
-const { UserInputError } = require('apollo-server');
-
-const User = require('../../models/User');
-const admin = require('../../utils/firebaseAdmin.util');
-const {
-  validateSignUpInput,
-  validateLoginInput,
-  validateProfileInput
-} = require('../../utils/validators.util');
-const {
+import {
+  AuthenticationError,
+  ApolloError,
+  UserInputError
+} from 'apollo-server';
+import bcrypt from 'bcryptjs';
+import User from '../../models/User';
+import admin from '../../utils/firebaseAdmin.util';
+import {
+  loginInputSchema,
+  signUpInputSchema,
+  updateUserInputSchema
+} from '../../middleware/validator.middleware';
+import { ContextType, SignUpInput, UpdateUserInput } from '../../types';
+import {
   checkAuth,
-  genAndStoreToken,
   clearToken,
+  genAndStoreToken,
   setGoogleToken
-} = require('../../utils/auth.util');
+} from '../../middleware/auth.middleware';
 
-module.exports = {
+export default {
   Mutation: {
-    async signUp(_, { signUpInput }, ctx) {
+    async signUp(
+      _: {},
+      { signUpInput }: { signUpInput: SignUpInput },
+      ctx: ContextType
+    ) {
       try {
-        const { firstName, lastName, email, password, confirmPassword } =
-          signUpInput;
+        await signUpInputSchema.validate(signUpInput, { abortEarly: false });
 
-        const { valid, errors } = validateSignUpInput(
-          firstName,
-          lastName,
-          email,
-          password,
-          confirmPassword
-        );
-
-        if (!valid) {
-          throw new UserInputError('Validation Error', { errors });
-        }
+        const { firstName, lastName, email, password } = signUpInput;
 
         const user = await User.findOne({ email });
 
         if (user) {
-          throw new UserInputError('Email is already taken.', {
-            errors: {
-              email: 'Email is already taken.'
-            }
-          });
+          throw new UserInputError('Email is already taken.');
         }
 
         const cryptedPassword = await bcrypt.hash(password, 12);
@@ -66,22 +58,35 @@ module.exports = {
             instagram: '',
             linkedin: '',
             github: ''
-          },
-          createdAt: new Date().toISOString()
+          }
         });
 
         const response = await newUser.save();
-        await genAndStoreToken(response, ctx);
+        await genAndStoreToken(
+          {
+            id: response._id.toString(),
+            email: response.email
+          },
+          ctx
+        );
 
         return {
           id: response._id,
-          email: response._doc.email
+          email: response.email
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async signUpWithGoogle(_, { idToken }, ctx) {
+    async signUpWithGoogle(
+      _: {},
+      {
+        idToken
+      }: {
+        idToken: string;
+      },
+      ctx: ContextType
+    ) {
       try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         const { name, email, picture } = decodedToken;
@@ -89,11 +94,7 @@ module.exports = {
         const user = await User.findOne({ email });
 
         if (user) {
-          throw new UserInputError('Email is already taken.', {
-            errors: {
-              email: 'Email is already taken.'
-            }
-          });
+          throw new UserInputError('Email is already taken.');
         }
 
         const firstName = name.split(' ')[0];
@@ -123,48 +124,61 @@ module.exports = {
         });
         const response = await newUser.save();
 
-        await setGoogleToken(idToken, response._id, ctx);
+        await setGoogleToken(idToken, response._id.toString(), ctx);
         return {
           id: response._id,
-          email: response._doc.email
+          email: response.email
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async login(_, { email, password }, ctx) {
+    async login(
+      _: {},
+      {
+        email,
+        password
+      }: {
+        email: string;
+        password: string;
+      },
+      ctx: ContextType
+    ) {
       try {
-        const { valid, errors } = validateLoginInput(email, password);
-
-        if (!valid) {
-          throw new UserInputError('Validation Error', { errors });
-        }
+        await loginInputSchema.validate(
+          { email, password },
+          { abortEarly: false }
+        );
 
         const user = await User.findOne({ email });
 
         if (!user) {
-          errors.general = 'User not found.';
-          throw new UserInputError('User not found.', { errors });
+          throw new UserInputError('User not found.');
         }
 
         const match = await bcrypt.compare(password, user.password);
 
         if (!match) {
-          errors.general = 'Wrong credentials.';
-          throw new UserInputError('Wrong credentials.', { errors });
+          throw new UserInputError('Wrong credentials.');
         }
 
-        await genAndStoreToken(user, ctx);
+        await genAndStoreToken(
+          {
+            id: user._id.toString(),
+            email: user.email
+          },
+          ctx
+        );
 
         return {
           id: user._id,
-          email: user._doc.email
+          email: user.email
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async loginWithGoogle(_, { idToken }, ctx) {
+    async loginWithGoogle(_: {}, { idToken }, ctx: ContextType) {
       try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         const { name, email, picture } = decodedToken;
@@ -173,11 +187,10 @@ module.exports = {
 
         const firstName = name.split(' ')[0];
         const lastName = name.split(' ')[1];
-        let returnId;
-        let returnEmail;
+        let returnId = null;
+        let returnEmail = null;
 
         if (!user) {
-          // create account
           const newUser = new User({
             firstName,
             lastName,
@@ -197,15 +210,14 @@ module.exports = {
               instagram: '',
               linkedin: '',
               github: ''
-            },
-            createdAt: new Date().toISOString()
+            }
           });
           const response = await newUser.save();
           returnId = response._id;
-          returnEmail = response._doc.email;
+          returnEmail = response.email;
         } else {
           returnId = user._id;
-          returnEmail = user._doc.email;
+          returnEmail = user.email;
         }
 
         await setGoogleToken(idToken, returnId, ctx);
@@ -214,10 +226,10 @@ module.exports = {
           email: returnEmail
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async logout(_, __, ctx) {
+    async logout(_: {}, __: {}, ctx: ContextType) {
       try {
         await clearToken(ctx);
 
@@ -225,15 +237,25 @@ module.exports = {
           success: true
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async changePassword(_, { oldPassword, newPassword }, ctx) {
+    async changePassword(
+      _: {},
+      {
+        oldPassword,
+        newPassword
+      }: {
+        oldPassword: string;
+        newPassword: string;
+      },
+      ctx: ContextType
+    ) {
       try {
         const user = await checkAuth(ctx);
 
         if (!user) {
-          throw new Error('User not authenticated.');
+          throw new AuthenticationError('User not authenticated.');
         }
 
         const response = await User.findById(user.id);
@@ -241,11 +263,7 @@ module.exports = {
         const match = await bcrypt.compare(oldPassword, response.password);
 
         if (!match) {
-          throw new UserInputError('Current password is incorrect.', {
-            errors: {
-              general: 'Current password is incorrect.'
-            }
-          });
+          throw new UserInputError('Current password is incorrect.');
         }
 
         const cryptedPassword = await bcrypt.hash(newPassword, 12);
@@ -259,79 +277,47 @@ module.exports = {
           success: true
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async updateProfile(_, { profileInput }, ctx) {
+    async updateUser(
+      _: {},
+      {
+        updateUserInput
+      }: {
+        updateUserInput: UpdateUserInput;
+      },
+      ctx: ContextType
+    ) {
       try {
         const user = await checkAuth(ctx);
 
         if (!user) {
-          throw new Error('User not authenticated.');
+          throw new AuthenticationError('User not authenticated.');
         }
 
-        const {
-          firstName,
-          lastName,
-          pronouns,
-          title,
-          location,
-          birthdate,
-          bio,
-          avatar,
-          coverPhoto,
-          socials,
-          tags
-        } = profileInput;
-
-        const { valid, errors } = validateProfileInput(
-          firstName,
-          lastName,
-          pronouns,
-          title,
-          location,
-          birthdate,
-          bio,
-          avatar,
-          coverPhoto,
-          socials,
-          tags
-        );
-
-        if (!valid) {
-          throw new UserInputError('Validation Error', { errors });
-        }
+        await updateUserInputSchema.validate(updateUserInput, {
+          abortEarly: false
+        });
 
         const response = await User.findByIdAndUpdate(
           user.id,
-          {
-            firstName,
-            lastName,
-            pronouns,
-            title,
-            location,
-            birthdate,
-            bio,
-            socials,
-            tags,
-            avatar,
-            coverPhoto
-          },
+          { $set: updateUserInput },
           { new: true }
         );
         await response.save();
 
         return {
           id: response._id,
-          ...response._doc
+          ...response.toObject()
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     }
   },
   Query: {
-    async getProfile(_, __, ctx) {
+    async getUserProfile(_: {}, __: {}, ctx: ContextType) {
       try {
         const user = await checkAuth(ctx);
 
@@ -340,31 +326,31 @@ module.exports = {
         });
 
         if (!response) {
-          throw new Error('User not found.');
+          throw new UserInputError('User not found.');
         } else {
           return {
             id: response._id,
-            ...response._doc
+            ...response.toObject()
           };
         }
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
-    async getProfileByEmail(_, { email }, __) {
+    async getUserProfileByEmail(_: {}, { email }, __: {}) {
       try {
         const response = await User.findOne({ email });
 
         if (!response) {
-          throw new Error('User not found.');
+          throw new UserInputError('User not found.');
         } else {
           return {
             id: response._id,
-            ...response._doc
+            ...response.toObject()
           };
         }
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     }
   }

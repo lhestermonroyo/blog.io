@@ -1,4 +1,6 @@
-require('dotenv').config({
+import dotenv from 'dotenv';
+
+dotenv.config({
   path: '.env'
 });
 
@@ -16,10 +18,9 @@ const firebaseAdmin = {
   universe_domain: process.env.FB_UNIVERSE_DOMAIN
 };
 
-module.exports = {
-  mongodbUri: process.env.MONGODB_URI,
-  secretKey: process.env.SECRET_KEY,
-  port: process.env.PORT || 4000,
-  firebaseAdmin,
-  clientUrl: process.env.CLIENT_URL
-};
+const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/blog';
+const secretKey = process.env.SECRET_KEY;
+const port = process.env.PORT || 4000;
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+
+export { mongodbUri, secretKey, port, firebaseAdmin, clientUrl };

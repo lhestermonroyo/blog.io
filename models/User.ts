@@ -1,4 +1,4 @@
-const { model, Schema } = require('mongoose');
+import { model, Schema } from 'mongoose';
 
 const userSchema = new Schema({
   email: {
@@ -24,7 +24,10 @@ const userSchema = new Schema({
     github: String
   },
   tags: [String],
-  createdAt: String
+  createdAt: {
+    type: String,
+    default: new Date().toISOString()
+  }
 });
 
-module.exports = model('User', userSchema);
+export default model('User', userSchema);

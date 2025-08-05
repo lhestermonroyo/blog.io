@@ -101,7 +101,7 @@ const populateNotification = [
   }
 ];
 
-module.exports = {
+export {
   profileBadgeProj,
   postBadgeProj,
   populatePost,

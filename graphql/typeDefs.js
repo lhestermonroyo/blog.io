@@ -1,6 +1,6 @@
 const { gql } = require('graphql-tag');
 
-module.exports = gql`
+export default gql`
   enum NotificationType {
     new_post
     new_comment
@@ -16,7 +16,7 @@ module.exports = gql`
     id: ID!
     email: String!
   }
-  type Profile {
+  type User {
     id: ID!
     email: String!
     firstName: String!
@@ -33,13 +33,6 @@ module.exports = gql`
     tags: [String]!
     createdAt: String!
   }
-  type ProfileBadge {
-    id: ID!
-    email: String!
-    firstName: String!
-    lastName: String!
-    avatar: String
-  }
   type Socials {
     facebook: String
     twitter: String
@@ -47,6 +40,13 @@ module.exports = gql`
     linkedin: String
     github: String
     website: String
+  }
+  type UserBadge {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String!
+    avatar: String
   }
 
   # Posts
@@ -60,7 +60,7 @@ module.exports = gql`
     tags: [String]!
     title: String!
     content: String!
-    creator: ProfileBadge!
+    creator: UserBadge!
     likeCount: Int!
     commentCount: Int!
     saveCount: Int!
@@ -71,7 +71,7 @@ module.exports = gql`
     tags: [String]!
     title: String!
     content: String!
-    creator: ProfileBadge!
+    creator: UserBadge!
     likes: [Like]!
     comments: [Comment]!
     saves: [Save]!
@@ -83,7 +83,7 @@ module.exports = gql`
   type Comment {
     id: ID!
     body: String!
-    commentor: ProfileBadge!
+    commentor: UserBadge!
     replies: [Reply]!
     likes: [Like]!
     isEdited: Boolean
@@ -92,19 +92,19 @@ module.exports = gql`
   type Reply {
     id: ID!
     body: String!
-    replier: ProfileBadge!
+    replier: UserBadge!
     likes: [Like]!
     isEdited: Boolean
     createdAt: String!
   }
   type Like {
     id: ID!
-    liker: ProfileBadge!
+    liker: UserBadge!
     createdAt: String!
   }
   type Save {
     id: ID!
-    user: ProfileBadge!
+    user: UserBadge!
     createdAt: String!
   }
   type LikeResponse {
@@ -123,28 +123,28 @@ module.exports = gql`
   # Stats
   type Stats {
     email: String!
-    followers: StatProfileBadge!
-    following: StatProfileBadge!
+    followers: StatUserBadge!
+    following: StatUserBadge!
     posts: StatPostItem!
     savedPosts: StatPostItem!
   }
   type FollowResponse {
-    followers: StatProfileBadge!
-    following: StatProfileBadge!
+    followers: StatUserBadge!
+    following: StatUserBadge!
   }
   type StatPostItem {
     count: Int!
     list: [PostItem]!
   }
-  type StatProfileBadge {
+  type StatUserBadge {
     count: Int!
-    list: [ProfileBadge]!
+    list: [UserBadge]!
   }
 
   # Search
   type SearchResults {
     totalCount: Int!
-    users: [ProfileBadge]!
+    users: [UserBadge]!
     tags: [String]!
     posts: [PostItem]!
   }
@@ -157,9 +157,9 @@ module.exports = gql`
   type NotificationDetails {
     id: ID!
     type: NotificationType!
-    user: ProfileBadge!
-    sender: ProfileBadge!
-    latestUser: [ProfileBadge]!
+    user: UserBadge!
+    sender: UserBadge!
+    latestUser: [UserBadge]!
     post: PostBadge
     comment: String
     isRead: Boolean!
@@ -188,9 +188,9 @@ module.exports = gql`
     password: String!
     confirmPassword: String!
   }
-  input ProfileInput {
-    firstName: String!
-    lastName: String!
+  input UpdateUserInput {
+    firstName: String
+    lastName: String
     pronouns: String
     title: String
     location: String
@@ -198,8 +198,8 @@ module.exports = gql`
     bio: String
     avatar: String
     coverPhoto: String
-    socials: SocialsInput!
-    tags: [String]!
+    socials: SocialsInput
+    tags: [String]
   }
   input SocialsInput {
     facebook: String
@@ -217,8 +217,8 @@ module.exports = gql`
 
   type Query {
     # Users
-    getProfile: Profile!
-    getProfileByEmail(email: String!): Profile!
+    getUserProfile: User!
+    getUserProfileByEmail(email: String!): User!
     # Posts
     getPosts(limit: Int, offset: Int): Posts!
     getPostsByTags(tags: [String]!, limit: Int, offset: Int): Posts!
@@ -240,7 +240,7 @@ module.exports = gql`
     loginWithGoogle(idToken: String!): Session!
     logout: Status!
     changePassword(oldPassword: String!, newPassword: String!): Status!
-    updateProfile(profileInput: ProfileInput): Profile!
+    updateUser(updateUserInput: UpdateUserInput): User!
     # Posts
     createPost(postInput: PostInput): PostDetails!
     updatePost(postId: ID!, postInput: PostInput): PostDetails!

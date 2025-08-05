@@ -1,10 +1,9 @@
-const User = require('../../models/User');
-const Post = require('../../models/Post');
-const { checkAuth } = require('../../utils/auth.util');
+import User from '../../models/User';
+import Post from '../../models/Post';
 
 const profileBadgeProj = '_id email firstName lastName avatar';
 
-module.exports = {
+export default {
   Mutation: {
     getSearchResults: async (_, { query }, context) => {
       const users = await User.find(

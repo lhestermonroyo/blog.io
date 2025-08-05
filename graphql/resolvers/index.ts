@@ -1,12 +1,12 @@
-const userResolver = require('./users');
-const postResolver = require('./posts');
-const likeResolver = require('./likes');
-const commentResolver = require('./comments');
-const statResolver = require('./stats');
-const searchResolver = require('./search');
-const notification = require('./notification');
+import userResolver from './users';
+import postResolver from './posts';
+import likeResolver from './likes';
+import commentResolver from './comments';
+import statResolver from './stats';
+import searchResolver from './search';
+import notification from './notification';
 
-module.exports = {
+export default {
   Posts: {
     currentCount: (parent) => parent.posts.length
   },

@@ -1,4 +1,4 @@
-const { model, Schema } = require('mongoose');
+import { model, Schema } from 'mongoose';
 
 const followSchema = new Schema({
   follower: {
@@ -11,4 +11,4 @@ const followSchema = new Schema({
   } // The user who is being followed
 });
 
-module.exports = model('Follow', followSchema);
+export default model('Follow', followSchema);

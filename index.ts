@@ -1,22 +1,23 @@
-const path = require('path');
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const { ApolloServer } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4');
-const { createServer } = require('http');
-const { makeExecutableSchema } = require('@graphql-tools/schema');
-const {
-  ApolloServerPluginDrainHttpServer
-} = require('@apollo/server/plugin/drainHttpServer');
-const { WebSocketServer } = require('ws');
-const { useServer } = require('graphql-ws/lib/use/ws');
+import path from 'path';
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
+import { ApolloServer } from '@apollo/server';
+import {
+  expressMiddleware,
+  ExpressContextFunctionArgument
+} from '@apollo/server/express4';
+import { createServer } from 'http';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
 
-const pubSub = require('./pubSub');
-const typeDefs = require('./graphql/typeDefs');
-const resolvers = require('./graphql/resolvers');
-const { mongodbUri, clientUrl, port } = require('./config');
+import pubSub from './pubSub';
+import typeDefs from './graphql/typeDefs';
+import resolvers from './graphql/resolvers';
+import { mongodbUri, clientUrl, port } from './config';
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -71,7 +72,7 @@ const apolloServer = new ApolloServer({
         cookieParser(),
         express.json(),
         expressMiddleware(apolloServer, {
-          context: async (ctx) => ({
+          context: async (ctx: ExpressContextFunctionArgument) => ({
             pubSub,
             ...ctx
           })
